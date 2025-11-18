@@ -1,0 +1,58 @@
+# --- Dependencies ---
+node_modules/
+.pnp
+.pnp.js
+
+# --- Environment & Security ---
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.test
+
+# --- IDEs & Editors ---
+
+# IntelliJ IDEA (WebStorm, PHPStorm, ecc.)
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# Visual Studio Code
+.vscode/
+# Se volete condividere le estensioni consigliate o i settings di formattazione,
+# potete commentare la riga sopra e ignorare solo file specifici come:
+# .vscode/settings.json
+# .vscode/tasks.json
+# .vscode/launch.json
+# Ma lasciare .vscode/extensions.json
+*.code-workspace
+
+# Mac OS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux
+*~
+
+# --- Logs ---
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+logs
+*.log
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# --- Miscellanea ---
+.eslintcache
