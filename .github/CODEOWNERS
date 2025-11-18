@@ -1,0 +1,7 @@
+# CODEOWNERS file
+# This file specifies code owners of the repository
+# For more information about CODEOWNERS, see:
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Assign all files to gianfrancobarba as the code owner
+* @gianfrancobarba
