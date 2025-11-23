@@ -11,9 +11,8 @@ import {
     jsonb,
     pgEnum,
     primaryKey,
-    check,
+    date,
 } from 'drizzle-orm/pg-core';
-import { sql } from 'drizzle-orm';
 
 // Enums
 export const nomePrioritaEnum = pgEnum('nome_priorita', [
@@ -81,13 +80,13 @@ export const paziente = pgTable('paziente', {
     idPaziente: uuid('id_paziente').defaultRandom().primaryKey(),
     nome: varchar('nome', { length: 64 }).notNull(),
     cognome: varchar('cognome', { length: 64 }).notNull(),
-    dataNascita: timestamp('data_nascita', { mode: 'string' }).notNull(), // using timestamp for date as drizzle date is string
+    dataNascita: date('data_nascita', { mode: 'string' }).notNull(),
     terms: boolean('terms').default(false).notNull(),
     email: varchar('email', { length: 64 }).notNull(),
     codFiscale: char('cod_fiscale', { length: 16 }).notNull().unique(),
     residenza: varchar('residenza', { length: 64 }).notNull(),
     sesso: tipoSessoEnum('sesso').notNull(),
-    dataIngresso: timestamp('data_ingresso', { mode: 'string' }).notNull(),
+    dataIngresso: date('data_ingresso', { mode: 'string' }).notNull(),
     score: doublePrecision('score'),
 
     idPriorita: nomePrioritaEnum('id_priorita')
@@ -198,10 +197,6 @@ export const ticket = pgTable(
             () => psicologo.codFiscale,
         ),
     },
-    (t) => ({
-        // Check constraint logic is complex in Drizzle schema, often omitted or done via raw SQL migration
-        // check: check('chk_solo_un_utente', sql`num_nonnulls(${t.idPaziente}, ${t.idPsicologo}) = 1`),
-    }),
 );
 
 export const alertClinico = pgTable('alert_clinico', {
@@ -248,7 +243,7 @@ export const questionario = pgTable('questionario', {
     score: doublePrecision('score'),
     risposte: jsonb('risposte'),
     cambiamento: boolean('cambiamento').default(false),
-    dataCompilazione: timestamp('data_compilazione').defaultNow(),
+    dataCompilazione: timestamp('data_compilazione').defaultNow().notNull(),
     revisionato: boolean('revisionato').default(false),
 
     invalidato: boolean('invalidato').default(false),
