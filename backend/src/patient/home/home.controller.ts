@@ -11,7 +11,6 @@ export class HomeController {
     @Get()
     @UseGuards(JwtAuthGuard)
     async getDashboard(@Req() req: Request): Promise<HomeDashboardDto> {
-        console.log('req', req.user);
         // In a real app, req.user would be populated by the guard.
         // For now, we'll cast it or use a default if missing for testing.
         const userId = (req as any).user?.id;

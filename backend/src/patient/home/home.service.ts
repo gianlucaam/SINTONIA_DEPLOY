@@ -1,81 +1,141 @@
 import { Injectable } from '@nestjs/common';
 import { HomeDashboardDto } from '../dto/home-dashboard.dto.js';
 import { db } from '../../drizzle/db.js';
-import { paziente, statoAnimo, ricezioneNotificaPaziente, domandaForum } from '../../drizzle/schema.js';
-import { eq, desc, count } from 'drizzle-orm';
+import { paziente, statoAnimo, domandaForum, questionario, tipologiaQuestionario, rispostaForum } from '../../drizzle/schema.js';
+import { eq, desc,} from 'drizzle-orm';
+
 
 @Injectable()
 export class HomeService {
     async getDashboard(userId: string): Promise<HomeDashboardDto> {
-        // 1. Fetch Patient Details
-        const patientData = await db
-            .select({
-                firstName: paziente.nome,
-            })
+        const [firstName, mood, notificationsCount, suggestedPosts, calendarDays, consecutiveDays] = await Promise.all([
+            this.getFirstName(userId),
+            this.getLastMood(userId),
+            this.getPendingQuestionnairesCount(userId),
+            this.getSuggestedPosts(),
+            this.getCalendarDays(userId),
+            this.getConsecutiveMoodDays(userId),
+        ]);
+
+        const streakLevel = Math.floor(consecutiveDays / 7);
+        const streakProgress = Math.round(((consecutiveDays % 7) / 7) * 100);
+
+        return {
+            firstName,
+            mood,
+            notificationsCount,
+            streakLevel,
+            streakProgress,
+            calendarDays,
+            suggestedPosts,
+        };
+    }
+    
+    // Formatter per ottenere YYYY-MM-DD in timezone locale
+    private formatLocalDate(date: Date): string {
+        const y = date.getFullYear();
+        const m = String(date.getMonth() + 1).padStart(2, '0');
+        const d = String(date.getDate()).padStart(2, '0');
+        return `${y}-${m}-${d}`;
+    }
+    //Ottieni il nome dell'utente
+    private async getFirstName(userId: string): Promise<string> {
+        const rows = await db
+            .select({ firstName: paziente.nome })
             .from(paziente)
             .where(eq(paziente.idPaziente, userId))
             .limit(1);
-
-        const firstName = patientData.length > 0 ? patientData[0].firstName : 'Utente';
-
-        // 2. Fetch Latest Mood
-        const lastMood = await db
-            .select({
-                umore: statoAnimo.umore,
-            })
+        return rows[0]?.firstName ?? 'Utente';
+    }
+    //Ottieni l'ultimo stato d'umore dell'utente
+    private async getLastMood(userId: string): Promise<string> {
+        const rows = await db
+            .select({ umore: statoAnimo.umore })
             .from(statoAnimo)
             .where(eq(statoAnimo.idPaziente, userId))
             .orderBy(desc(statoAnimo.dataInserimento))
             .limit(1);
+        return rows[0]?.umore ?? 'Neutro';
+    }
+    //Ottieni numero questionari non compilati
+    private async getPendingQuestionnairesCount(userId: string): Promise<number> {
+        const patientRow = await db
+            .select({ dataIngresso: paziente.dataIngresso })
+            .from(paziente)
+            .where(eq(paziente.idPaziente, userId))
+            .limit(1);
 
-        const mood = lastMood.length > 0 ? lastMood[0].umore : 'Neutro';
+        const dataIngressoStr = patientRow[0]?.dataIngresso;
+        if (!dataIngressoStr) return 0;
 
-        // 3. Fetch Notifications Count (Mocking logic as "unread" isn't explicitly in schema, counting all for now)
-        const notificationsResult = await db
-            .select({ count: count() })
-            .from(ricezioneNotificaPaziente)
-            .where(eq(ricezioneNotificaPaziente.idPaziente, userId));
+        const dataIngressoDate = new Date(dataIngressoStr);
+        const today = new Date();
+        const msPerDay = 1000 * 60 * 60 * 24;
+        const daysSinceIngresso = Math.floor((today.getTime() - dataIngressoDate.getTime()) / msPerDay);
 
-        const notificationsCount = Number(notificationsResult[0]?.count || 0);
+        const allTypes = await db
+            .select({ nome: tipologiaQuestionario.nome, tempo: tipologiaQuestionario.tempoSomministrazione })
+            .from(tipologiaQuestionario);
 
-        // 4. Suggested Posts (Fetching recent posts from forum)
-        const suggestedPostsData = await db
+        const dueTypeNames = allTypes.filter(t => t.tempo <= daysSinceIngresso).map(t => t.nome);
+
+        const compiled = await db
+            .select({ nome: questionario.nomeTipologia })
+            .from(questionario)
+            .where(eq(questionario.idPaziente, userId));
+
+        const compiledSet = new Set(compiled.map(c => c.nome));
+        return dueTypeNames.filter(n => !compiledSet.has(n)).length;
+    }
+    //Ottieni i post suggeriti
+    private async getSuggestedPosts() {
+        // Ultime 3 domande che hanno almeno una risposta
+        const rows = await db
             .select({
                 id: domandaForum.idDomanda,
                 category: domandaForum.categoria,
                 title: domandaForum.titolo,
                 contentSnippet: domandaForum.testo,
+                createdAt: domandaForum.dataInserimento,
             })
             .from(domandaForum)
+            .innerJoin(rispostaForum, eq(rispostaForum.idDomanda, domandaForum.idDomanda))
+            .groupBy(
+                domandaForum.idDomanda,
+                domandaForum.categoria,
+                domandaForum.titolo,
+                domandaForum.testo,
+                domandaForum.dataInserimento,
+            )
             .orderBy(desc(domandaForum.dataInserimento))
-            .limit(2);
+            .limit(3);
 
-        const suggestedPosts = suggestedPostsData.map(post => ({
+        return rows.map(({ createdAt, ...post }) => ({
             ...post,
             contentSnippet: post.contentSnippet.substring(0, 50) + (post.contentSnippet.length > 50 ? '...' : ''),
         }));
+    }
 
-        // 5. Calendar Days (Generating last 7 days and checking for events)
-        const calendarDays: { day: string; date: number; fullDate: string; hasEvent: boolean; isToday: boolean; }[] = [];
+    private async getCalendarDays(userId: string) {
+        const calendarDays: { day: string; date: number; fullDate: string; hasEvent: boolean; isToday: boolean }[] = [];
         const today = new Date();
 
-        // Fetch recent mood entries to mark "hasEvent"
+        // Prendiamo un margine sufficiente (es. 30) per coprire gli ultimi 7 giorni
         const recentMoods = await db
             .select({ date: statoAnimo.dataInserimento })
             .from(statoAnimo)
             .where(eq(statoAnimo.idPaziente, userId))
-            .orderBy(desc(statoAnimo.dataInserimento))
-            .limit(10); // Fetch enough to cover the week
+            .orderBy(desc(statoAnimo.dataInserimento));
 
-        const moodDates = new Set(recentMoods.map(m => m.date.toISOString().split('T')[0]));
+        const moodDates = new Set(recentMoods.map(m => this.formatLocalDate(new Date(m.date))));
 
-        for (let i = 0; i < 7; i++) {
+        // Ultimi 7 giorni: da today-6 a today
+        for (let offset = 6; offset >= 0; offset--) {
             const date = new Date(today);
-            date.setDate(today.getDate() + i); // Next 7 days? Or past? UI usually shows current week or surrounding. Let's do current week starting today or centered.
-            // Let's match the mock: "Lun 12", "Mar 13". 
-            // We'll generate for the current week.
+            date.setHours(0, 0, 0, 0);
+            date.setDate(today.getDate() - offset);
 
-            const dateString = date.toISOString().split('T')[0];
+            const dateString = this.formatLocalDate(date);
             const dayName = date.toLocaleDateString('it-IT', { weekday: 'short' });
             const dayNumber = date.getDate();
 
@@ -84,19 +144,41 @@ export class HomeService {
                 date: dayNumber,
                 fullDate: dateString,
                 hasEvent: moodDates.has(dateString),
-                isToday: i === 0,
+                isToday: offset === 0,
             });
         }
 
-        return {
-            firstName,
-            mood,
-            notificationsCount,
-            streakLevel: 3, // Placeholder
-            streakProgress: 75, // Placeholder
-            dailyNote: '', // Placeholder
-            calendarDays,
-            suggestedPosts,
-        };
+        return calendarDays;
+    }
+
+    // Calcola i giorni consecutivi di compilazione stato d'animo fino a oggi (incluso)
+    private async getConsecutiveMoodDays(userId: string): Promise<number> {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        // Recupera un numero ragionevole di record per valutare la streak
+        const moods = await db
+            .select({ date: statoAnimo.dataInserimento })
+            .from(statoAnimo)
+            .where(eq(statoAnimo.idPaziente, userId))
+            .orderBy(desc(statoAnimo.dataInserimento))
+            .limit(90);
+
+        const moodSet = new Set(moods.map(m => this.formatLocalDate(new Date(m.date))));
+
+        let consecutive = 0;
+        // Partiamo da oggi e torniamo indietro fino a quando troviamo un giorno senza evento
+        for (let i = 0; i < 365; i++) { // safety cap
+            const d = new Date(today);
+            d.setDate(today.getDate() - i);
+            const key = this.formatLocalDate(d);
+            if (moodSet.has(key)) {
+                consecutive += 1;
+            } else {
+                break;
+            }
+        }
+
+        return consecutive;
     }
 }

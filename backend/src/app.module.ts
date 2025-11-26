@@ -10,4 +10,3 @@ import { PatientModule } from './patient/patient.module.js';
   providers: [],
 })
 export class AppModule { }
-// Force restart

@@ -1,17 +1,15 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
 :root {
-  --primary-dark: #0f3e4d; /* Dark Teal from header */
-  --primary-light: #88b7b5; /* Light Teal from streak/icons */
-  --secondary-bg: #f0f4f5; /* Light background */
+  --primary-dark: #0f3e4d;
+  /* Dark Teal from header */
+  --primary-light: #88b7b5;
+  /* Light Teal from streak/icons */
+  --secondary-bg: #f0f4f5;
+  /* Light background */
   --white: #ffffff;
   --text-dark: #1a1a1a;
   --text-gray: #666666;
-  --accent-orange: #e89b78; /* Dots in calendar */
+  --accent-orange: #e89b78;
+  /* Dots in calendar */
   --accent-brown: #a88b7d;
   --accent-yellow: #e8c578;
 
@@ -26,10 +24,25 @@
 
 body {
   font-family: var(--font-family);
-  background-color: var(--secondary-bg);
+  background-color: #ffffff;
+  /* White bands */
   color: var(--text-dark);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+#root {
+  width: 100%;
+  max-width: 430px;
+  /* Mobile width */
+  background-color: var(--secondary-bg);
+  min-height: 100vh;
+  position: relative;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  /* Optional shadow for depth */
 }
 
 /* Utility classes */
@@ -38,40 +51,20 @@ body {
 }
 
 .card {
-    background-color: var(--white);
-    border-radius: 20px;
-    padding: 20px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-}
-
-body {
-  margin: 0;
-  padding: 0;
-  min-width: 320px;
-  min-height: 100vh;
-  overflow-x: hidden;
-}
-
-#root {
-  width: 100%;
-  min-height: 100vh;
+  background-color: var(--white);
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 /* Hide scrollbar for horizontal scrolling */
 .no-scrollbar::-webkit-scrollbar {
-    display: none;
-}
-
-a {
-    color: #646cff;
-    text-decoration: inherit;
+  display: none;
 }
 
 .no-scrollbar {
-    -ms-overflow-style: none; /* IE and Edge */
-    scrollbar-width: none; /* Firefox */
-}
-
-a:hover {
-    color: #535bf2;
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
 }

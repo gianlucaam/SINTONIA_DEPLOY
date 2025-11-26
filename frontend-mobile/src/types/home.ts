@@ -4,6 +4,7 @@ export interface CalendarDay {
     fullDate: string;
     hasEvent: boolean;
     isToday: boolean;
+    mood?: string;
 }
 
 export interface SuggestedPost {
