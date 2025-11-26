@@ -125,8 +125,7 @@ export class HomeService {
             .select({ date: statoAnimo.dataInserimento })
             .from(statoAnimo)
             .where(eq(statoAnimo.idPaziente, userId))
-            .orderBy(desc(statoAnimo.dataInserimento))
-            .limit(30);
+            .orderBy(desc(statoAnimo.dataInserimento));
 
         const moodDates = new Set(recentMoods.map(m => this.formatLocalDate(new Date(m.date))));
 
