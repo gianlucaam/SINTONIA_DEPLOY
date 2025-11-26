@@ -4,7 +4,6 @@ export class HomeDashboardDto {
     notificationsCount: number;
     streakLevel: number;
     streakProgress: number; // Percentage 0-100
-    dailyNote?: string; // Content of the note if it exists
     calendarDays: {
         day: string; // "Lun", "Mar"
         date: number; // 12, 13

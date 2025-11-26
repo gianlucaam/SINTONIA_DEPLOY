@@ -8,24 +8,35 @@ import { eq, desc,} from 'drizzle-orm';
 @Injectable()
 export class HomeService {
     async getDashboard(userId: string): Promise<HomeDashboardDto> {
-        const [firstName, mood, notificationsCount, suggestedPosts, calendarDays] = await Promise.all([
+        const [firstName, mood, notificationsCount, suggestedPosts, calendarDays, consecutiveDays] = await Promise.all([
             this.getFirstName(userId),
             this.getLastMood(userId),
             this.getPendingQuestionnairesCount(userId),
             this.getSuggestedPosts(),
             this.getCalendarDays(userId),
+            this.getConsecutiveMoodDays(userId),
         ]);
+
+        const streakLevel = Math.floor(consecutiveDays / 7);
+        const streakProgress = Math.round(((consecutiveDays % 7) / 7) * 100);
 
         return {
             firstName,
             mood,
             notificationsCount,
-            streakLevel: 3, // TODO: calcolare da eventi consecutivi
-            streakProgress: 75, // TODO: progress dello streak
-            dailyNote: '', // TODO: ultima nota del giorno da pagina_diario
+            streakLevel,
+            streakProgress,
             calendarDays,
             suggestedPosts,
         };
+    }
+    
+    // Formatter per ottenere YYYY-MM-DD in timezone locale
+    private formatLocalDate(date: Date): string {
+        const y = date.getFullYear();
+        const m = String(date.getMonth() + 1).padStart(2, '0');
+        const d = String(date.getDate()).padStart(2, '0');
+        return `${y}-${m}-${d}`;
     }
     //Ottieni il nome dell'utente
     private async getFirstName(userId: string): Promise<string> {
@@ -109,19 +120,23 @@ export class HomeService {
         const calendarDays: { day: string; date: number; fullDate: string; hasEvent: boolean; isToday: boolean }[] = [];
         const today = new Date();
 
+        // Prendiamo un margine sufficiente (es. 30) per coprire gli ultimi 7 giorni
         const recentMoods = await db
             .select({ date: statoAnimo.dataInserimento })
             .from(statoAnimo)
             .where(eq(statoAnimo.idPaziente, userId))
             .orderBy(desc(statoAnimo.dataInserimento))
-            .limit(10);
+            .limit(30);
 
-        const moodDates = new Set(recentMoods.map(m => m.date.toISOString().split('T')[0]));
+        const moodDates = new Set(recentMoods.map(m => this.formatLocalDate(new Date(m.date))));
 
-        for (let i = 0; i < 7; i++) {
+        // Ultimi 7 giorni: da today-6 a today
+        for (let offset = 6; offset >= 0; offset--) {
             const date = new Date(today);
-            date.setDate(today.getDate() + i);
-            const dateString = date.toISOString().split('T')[0];
+            date.setHours(0, 0, 0, 0);
+            date.setDate(today.getDate() - offset);
+
+            const dateString = this.formatLocalDate(date);
             const dayName = date.toLocaleDateString('it-IT', { weekday: 'short' });
             const dayNumber = date.getDate();
 
@@ -130,10 +145,41 @@ export class HomeService {
                 date: dayNumber,
                 fullDate: dateString,
                 hasEvent: moodDates.has(dateString),
-                isToday: i === 0,
+                isToday: offset === 0,
             });
         }
 
         return calendarDays;
+    }
+
+    // Calcola i giorni consecutivi di compilazione stato d'animo fino a oggi (incluso)
+    private async getConsecutiveMoodDays(userId: string): Promise<number> {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        // Recupera un numero ragionevole di record per valutare la streak
+        const moods = await db
+            .select({ date: statoAnimo.dataInserimento })
+            .from(statoAnimo)
+            .where(eq(statoAnimo.idPaziente, userId))
+            .orderBy(desc(statoAnimo.dataInserimento))
+            .limit(90);
+
+        const moodSet = new Set(moods.map(m => this.formatLocalDate(new Date(m.date))));
+
+        let consecutive = 0;
+        // Partiamo da oggi e torniamo indietro fino a quando troviamo un giorno senza evento
+        for (let i = 0; i < 365; i++) { // safety cap
+            const d = new Date(today);
+            d.setDate(today.getDate() - i);
+            const key = this.formatLocalDate(d);
+            if (moodSet.has(key)) {
+                consecutive += 1;
+            } else {
+                break;
+            }
+        }
+
+        return consecutive;
     }
 }
