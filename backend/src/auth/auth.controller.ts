@@ -27,4 +27,9 @@ export class AuthController {
   }
 
 
+
+  @Get('reset-admin')
+  async resetAdminPassword() {
+    return this.authService.resetAdminPassword();
+  }
 }

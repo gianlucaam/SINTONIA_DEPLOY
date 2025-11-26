@@ -24,8 +24,33 @@ const SPIDCallback = () => {
     }, [searchParams, navigate]);
 
     return (
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-            <p>Autenticazione in corso...</p>
+        <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '100vh',
+            background: 'linear-gradient(135deg, #0066CC 0%, #004C99 100%)',
+            color: 'white'
+        }}>
+            <div style={{
+                width: '60px',
+                height: '60px',
+                border: '4px solid rgba(255, 255, 255, 0.3)',
+                borderTop: '4px solid white',
+                borderRadius: '50%',
+                animation: 'spin 1s linear infinite',
+                marginBottom: '20px'
+            }}></div>
+            <p style={{ fontSize: '18px', fontWeight: '500' }}>Autenticazione in corso...</p>
+            <p style={{ fontSize: '14px', opacity: 0.8, marginTop: '8px' }}>Attendere prego</p>
+
+            <style>{`
+                @keyframes spin {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
+                }
+            `}</style>
         </div>
     );
 };

@@ -17,17 +17,25 @@ export class AuthService {
   async validateUser(email: string, pass: string, role: 'admin' | 'psychologist'): Promise<any> {
     let user: any;
     try {
+      console.log(`Attempting login for ${email} with role ${role}`);
       if (role === 'admin') {
         const users = await this.db.select().from(schema.amministratore).where(eq(schema.amministratore.email, email));
         user = users[0];
       }
 
       if (user) {
-        const isMatch = await bcrypt.compare(pass, user.pw || user.password);
+        console.log('User found:', user.email);
+        const storedHash = user.pw || user.password;
+        console.log('Stored hash length:', storedHash?.length);
+        const isMatch = await bcrypt.compare(pass, storedHash);
+        console.log('Password match:', isMatch);
+
         if (isMatch) {
           const { password, pw, ...result } = user;
           return result;
         }
+      } else {
+        console.log('User not found in database');
       }
     } catch (e) {
       console.error('Error in validateUser:', e);
@@ -57,5 +65,17 @@ export class AuthService {
       access_token: this.jwtService.sign(payload),
       user: user,
     };
+  }
+
+  async resetAdminPassword() {
+    const email = 'admin@sintonia.it';
+    const password = '123';
+    const hash = await bcrypt.hash(password, 10);
+
+    await this.db.update(schema.amministratore)
+      .set({ pw: hash })
+      .where(eq(schema.amministratore.email, email));
+
+    return { message: 'Password reset successfully', hashLength: hash.length };
   }
 }

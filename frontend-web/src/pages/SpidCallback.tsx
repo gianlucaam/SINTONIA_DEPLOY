@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode';
 
 const SpidCallback = () => {
     const [searchParams] = useSearchParams();
@@ -9,12 +10,28 @@ const SpidCallback = () => {
         const token = searchParams.get('token');
 
         if (token) {
-            // Salva il token nel localStorage
-            localStorage.setItem('token', token);
-            localStorage.setItem('user', JSON.stringify({ role: 'patient' }));
+            try {
+                // Decode token to get role
+                const decoded: any = jwtDecode(token);
+                const role = decoded.role;
 
-            // Redirect alla dashboard paziente
-            navigate('/patient-dashboard');
+                // Salva il token nel localStorage
+                localStorage.setItem('token', token);
+                localStorage.setItem('user', JSON.stringify({
+                    ...decoded,
+                    role: role
+                }));
+
+                // Redirect based on role
+                if (role === 'psychologist' || role === 'admin') {
+                    navigate('/dashboard');
+                } else {
+                    navigate('/patient-dashboard');
+                }
+            } catch (error) {
+                console.error('Invalid token:', error);
+                navigate('/spid-error');
+            }
         } else {
             // Se non c'è token, errore
             navigate('/spid-error');

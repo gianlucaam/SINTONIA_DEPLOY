@@ -81,14 +81,43 @@ export class SpidAuthService {
         return newPatients[0];
     }
 
-    async generateToken(patient: any) {
+    async validatePsychologist(spidProfile: SpidProfileDto) {
+        console.log('Validating SPID profile for Psychologist:', spidProfile);
+
+        const psychologists = await this.db
+            .select()
+            .from(schema.psicologo)
+            .where(eq(schema.psicologo.codFiscale, spidProfile.fiscalNumber));
+
+        if (psychologists.length > 0) {
+            console.log('Psychologist found:', psychologists[0].codFiscale);
+            return psychologists[0];
+        }
+
+        console.log('Psychologist not found, creating new one...');
+
+        // Create new psychologist
+        const newPsychologists = await this.db.insert(schema.psicologo).values({
+            codFiscale: spidProfile.fiscalNumber,
+            nome: spidProfile.name,
+            cognome: spidProfile.familyName,
+            aslAppartenenza: 'ASL001', // Default ASL
+            stato: true,
+            immagineProfilo: 'default-profile.jpg'
+        }).returning();
+
+        console.log('New psychologist created:', newPsychologists[0].codFiscale);
+        return newPsychologists[0];
+    }
+
+    async generateToken(user: any, role: 'patient' | 'psychologist' = 'patient') {
         const payload = {
-            sub: patient.idPaziente,
-            email: patient.email,
-            fiscalCode: patient.codFiscale,
-            role: 'patient',
-            name: patient.nome,
-            familyName: patient.cognome,
+            sub: role === 'patient' ? user.idPaziente : user.codFiscale,
+            email: user.email || user.codFiscale, // Psicologo might not have email in schema
+            fiscalCode: user.codFiscale,
+            role: role,
+            name: user.nome,
+            familyName: user.cognome,
         };
 
         const access_token = this.jwtService.sign(payload);
@@ -96,11 +125,11 @@ export class SpidAuthService {
         return {
             access_token,
             user: {
-                id: patient.idPaziente,
-                email: patient.email,
-                name: patient.nome,
-                familyName: patient.cognome,
-                role: 'patient',
+                id: role === 'patient' ? user.idPaziente : user.codFiscale,
+                email: user.email || user.codFiscale,
+                name: user.nome,
+                familyName: user.cognome,
+                role: role,
             },
         };
     }

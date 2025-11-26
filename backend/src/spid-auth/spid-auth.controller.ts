@@ -7,7 +7,10 @@ export class SpidAuthController {
   constructor(private readonly spidAuthService: SpidAuthService) { }
 
   @Get('login')
-  async login(@Res() res: Response) {
+  async login(@Query('frontendUrl') frontendUrl: string, @Query('userType') userType: string, @Res() res: Response) {
+    const targetFrontendUrl = frontendUrl || 'http://localhost:5173';
+    const targetUserType = userType || 'patient';
+
     // Replica esatta della pagina di scelta provider SPID
     const html = `
       <!DOCTYPE html>
@@ -17,6 +20,7 @@ export class SpidAuthController {
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Entra con SPID</title>
         <style>
+          /* ... styles ... */
           * { margin: 0; padding: 0; box-sizing: border-box; }
           body { 
             font-family: 'Titillium Web', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; 
@@ -31,7 +35,7 @@ export class SpidAuthController {
           }
           .spid-header { 
             background: linear-gradient(135deg, #0066CC 0%, #0052A3 100%);
-            color: white; padding: 40px 30px; text-align: center; 
+            color: white; padding: 15px 15px; text-align: center; 
             position: relative; overflow: hidden;
           }
           .spid-header::before {
@@ -42,7 +46,6 @@ export class SpidAuthController {
             width: 200%;
             height: 200%;
             background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-            animation: pulse 4s ease-in-out infinite;
           }
           @keyframes pulse {
             0%, 100% { transform: scale(1); opacity: 0.5; }
@@ -117,37 +120,37 @@ export class SpidAuthController {
             <h2 class="spid-title">Scegli il tuo Identity Provider</h2>
             <ul class="provider-list">
               <li class="provider-item">
-                <a href="/spid-auth/provider-login?provider=Poste Italiane" class="provider-btn">
+                <a href="/spid-auth/provider-login?provider=Poste Italiane&frontendUrl=${targetFrontendUrl}&userType=${targetUserType}" class="provider-btn">
                   <div class="provider-logo" style="background: linear-gradient(135deg, #FFCD00 0%, #FFB700 100%); color: #003366;">PI</div>
                   <span>Poste Italiane SpID</span>
                 </a>
               </li>
               <li class="provider-item">
-                <a href="/spid-auth/provider-login?provider=Aruba" class="provider-btn">
+                <a href="/spid-auth/provider-login?provider=Aruba&frontendUrl=${targetFrontendUrl}&userType=${targetUserType}" class="provider-btn">
                   <div class="provider-logo" style="background: linear-gradient(135deg, #FF6600 0%, #FF4500 100%); color: white;">A</div>
                   <span>Aruba ID</span>
                 </a>
               </li>
               <li class="provider-item">
-                <a href="/spid-auth/provider-login?provider=InfoCert" class="provider-btn">
+                <a href="/spid-auth/provider-login?provider=InfoCert&frontendUrl=${targetFrontendUrl}&userType=${targetUserType}" class="provider-btn">
                   <div class="provider-logo" style="background: linear-gradient(135deg, #00A1E4 0%, #0077B6 100%); color: white;">IC</div>
                   <span>InfoCert ID</span>
                 </a>
               </li>
               <li class="provider-item">
-                <a href="/spid-auth/provider-login?provider=Intesa" class="provider-btn">
+                <a href="/spid-auth/provider-login?provider=Intesa&frontendUrl=${targetFrontendUrl}&userType=${targetUserType}" class="provider-btn">
                   <div class="provider-logo" style="background: linear-gradient(135deg, #0066CC 0%, #0052A3 100%); color: white;">IN</div>
                   <span>Intesa ID</span>
                 </a>
               </li>
               <li class="provider-item">
-                <a href="/spid-auth/provider-login?provider=Namirial" class="provider-btn">
+                <a href="/spid-auth/provider-login?provider=Namirial&frontendUrl=${targetFrontendUrl}&userType=${targetUserType}" class="provider-btn">
                   <div class="provider-logo" style="background: linear-gradient(135deg, #E30613 0%, #B3050F 100%); color: white;">N</div>
                   <span>Namirial ID</span>
                 </a>
               </li>
               <li class="provider-item">
-                <a href="/spid-auth/provider-login?provider=Sielte" class="provider-btn">
+                <a href="/spid-auth/provider-login?provider=Sielte&frontendUrl=${targetFrontendUrl}&userType=${targetUserType}" class="provider-btn">
                   <div class="provider-logo" style="background: linear-gradient(135deg, #0099CC 0%, #007AA3 100%); color: white;">S</div>
                   <span>Sielte ID</span>
                 </a>
@@ -165,9 +168,10 @@ export class SpidAuthController {
   }
 
   @Get('provider-login')
-  async providerLogin(@Query('provider') provider: string, @Query('frontendUrl') frontendUrl: string, @Res() res: Response) {
+  async providerLogin(@Query('provider') provider: string, @Query('frontendUrl') frontendUrl: string, @Query('userType') userType: string, @Res() res: Response) {
     const providerName = provider || 'Provider';
     const targetFrontendUrl = frontendUrl || 'http://localhost:5173';
+    const targetUserType = userType || 'patient';
 
     // Form login stile Poste Italiane modernizzato
     const html = `
@@ -178,6 +182,7 @@ export class SpidAuthController {
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Accesso SPID - ${providerName}</title>
         <style>
+          /* ... styles ... */
           * { margin: 0; padding: 0; box-sizing: border-box; }
           body { 
             font-family: 'Titillium Web', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; 
@@ -374,6 +379,7 @@ export class SpidAuthController {
               
               <form action="/spid-auth/callback" method="POST">
                 <input type="hidden" name="frontendUrl" value="${targetFrontendUrl}">
+                <input type="hidden" name="userType" value="${targetUserType}">
                 <div class="form-group">
                   <label class="form-label" for="fiscalcode">
                     Codice Fiscale
@@ -411,7 +417,6 @@ export class SpidAuthController {
                 <div class="button-group">
                   <button type="button" class="btn btn-cancel" onclick="window.history.back()">ANNULLA</button>
                   <button type="submit" class="btn btn-submit">
-                    <span class="spid-icon-btn">🔐</span>
                     ENTRA CON SPID
                   </button>
                 </div>
@@ -432,6 +437,7 @@ export class SpidAuthController {
   @Post('callback')
   async callback(@Body() body: any, @Res() res: Response) {
     const frontendUrl = body.frontendUrl || 'http://localhost:5173';
+    const userType = body.userType || 'patient';
 
     try {
       // Simuliamo un ritardo di autenticazione realistico
@@ -446,11 +452,18 @@ export class SpidAuthController {
         dateOfBirth: '2000-07-05'
       };
 
-      console.log('✓ Autenticazione SPID completata per:', spidProfile.fiscalNumber);
+      console.log(`✓ Autenticazione SPID completata per: ${spidProfile.fiscalNumber} (${userType})`);
 
-      // Valida utente e genera token
-      const patient = await this.spidAuthService.validatePatient(spidProfile);
-      const tokenData = await this.spidAuthService.generateToken(patient);
+      let user;
+      let tokenData;
+
+      if (userType === 'psychologist') {
+        user = await this.spidAuthService.validatePsychologist(spidProfile);
+        tokenData = await this.spidAuthService.generateToken(user, 'psychologist');
+      } else {
+        user = await this.spidAuthService.validatePatient(spidProfile);
+        tokenData = await this.spidAuthService.generateToken(user, 'patient');
+      }
 
       // Redirect al frontend con token
       const redirectUrl = `${frontendUrl}/spid-callback?token=${tokenData.access_token}`;

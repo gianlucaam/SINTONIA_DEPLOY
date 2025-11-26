@@ -7,6 +7,16 @@
     color: white;
     text-align: center;
     padding: 20px;
+    opacity: 0;
+    transition: opacity 0.5s ease-in;
+}
+
+.welcome-container.fade-in {
+    opacity: 1;
+}
+
+.welcome-container.fade-out {
+    opacity: 0;
 }
 
 .welcome-content {
