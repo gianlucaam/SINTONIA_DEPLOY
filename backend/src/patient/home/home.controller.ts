@@ -13,7 +13,7 @@ export class HomeController {
     async getDashboard(@Req() req: Request): Promise<HomeDashboardDto> {
         // In a real app, req.user would be populated by the guard.
         // For now, we'll cast it or use a default if missing for testing.
-        const userId = (req as any).user?.id || '8b329713-a6ed-4733-9ce9-931471e86cef';
+        const userId = (req as any).user?.id || '08168aed-c612-4af7-b66f-1e344a2857e9';
         return this.homeService.getDashboard(userId);
     }
 }

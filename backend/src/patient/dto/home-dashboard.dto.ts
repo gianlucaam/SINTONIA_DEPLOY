@@ -10,6 +10,7 @@ export class HomeDashboardDto {
         fullDate: string; // ISO date
         hasEvent: boolean;
         isToday: boolean;
+        mood?: string; // "Felice", "Triste", etc.
     }[];
     suggestedPosts: {
         id: string;
