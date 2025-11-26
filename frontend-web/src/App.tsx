@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/Login';
-import Dashboard from './pages/Dashboard';
+import PsychologistDashboard from './pages/PsychologistDashboard';
 import { getCurrentUser } from './services/auth.service';
 
 const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
@@ -22,7 +22,7 @@ function App() {
           path="/dashboard"
           element={
             <PrivateRoute>
-              <Dashboard />
+                <PsychologistDashboard />
             </PrivateRoute>
           }
         />
@@ -33,5 +33,4 @@ function App() {
   );
 }
 
-export default App;
-
+export default App
