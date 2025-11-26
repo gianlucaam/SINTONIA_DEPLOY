@@ -1,7 +1,7 @@
 import React from 'react';
 import type { HomeDashboardDto } from '../types/home';
 import '../css/StreakStatus.css';
-import fireIcon from '../assets/icons/fire.svg';
+import fireIcon from '../assets/icons/fire-department.svg';
 
 interface StreakStatusProps {
     data: HomeDashboardDto;

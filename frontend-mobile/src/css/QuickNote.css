@@ -1,18 +1,18 @@
 .quick-note-container {
     padding: 20px;
-    margin-top: -20px;
-    /* Overlap slightly if needed, or just standard spacing */
+    margin-top: 15px;
+    margin-bottom: 15px;
 }
 
 .quick-note-card {
     background-color: var(--white);
     border-radius: 50px;
-    /* Pill shape */
     padding: 15px 25px;
     display: flex;
     align-items: center;
     gap: 15px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    /* Sharp, dark, deep shadow */
+    box-shadow: 0 10px 10px -5px rgba(0, 0, 0, 0.35);
 }
 
 .note-icon {

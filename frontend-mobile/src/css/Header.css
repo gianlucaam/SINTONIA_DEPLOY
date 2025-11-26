@@ -2,9 +2,10 @@
     background-color: var(--primary-dark);
     color: var(--white);
     padding: 40px 20px 30px;
-    border-bottom-left-radius: 30px;
-    border-bottom-right-radius: 30px;
+    border-bottom-left-radius: 50px;
+    border-bottom-right-radius: 50px;
     position: relative;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
 }
 
 .header-top {
@@ -19,6 +20,13 @@
     display: flex;
     align-items: center;
     gap: 8px;
+}
+
+.calendar-icon {
+    width: 20px;
+    height: 20px;
+    filter: brightness(0) invert(1);
+    /* Make SVG white */
 }
 
 .user-section {
@@ -37,12 +45,12 @@
     width: 60px;
     height: 60px;
     background-color: #f2d4c9;
-    /* Skin tone bg */
     border-radius: 50%;
     overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
 }
 
 .avatar img {
@@ -65,18 +73,24 @@
     opacity: 0.9;
 }
 
+.mood-icon {
+    width: 20px;
+    height: 20px;
+}
+
 .notification-icon {
     position: relative;
 }
 
 .icon-box {
-    width: 50px;
-    height: 50px;
+    width: 60px;
+    height: 60px;
     background-color: var(--primary-light);
-    border-radius: 16px;
+    border-radius: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
 }
 
 .badge {

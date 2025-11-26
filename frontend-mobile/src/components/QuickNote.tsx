@@ -1,7 +1,7 @@
 import React from 'react';
 import '../css/QuickNote.css';
-import noteIcon from '../assets/icons/note.svg';
-import editIcon from '../assets/icons/edit.svg';
+import noteIcon from '../assets/icons/sintonia-mockup-monotone.svg';
+import editIcon from '../assets/icons/edit-pen.svg';
 
 const QuickNote: React.FC = () => {
     return (

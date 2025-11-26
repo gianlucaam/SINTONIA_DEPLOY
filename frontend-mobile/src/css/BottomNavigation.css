@@ -1,5 +1,7 @@
 /* Global reset to avoid unintended gaps */
-:root, body, #root {
+:root,
+body,
+#root {
     margin: 0;
     padding: 0;
 }
@@ -8,7 +10,8 @@
     position: fixed;
     bottom: 0;
     left: 0;
-    right: 0; /* ensure stretch to both edges */
+    right: 0;
+    /* ensure stretch to both edges */
     /* Full-bleed to screen edges without 100vw issues */
     width: 100%;
     max-width: none;
@@ -25,9 +28,11 @@
     bottom: 0;
     left: 0;
     right: 0;
-    width: 100%; /* stretch with container */
+    width: 100%;
+    /* stretch with container */
     height: 100%;
-    pointer-events: none; /* Background is decorative; allow clicks on items above */
+    pointer-events: none;
+    /* Background is decorative; allow clicks on items above */
     overflow: visible;
 }
 
@@ -54,9 +59,11 @@
     bottom: 0;
     left: 0;
     right: 0;
-    width: 100%; /* fill container width */
+    width: 100%;
+    /* fill container width */
     height: 100%;
-    object-fit: fill; /* fill horizontally exactly to edges */
+    object-fit: fill;
+    /* fill horizontally exactly to edges */
     object-position: bottom center;
 }
 
@@ -76,12 +83,14 @@
     position: absolute;
     inset: 0;
     z-index: 103;
-    pointer-events: none; /* enable per-button only */
+    pointer-events: none;
+    /* enable per-button only */
 }
 
 .hit-btn {
     position: absolute;
-    width: 44px; /* do not exceed icon footprint */
+    width: 44px;
+    /* do not exceed icon footprint */
     height: 44px;
     border-radius: 50%;
     background: transparent;
@@ -94,15 +103,41 @@
 
 /* Positions derived from SVG centers (viewBox 375x123):
    leftmost (40,83), left (108,83), center (188,44), right (267,84), rightmost (335,88) */
-.hit-leftmost { left: 10.667%; top: 67.48%; }
-.hit-left     { left: 28.800%; top: 67.48%; }
-.hit-center   { left: 50.133%; top: 35.772%; width: 64px; height: 64px; }
-.hit-right    { left: 71.200%; top: 68.293%; }
-.hit-rightmost{ left: 89.333%; top: 71.545%; }
+.hit-leftmost {
+    left: 10.667%;
+    top: 67.48%;
+}
+
+.hit-left {
+    left: 28.800%;
+    top: 67.48%;
+}
+
+.hit-center {
+    left: 50.133%;
+    top: 35.772%;
+    width: 64px;
+    height: 64px;
+}
+
+.hit-right {
+    left: 71.200%;
+    top: 68.293%;
+}
+
+.hit-rightmost {
+    left: 89.333%;
+    top: 71.545%;
+}
 
 /* Icon theming via inline SVG currentColor */
-.nav-icon { color: #83B9C1; }
-.nav-icon--center { color: #0D475D; }
+.nav-icon {
+    color: #83B9C1;
+}
+
+.nav-icon--center {
+    color: #0D475D;
+}
 
 .nav-item {
     background: none;
@@ -135,7 +170,8 @@
 .fab {
     width: 84px;
     height: 84px;
-    background-color: #dff2f7; /* light aqua */
+    background-color: #dff2f7;
+    /* light aqua */
     border-radius: 50%;
     border: none;
     display: flex;

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import type { CalendarDay } from '../types/home';
 import '../css/Calendar.css';
 
@@ -7,19 +7,24 @@ interface CalendarProps {
 }
 
 const Calendar: React.FC<CalendarProps> = ({ days: initialDays }) => {
-    const [startDate, setStartDate] = useState(new Date());
-    const [displayDays, setDisplayDays] = useState<CalendarDay[]>([]);
+    // Helper to get Monday of the week for a given date
+    const getMonday = (d: Date) => {
+        const date = new Date(d);
+        const day = date.getDay();
+        const diff = date.getDate() - day + (day === 0 ? -6 : 1); // adjust when day is sunday
+        return new Date(date.setDate(diff));
+    };
 
-    // Mappa data (YYYY-MM-DD) -> mood, costruita dai giorni con stato d'animo
+    const [startDate, setStartDate] = useState(getMonday(new Date()));
+    const [isAnimating, setIsAnimating] = useState(false);
+    const [slideDirection, setSlideDirection] = useState<'left' | 'right' | null>(null);
+
+    // Mappa data (YYYY-MM-DD) -> mood
     const moodMap = React.useMemo(() => {
         const map = new Map<string, string>();
         initialDays.forEach(d => { if (d.mood) map.set(d.fullDate, d.mood); });
         return map;
     }, [initialDays]);
-
-    useEffect(() => {
-        generateDays(startDate);
-    }, [startDate, moodMap]);
 
     const formatLocalDate = (date: Date) => {
         const y = date.getFullYear();
@@ -28,8 +33,8 @@ const Calendar: React.FC<CalendarProps> = ({ days: initialDays }) => {
         return `${y}-${m}-${d}`;
     };
 
-    // Genera una finestra continua di 7 giorni a partire da startDate
-    const generateDays = (start: Date) => {
+    // Genera i giorni per una data settimana
+    const generateDaysForWeek = (start: Date) => {
         const newDays: CalendarDay[] = [];
         const todayStr = formatLocalDate(new Date());
 
@@ -50,52 +55,132 @@ const Calendar: React.FC<CalendarProps> = ({ days: initialDays }) => {
                 mood,
             });
         }
-        setDisplayDays(newDays);
+        return newDays;
     };
 
     const handlePrev = () => {
-        const newDate = new Date(startDate);
-        newDate.setDate(startDate.getDate() - 1);
-        setStartDate(newDate);
+        if (isAnimating) return;
+        setSlideDirection('right');
+        setIsAnimating(true);
+        setTimeout(() => {
+            const newDate = new Date(startDate);
+            newDate.setDate(startDate.getDate() - 7);
+            setStartDate(newDate);
+            setIsAnimating(false);
+            setSlideDirection(null);
+        }, 300); // Match CSS transition duration
     };
 
     const handleNext = () => {
-        const newDate = new Date(startDate);
-        newDate.setDate(startDate.getDate() + 1);
-        setStartDate(newDate);
+        if (isAnimating) return;
+        setSlideDirection('left');
+        setIsAnimating(true);
+        setTimeout(() => {
+            const newDate = new Date(startDate);
+            newDate.setDate(startDate.getDate() + 7);
+            setStartDate(newDate);
+            setIsAnimating(false);
+            setSlideDirection(null);
+        }, 300); // Match CSS transition duration
     };
+
+    // Swipe handling
+    const [touchStart, setTouchStart] = useState<number | null>(null);
+    const [touchEnd, setTouchEnd] = useState<number | null>(null);
+    const minSwipeDistance = 50;
+
+    const onTouchStart = (e: React.TouchEvent) => {
+        setTouchEnd(null);
+        setTouchStart(e.targetTouches[0].clientX);
+    };
+
+    const onTouchMove = (e: React.TouchEvent) => {
+        setTouchEnd(e.targetTouches[0].clientX);
+    };
+
+    const onTouchEnd = () => {
+        if (!touchStart || !touchEnd) return;
+        const distance = touchStart - touchEnd;
+        const isLeftSwipe = distance > minSwipeDistance;
+        const isRightSwipe = distance < -minSwipeDistance;
+
+        if (isLeftSwipe) {
+            handleNext();
+        } else if (isRightSwipe) {
+            handlePrev();
+        }
+    };
+
+    // Determine which weeks to render based on animation state
+    const currentWeekDays = generateDaysForWeek(startDate);
+    let prevWeekDays: CalendarDay[] = [];
+    let nextWeekDays: CalendarDay[] = [];
+
+    if (slideDirection === 'right') {
+        const prevDate = new Date(startDate);
+        prevDate.setDate(startDate.getDate() - 7);
+        prevWeekDays = generateDaysForWeek(prevDate);
+    } else if (slideDirection === 'left') {
+        const nextDate = new Date(startDate);
+        nextDate.setDate(startDate.getDate() + 7);
+        nextWeekDays = generateDaysForWeek(nextDate);
+    }
+
+    // Format header date range
+    const formatWeekRange = () => {
+        // If animating, show the target week's date? Or keep current?
+        // Keeping current is safer to avoid jumpiness, or update if we want.
+        // Let's keep current startDate logic for header.
+        const endDate = new Date(startDate);
+        endDate.setDate(startDate.getDate() + 6);
+        const startDay = startDate.getDate();
+        const startMonth = startDate.toLocaleDateString('it-IT', { month: 'short' });
+        const endDay = endDate.getDate();
+        const endMonth = endDate.toLocaleDateString('it-IT', { month: 'short' });
+
+        if (startDate.getMonth() === endDate.getMonth()) {
+            return `${startDay} - ${endDay} ${startMonth}`;
+        }
+        return `${startDay} ${startMonth} - ${endDay} ${endMonth}`;
+    };
+
+    const renderWeek = (days: CalendarDay[]) => (
+        <div className="week-view">
+            {days.map((day, index) => {
+                const moodColor = getMoodColor(day.mood);
+                return (
+                    <div key={index} className={`day-item ${day.isToday ? 'active' : ''}`}>
+                        <div
+                            className="dot"
+                            style={{ backgroundColor: day.hasEvent ? moodColor : 'transparent' }}
+                        ></div>
+                        <span className="day-number">{day.date}</span>
+                        <span className="day-name">{day.day}</span>
+                    </div>
+                );
+            })}
+        </div>
+    );
 
     return (
         <div className="calendar-section">
             <div className="calendar-header">
                 <button className="nav-arrow" onClick={handlePrev}>‹</button>
-                <h2>Oggi</h2>
+                <h2>{formatWeekRange()}</h2>
                 <button className="nav-arrow" onClick={handleNext}>›</button>
             </div>
 
-            <div className="days-container no-scrollbar">
-                {displayDays.map((day, index) => {
-                    const moodColor = getMoodColor(day.mood);
-                    const isMoodDay = day.hasEvent && !day.isToday;
-                    const style: React.CSSProperties = isMoodDay
-                        ? {
-                            backgroundColor: hexToRgba(moodColor, 0.15),
-                            boxShadow: `0 4px 10px ${hexToRgba(moodColor, 0.25)}`,
-                        }
-                        : {};
-                    return (
-                        <div key={index} className={`day-item ${day.isToday ? 'active' : ''}`} style={style}>
-                            {day.hasEvent && (
-                                <div
-                                    className="dot"
-                                    style={{ backgroundColor: moodColor }}
-                                ></div>
-                            )}
-                            <span className="day-name">{day.day}</span>
-                            <span className="day-number">{day.date}</span>
-                        </div>
-                    );
-                })}
+            <div
+                className="calendar-viewport"
+                onTouchStart={onTouchStart}
+                onTouchMove={onTouchMove}
+                onTouchEnd={onTouchEnd}
+            >
+                <div className={`calendar-track ${slideDirection ? `animating-${slideDirection}` : ''}`}>
+                    {slideDirection === 'right' && renderWeek(prevWeekDays)}
+                    {renderWeek(currentWeekDays)}
+                    {slideDirection === 'left' && renderWeek(nextWeekDays)}
+                </div>
             </div>
         </div>
     );
@@ -104,35 +189,21 @@ const Calendar: React.FC<CalendarProps> = ({ days: initialDays }) => {
 const getMoodColor = (mood?: string): string => {
     const m = mood?.toLowerCase();
     switch (m) {
-        case 'felice': return '#4CAF50'; // Green
+        case 'felice': return '#4CAF50';
         case 'calmo': return '#4CAF50';
         case 'speranzoso': return '#43A047';
-        case 'triste': return '#2196F3'; // Blue
-        case 'ansia': return '#FF9800'; // Orange (generic)
+        case 'triste': return '#2196F3';
+        case 'ansia': return '#FF9800';
         case 'ansioso': return '#FB8C00';
         case 'agitato': return '#F57C00';
-        case 'stanco': return '#9E9E9E'; // Gray
+        case 'stanco': return '#9E9E9E';
         case 'apatico': return '#9E9E9E';
-        case 'panico': return '#E53935'; // Red deep
-        case 'rabbia': return '#F44336'; // Red
+        case 'panico': return '#E53935';
+        case 'rabbia': return '#F44336';
         case 'irritabile': return '#EF5350';
-        case 'neutro': return '#9E9E9E'; // Gray
-        default: return '#88b7b5'; // Default teal
+        case 'neutro': return '#9E9E9E';
+        default: return '#88b7b5';
     }
-};
-
-const hexToRgba = (hex: string, alpha: number): string => {
-    // Expand shorthand form (e.g. "#03F") to full form (e.g. "#0033FF")
-    const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
-    const fullHex = hex.replace(shorthandRegex, function (_m, r, g, b) {
-        return r + r + g + g + b + b;
-    });
-    const match = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(fullHex);
-    if (!match) return hex;
-    const r = parseInt(match[1], 16);
-    const g = parseInt(match[2], 16);
-    const b = parseInt(match[3], 16);
-    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 };
 
 export default Calendar;
