@@ -1,0 +1,25 @@
+export interface CalendarDay {
+    day: string;
+    date: number;
+    fullDate: string;
+    hasEvent: boolean;
+    isToday: boolean;
+}
+
+export interface SuggestedPost {
+    id: string;
+    category: string;
+    title: string;
+    contentSnippet: string;
+}
+
+export interface HomeDashboardDto {
+    firstName: string;
+    mood: string;
+    notificationsCount: number;
+    streakLevel: number;
+    streakProgress: number;
+    dailyNote: string;
+    calendarDays: CalendarDay[];
+    suggestedPosts: SuggestedPost[];
+}

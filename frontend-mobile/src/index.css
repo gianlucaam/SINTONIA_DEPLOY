@@ -1,0 +1,48 @@
+:root {
+  --primary-dark: #0f3e4d; /* Dark Teal from header */
+  --primary-light: #88b7b5; /* Light Teal from streak/icons */
+  --secondary-bg: #f0f4f5; /* Light background */
+  --white: #ffffff;
+  --text-dark: #1a1a1a;
+  --text-gray: #666666;
+  --accent-orange: #e89b78; /* Dots in calendar */
+  --accent-brown: #a88b7d;
+  --accent-yellow: #e8c578;
+  
+  --font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: var(--secondary-bg);
+  color: var(--text-dark);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Utility classes */
+.container {
+  padding: 0 20px;
+}
+
+.card {
+  background-color: var(--white);
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* Hide scrollbar for horizontal scrolling */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
