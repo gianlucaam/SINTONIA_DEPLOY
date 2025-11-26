@@ -8,7 +8,7 @@ export class JwtAuthGuard implements CanActivate {
     ): boolean | Promise<boolean> | Observable<boolean> {
         // Placeholder implementation: Allow all requests and mock a user
         const request = context.switchToHttp().getRequest();
-        request.user = { id: 1, email: 'test@example.com' }; // Mock user
+        request.user = { id: '8b329713-a6ed-4733-9ce9-931471e86cef', email: 'test@example.com' }; // Mock user with UUID
         return true;
     }
 }
