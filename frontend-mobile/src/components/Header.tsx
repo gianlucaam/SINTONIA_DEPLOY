@@ -1,17 +1,53 @@
 import React from 'react';
 import type { HomeDashboardDto } from '../types/home';
+import '../css/Header.css';
+import questionnaireIcon from '../assets/icons/questionnaire.svg';
+import calendarIcon from '../assets/icons/calendar.svg';
+import moodHappy from '../assets/icons/mood-happy.svg';
+import moodOverjoyed from '../assets/icons/mood-overjoyed.svg';
+import moodNeutral from '../assets/icons/mood-neutral.svg';
+import moodSad from '../assets/icons/mood-sad.svg';
+import moodDepressed from '../assets/icons/mood-depressed.svg';
+import profileAvatar from '../assets/images/profile-avatar.png';
 
 interface HeaderProps {
     data: HomeDashboardDto;
 }
 
 const Header: React.FC<HeaderProps> = ({ data }) => {
+    // Generate current date in Italian format
+    const getCurrentDate = () => {
+        const today = new Date();
+        const options: Intl.DateTimeFormatOptions = {
+            weekday: 'short',
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric'
+        };
+        return today.toLocaleDateString('it-IT', options);
+    };
+
+    // Map mood to appropriate icon
+    const getMoodIcon = () => {
+        const mood = data.mood?.toLowerCase();
+        if (!mood) return moodNeutral;
+
+        if (mood.includes('felice') || mood.includes('calmo') || mood.includes('speranzoso')) {
+            return mood.includes('speranzoso') || mood.includes('calmo') ? moodHappy : moodOverjoyed;
+        } else if (mood.includes('triste') || mood.includes('apatico')) {
+            return moodSad;
+        } else if (mood.includes('panico') || mood.includes('ansia') || mood.includes('agitato') || mood.includes('rabbia') || mood.includes('irritabile') || mood.includes('stanco')) {
+            return moodDepressed;
+        }
+        return moodNeutral;
+    };
+
     return (
         <header className="header">
             <div className="header-top">
                 <div className="date-display">
-                    <span className="calendar-icon">📅</span>
-                    <span>Gio, 15 Dic 2025</span> {/* Hardcoded for design match, or use real date */}
+                    <img src={calendarIcon} alt="Calendar" className="calendar-icon" />
+                    <span>{getCurrentDate()}</span>
                 </div>
                 <div className="status-bar-placeholder">
                     {/* Status bar area handled by OS/Device, but we leave space if needed */}
@@ -21,12 +57,12 @@ const Header: React.FC<HeaderProps> = ({ data }) => {
             <div className="user-section">
                 <div className="user-info">
                     <div className="avatar">
-                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Giuseppe" alt="Avatar" />
+                        <img src={profileAvatar} alt="Avatar" />
                     </div>
                     <div className="greeting-text">
                         <h1>Ciao, {data.firstName}!</h1>
                         <div className="mood-badge">
-                            <span className="mood-icon">🙂</span>
+                            <img src={getMoodIcon()} alt={data.mood} className="mood-icon" />
                             <span>{data.mood}</span>
                         </div>
                     </div>
@@ -34,116 +70,13 @@ const Header: React.FC<HeaderProps> = ({ data }) => {
 
                 <div className="notification-icon">
                     <div className="icon-box">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M9 11C9 11 9 12.5 10 13.5C11 14.5 12.5 14.5 12.5 14.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                            <rect x="5" y="4" width="14" height="16" rx="3" stroke="white" strokeWidth="2" />
-                            <path d="M15 8L9 14" stroke="white" strokeWidth="2" strokeLinecap="round" />
-                        </svg>
+                        <img src={questionnaireIcon} alt="Questionnaires" />
                     </div>
                     {data.notificationsCount > 0 && (
                         <span className="badge">+{data.notificationsCount}</span>
                     )}
                 </div>
             </div>
-
-            <style>{`
-                .header {
-                    background-color: var(--primary-dark);
-                    color: var(--white);
-                    padding: 40px 20px 30px;
-                    border-bottom-left-radius: 30px;
-                    border-bottom-right-radius: 30px;
-                    position: relative;
-                }
-                
-                .header-top {
-                    display: flex;
-                    justify-content: space-between;
-                    margin-bottom: 20px;
-                    font-size: 0.9rem;
-                    opacity: 0.9;
-                }
-
-                .date-display {
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
-                }
-
-                .user-section {
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                }
-
-                .user-info {
-                    display: flex;
-                    align-items: center;
-                    gap: 15px;
-                }
-
-                .avatar {
-                    width: 60px;
-                    height: 60px;
-                    background-color: #f2d4c9; /* Skin tone bg */
-                    border-radius: 50%;
-                    overflow: hidden;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                }
-                
-                .avatar img {
-                    width: 100%;
-                    height: 100%;
-                    object-fit: cover;
-                }
-
-                .greeting-text h1 {
-                    font-size: 1.5rem;
-                    font-weight: 700;
-                    margin-bottom: 5px;
-                }
-
-                .mood-badge {
-                    display: inline-flex;
-                    align-items: center;
-                    gap: 5px;
-                    font-size: 0.9rem;
-                    opacity: 0.9;
-                }
-
-                .notification-icon {
-                    position: relative;
-                }
-
-                .icon-box {
-                    width: 50px;
-                    height: 50px;
-                    background-color: var(--primary-light);
-                    border-radius: 16px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                }
-
-                .badge {
-                    position: absolute;
-                    top: -5px;
-                    right: -5px;
-                    background-color: var(--white);
-                    color: var(--primary-dark);
-                    font-size: 0.75rem;
-                    font-weight: bold;
-                    width: 20px;
-                    height: 20px;
-                    border-radius: 50%;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-                }
-            `}</style>
         </header>
     );
 };

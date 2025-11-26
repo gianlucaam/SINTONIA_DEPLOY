@@ -1,11 +1,28 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import type { SuggestedPost } from '../types/home';
+import '../css/SuggestedPosts.css';
 
 interface SuggestedPostsProps {
     posts: SuggestedPost[];
 }
 
 const SuggestedPosts: React.FC<SuggestedPostsProps> = ({ posts }) => {
+    const [activeIndex, setActiveIndex] = useState(0);
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+    const handleScroll = () => {
+        if (scrollContainerRef.current) {
+            const { scrollLeft } = scrollContainerRef.current;
+            // Assuming card width + gap is roughly 275px (260px min-width + 15px gap)
+            // Or simpler: calculate based on center point
+            const cardWidth = 275;
+            const index = Math.round(scrollLeft / cardWidth);
+            // Clamp index to bounds
+            const clampedIndex = Math.max(0, Math.min(index, posts.length - 1));
+            setActiveIndex(clampedIndex);
+        }
+    };
+
     return (
         <div className="suggested-posts-section">
             <div className="section-header">
@@ -13,7 +30,11 @@ const SuggestedPosts: React.FC<SuggestedPostsProps> = ({ posts }) => {
                 <button className="more-options">•••</button>
             </div>
 
-            <div className="posts-container no-scrollbar">
+            <div
+                className="posts-container no-scrollbar"
+                ref={scrollContainerRef}
+                onScroll={handleScroll}
+            >
                 {posts.map((post) => (
                     <div key={post.id} className="post-card">
                         <div className="post-category-tag">
@@ -25,74 +46,14 @@ const SuggestedPosts: React.FC<SuggestedPostsProps> = ({ posts }) => {
                 ))}
             </div>
 
-            <style>{`
-                .suggested-posts-section {
-                    margin-bottom: 100px; /* Space for bottom nav */
-                }
-
-                .section-header {
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    padding: 0 20px;
-                    margin-bottom: 15px;
-                }
-
-                .section-header h3 {
-                    font-size: 1.1rem;
-                    font-weight: 800;
-                }
-
-                .more-options {
-                    background: none;
-                    border: none;
-                    font-size: 1.2rem;
-                    color: var(--primary-light);
-                    cursor: pointer;
-                    letter-spacing: 2px;
-                }
-
-                .posts-container {
-                    display: flex;
-                    gap: 15px;
-                    overflow-x: auto;
-                    padding: 0 20px 20px; /* Bottom padding for shadow */
-                }
-
-                .post-card {
-                    min-width: 260px;
-                    background-color: var(--white);
-                    border-radius: 20px;
-                    padding: 20px;
-                    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-                    display: flex;
-                    flex-direction: column;
-                    gap: 10px;
-                }
-
-                .post-category-tag {
-                    align-self: flex-start;
-                    background-color: #e0f2f1; /* Light teal bg */
-                    color: var(--primary-dark);
-                    font-size: 0.7rem;
-                    font-weight: 700;
-                    padding: 5px 10px;
-                    border-radius: 8px;
-                    text-transform: uppercase;
-                }
-
-                .post-title {
-                    font-size: 0.95rem;
-                    font-weight: 700;
-                    line-height: 1.4;
-                }
-
-                .post-snippet {
-                    font-size: 0.85rem;
-                    color: var(--text-gray);
-                    line-height: 1.4;
-                }
-            `}</style>
+            <div className="pagination-dots">
+                {posts.map((_, index) => (
+                    <div
+                        key={index}
+                        className={`pagination-dot ${index === activeIndex ? 'active' : ''}`}
+                    />
+                ))}
+            </div>
         </div>
     );
 };

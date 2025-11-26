@@ -3,7 +3,8 @@
   /* Dark Teal from header */
   --primary-light: #88b7b5;
   /* Light Teal from streak/icons */
-  --secondary-bg: #f0f4f5;
+  --secondary-bg: #eaf6f8;
+  /* Lighter blue/azure */
   /* Light background */
   --white: #ffffff;
   --text-dark: #1a1a1a;
@@ -13,7 +14,7 @@
   --accent-brown: #a88b7d;
   --accent-yellow: #e8c578;
 
-  --font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
+  --font-family: 'Urbanist', system-ui, Avenir, Helvetica, Arial, sans-serif;
 }
 
 * {
@@ -27,11 +28,15 @@ body {
   background-color: #ffffff;
   /* White bands */
   color: var(--text-dark);
+  font-weight: 600;
+  /* Increased global font weight */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   display: flex;
   justify-content: center;
   min-height: 100vh;
+  overflow-x: hidden;
+  /* Prevent horizontal scroll causing layout shifts */
 }
 
 #root {
@@ -52,9 +57,10 @@ body {
 
 .card {
   background-color: var(--white);
-  border-radius: 20px;
+  border-radius: 30px;
   padding: 20px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  /* Sharp, dark, deep, thin shadow */
+  box-shadow: 0 10px 10px -5px rgba(0, 0, 0, 0.35);
 }
 
 /* Hide scrollbar for horizontal scrolling */
