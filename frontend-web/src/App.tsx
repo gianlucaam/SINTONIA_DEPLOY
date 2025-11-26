@@ -1,11 +1,35 @@
-import './App.css'
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import Login from './pages/Login';
+import Dashboard from './pages/Dashboard';
+import { getCurrentUser } from './services/auth.service';
+
+const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
+  const user = getCurrentUser();
+  return user ? children : <Navigate to="/login" />;
+};
 
 function App() {
-    return (
-        <div>
-            <h1>Sintonia Mobile</h1>
-        </div>
-    )
+  return (
+    <Router>
+      <Routes>
+
+        {/* Login per admin/psicologi */}
+        <Route path="/login" element={<Login />} />
+
+
+        {/* Dashboard admin/psicologo */}
+        <Route
+          path="/dashboard"
+          element={
+            <PrivateRoute>
+              <Dashboard />
+            </PrivateRoute>
+          }
+        />
+      </Routes>
+    </Router>
+  );
 }
 
-export default App
+export default App;
+

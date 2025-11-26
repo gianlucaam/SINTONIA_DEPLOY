@@ -1,0 +1,17 @@
+.splash-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #E2FAFE;
+}
+
+.logo {
+    text-align: center;
+}
+
+.splash-logo-img {
+    width: 200px;
+    height: auto;
+    object-fit: contain;
+}

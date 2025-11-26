@@ -35,4 +35,13 @@ docker-compose down -v
 
 ### 🛠 Utili
 - **Backend**: http://localhost:3000
+- **Frontend Web**: http://localhost:5173 (Admin/Psicologo)
+- **Frontend Mobile**: http://localhost:5174 (Pazienti)
 - **Database**: localhost:5433 (User: `root`, Pass: `secret`, DB: `sintonia`)
+- **SPID Test Environment**: http://localhost:8088
+
+### 📱 Test SPID Authentication
+Per testare il login SPID dei pazienti, crea un paziente di test con
+
+
+Poi vai su http://localhost:5174 e usa il Codice Fiscale: `RSSMRA85M01H501Z`

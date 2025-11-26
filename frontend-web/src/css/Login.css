@@ -1,0 +1,183 @@
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+    /* Ensure full width */
+    margin: 0;
+    padding: 0;
+    background-color: #7aaeb4;
+    /* Approximate color from image */
+    font-family: 'Arial', sans-serif;
+    position: absolute;
+    /* Break out of any flex constraints from body if needed */
+    top: 0;
+    left: 0;
+}
+
+.login-card {
+    background: white;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+}
+
+.logo-text {
+    color: #4a8b92;
+    font-size: 2rem;
+    margin-bottom: 30px;
+}
+
+.logo-sub {
+    color: #8bc34a;
+}
+
+.input-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.input-group label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: #f9f9f9;
+    border-radius: 25px;
+    padding: 10px 15px;
+    border: 1px solid #eee;
+}
+
+.input-wrapper input {
+    border: none;
+    background: transparent;
+    flex: 1;
+    outline: none;
+    font-size: 0.9rem;
+    color: #333;
+    /* Force dark text color */
+}
+
+.input-icon,
+.icon-button {
+    color: #666;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+    display: flex;
+    align-items: center;
+}
+
+.remember-me {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    background: #f9f9f9;
+    padding: 10px 15px;
+    border-radius: 25px;
+    border: 1px solid #eee;
+}
+
+.toggle-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.9rem;
+    color: #555;
+}
+
+/* Switch toggle */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    height: 20px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 2px;
+    bottom: 2px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+input:checked+.slider {
+    background-color: #1a4d63;
+}
+
+input:focus+.slider {
+    box-shadow: 0 0 1px #1a4d63;
+}
+
+input:checked+.slider:before {
+    -webkit-transform: translateX(20px);
+    -ms-transform: translateX(20px);
+    transform: translateX(20px);
+}
+
+.slider.round {
+    border-radius: 34px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+
+.login-button {
+    background-color: #1a4d63;
+    color: white;
+    border: none;
+    padding: 15px;
+    width: 100%;
+    border-radius: 25px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background 0.3s;
+}
+
+.login-button:hover {
+    background-color: #133b4d;
+}
+
+.error-message {
+    color: red;
+    font-size: 0.8rem;
+    margin-bottom: 10px;
+}
