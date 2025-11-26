@@ -10,10 +10,12 @@ export class TermsService {
     ) { }
 
     async acceptTerms(patientId: string) {
-        return await this.db
+        const result = await this.db
             .update(schema.paziente)
             .set({ terms: true })
             .where(eq(schema.paziente.idPaziente, patientId))
             .returning();
+
+        return result[0];
     }
 }

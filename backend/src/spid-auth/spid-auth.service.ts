@@ -89,6 +89,7 @@ export class SpidAuthService {
             role: 'patient',
             name: patient.nome,
             familyName: patient.cognome,
+            terms: patient.terms,
         };
 
         const access_token = this.jwtService.sign(payload);
@@ -101,6 +102,7 @@ export class SpidAuthService {
                 name: patient.nome,
                 familyName: patient.cognome,
                 role: 'patient',
+                terms: patient.terms,
             },
         };
     }
