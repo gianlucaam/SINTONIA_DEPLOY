@@ -6,10 +6,12 @@ import { DashboardModule } from './dashboard/dashboard.module.js';
 import { PsiModule } from './psi/psi.module.js';
 import { SpidAuthModule } from './spid-auth/spid-auth.module.js';
 import { PatientModule } from './patient/patient.module.js';
+import { QuestionnairesModule } from './questionari/questionnaires.module.js';
 
 @Module({
-  imports: [AuthModule, DashboardModule, SpidAuthModule, PatientModule, PsiModule],
+  imports: [AuthModule, DashboardModule, SpidAuthModule, PatientModule, PsiModule, QuestionnairesModule],
   controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule { }
+
