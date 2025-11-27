@@ -1,11 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import type { QuestionnaireData } from '../types/psychologist';
-import { getQuestionnaireStatus } from '../types/psychologist';
 import '../css/QuestionnaireDetailModal.css';
 
 interface QuestionnaireDetailModalProps {
     questionnaire: QuestionnaireData | null;
     onClose: () => void;
+    role?: 'psychologist' | 'admin';
+    onRequestInvalidation?: (id: string, notes: string) => void;
 }
 
 interface Question {
@@ -23,10 +24,12 @@ interface Answer {
 const QuestionnaireDetailModal: React.FC<QuestionnaireDetailModalProps> = ({
     questionnaire,
     onClose,
+    role = 'psychologist',
+    onRequestInvalidation,
 }) => {
     if (!questionnaire) return null;
 
-    const status = getQuestionnaireStatus(questionnaire);
+    const [invalidationNotes, setInvalidationNotes] = useState<string>('');
 
     // Mock questions based on questionnaire type
     const getQuestions = (type: string): Question[] => {
@@ -122,9 +125,7 @@ const QuestionnaireDetailModal: React.FC<QuestionnaireDetailModalProps> = ({
         return answer.value.toString();
     };
 
-    const getStatusClassName = (status: string) => {
-        return `status-badge status-${status.toLowerCase()}`;
-    };
+
 
     return (
         <div className="modal-overlay" onClick={onClose}>
@@ -132,7 +133,6 @@ const QuestionnaireDetailModal: React.FC<QuestionnaireDetailModalProps> = ({
                 <div className="modal-header">
                     <div className="modal-title-section">
                         <h2 className="modal-title">Dettagli Questionario</h2>
-                        <span className={getStatusClassName(status)}>{status}</span>
                     </div>
                     <button className="modal-close-btn" onClick={onClose} aria-label="Chiudi">
                         ✕
@@ -192,6 +192,34 @@ const QuestionnaireDetailModal: React.FC<QuestionnaireDetailModalProps> = ({
                         <div className="notes-section">
                             <h3 className="section-title">Note Invalidazione</h3>
                             <div className="notes-content">{questionnaire.noteInvalidazione}</div>
+                        </div>
+                    )}
+
+                    {role === 'psychologist' && (
+                        <div className="invalidation-request-section">
+                            <h3 className="section-title">Richiesta Invalidazione</h3>
+                            <div className="invalidation-form">
+                                <textarea
+                                    className="invalidation-textarea"
+                                    placeholder="Inserisci il motivo della richiesta di invalidazione..."
+                                    value={invalidationNotes}
+                                    onChange={(e) => setInvalidationNotes(e.target.value)}
+                                    rows={4}
+                                />
+                                <button
+                                    className="btn-request-invalidation"
+                                    onClick={() => {
+                                        if (invalidationNotes.trim()) {
+                                            onRequestInvalidation?.(questionnaire.idQuestionario, invalidationNotes);
+                                            setInvalidationNotes('');
+                                            onClose();
+                                        }
+                                    }}
+                                    disabled={!invalidationNotes.trim()}
+                                >
+                                    📝 Richiedi Invalidazione
+                                </button>
+                            </div>
                         </div>
                     )}
                 </div>

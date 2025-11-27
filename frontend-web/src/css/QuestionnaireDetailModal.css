@@ -18,6 +18,7 @@
     from {
         opacity: 0;
     }
+
     to {
         opacity: 1;
     }
@@ -42,6 +43,7 @@
         transform: translateY(20px);
         opacity: 0;
     }
+
     to {
         transform: translateY(0);
         opacity: 1;
@@ -224,6 +226,71 @@
     line-height: 1.6;
     color: #666;
 }
+
+/* Invalidation Request Section */
+.invalidation-request-section {
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 2px solid var(--color-background);
+}
+
+.invalidation-form {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+}
+
+.invalidation-textarea {
+    flex: 1;
+    padding: 12px 16px;
+    border: 2px solid var(--color-teal-light);
+    border-radius: 8px;
+    background-color: white;
+    color: var(--color-text-primary);
+    font-family: inherit;
+    font-size: 14px;
+    resize: vertical;
+    min-height: 100px;
+    transition: border-color 0.3s ease;
+}
+
+.invalidation-textarea:focus {
+    outline: none;
+    border-color: var(--color-teal-medium);
+    box-shadow: 0 0 0 3px rgba(43, 122, 122, 0.1);
+}
+
+.invalidation-textarea::placeholder {
+    color: var(--color-text-secondary);
+    opacity: 0.6;
+}
+
+.btn-request-invalidation {
+    padding: 12px 24px;
+    background-color: #FFB74D;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    align-self: flex-start;
+}
+
+.btn-request-invalidation:hover:not(:disabled) {
+    background-color: #FF9800;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 152, 0, 0.4);
+}
+
+.btn-request-invalidation:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
 
 /* Modal Footer */
 .modal-footer {
