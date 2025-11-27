@@ -1,6 +1,5 @@
 import React from 'react';
 import type { QuestionnaireData } from '../types/adminDashboard.types';
-import { getQuestionnaireStatus } from '../types/adminDashboard.types';
 import '../css/QuestionnaireTable.css';
 
 interface QuestionnaireTableProps {
@@ -22,10 +21,6 @@ const QuestionnaireTable: React.FC<QuestionnaireTableProps> = ({
     onReview,
     onRequestInvalidation,
 }) => {
-    const getStatusClassName = (status: string) => {
-        return `status-badge status-${status.toLowerCase()}`;
-    };
-
     const formatDate = (dateString: string | null) => {
         if (!dateString) return '-';
         return dateString;
@@ -37,16 +32,14 @@ const QuestionnaireTable: React.FC<QuestionnaireTableProps> = ({
                 <thead>
                     <tr>
                         <th>ID Questionario</th>
-                        <th>Autore (ID Paziente)</th>
+                        {role === 'admin' && <th>Autore (ID Paziente)</th>}
                         <th>Tipologia</th>
-                        <th>Stato</th>
-                        <th>Data Revisione</th>
+                        {role === 'admin' && <th>Data Revisione</th>}
                         <th>Azioni</th>
                     </tr>
                 </thead>
                 <tbody>
                     {questionnaires.map((q) => {
-                        const status = getQuestionnaireStatus(q);
                         const isSelected = selectedId === q.idQuestionario;
 
                         return (
@@ -55,15 +48,15 @@ const QuestionnaireTable: React.FC<QuestionnaireTableProps> = ({
                                 className={isSelected ? 'selected' : ''}
                                 onClick={() => onSelect(q.idQuestionario)}
                             >
-                                <td>{q.idQuestionario}</td>
-                                <td>{q.idPaziente}</td>
-                                <td>{q.nomeTipologia}</td>
-                                <td>
-                                    <span className={getStatusClassName(status)}>
-                                        {status}
-                                    </span>
+                                <td
+                                    className="questionnaire-id-cell"
+                                    title={`ID Completo: ${q.idQuestionario}`}
+                                >
+                                    {q.idQuestionario.substring(0, 8)}...
                                 </td>
-                                <td>{formatDate(q.dataInvalidazione)}</td>
+                                {role === 'admin' && <td>{q.idPaziente}</td>}
+                                <td>{q.nomeTipologia}</td>
+                                {role === 'admin' && <td>{formatDate(q.dataInvalidazione)}</td>}
                                 <td className="actions-cell">
                                     <button
                                         className="action-btn view-btn"
@@ -77,7 +70,7 @@ const QuestionnaireTable: React.FC<QuestionnaireTableProps> = ({
                                         👁
                                     </button>
 
-                                    {role === 'psychologist' && (
+                                    {role === 'admin' && (
                                         <>
                                             <button
                                                 className="action-btn review-btn"
