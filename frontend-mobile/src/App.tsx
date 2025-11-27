@@ -6,6 +6,7 @@ import Welcome from './pages/Welcome';
 import SPIDInfo from './pages/SPIDInfo';
 import SPIDCallback from './pages/SPIDCallback';
 import Home from './pages/Home';
+import Profile from './pages/Profile';
 import './App.css';
 
 import Terms from './pages/Terms';
@@ -44,6 +45,14 @@ function App() {
           element={
             <PrivateRoute>
               <Home />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <PrivateRoute>
+              <Profile />
             </PrivateRoute>
           }
         />
