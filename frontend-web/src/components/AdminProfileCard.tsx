@@ -2,13 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { fetchAdministratorInfo } from '../services/adminDashboard.service';
 import type { AdminInfo } from '../types/adminDashboard.types';
 import profilePhoto from '../icons/profile_picture.svg';
-import psychologistIcon from '../icons/pazienti_icon.svg';
+import psychologistIcon from '../icons/psychologist_icon.svg';
 import notificationIcon from '../icons/notification_icon.svg';
 import editIcon from '../icons/edit_icon.svg';
 import patientIcon from '../icons/pazienti_icon.svg';
 import questionnaireIcon from '../icons/questionario_icon.svg';
 import forumIcon from '../icons/forum_icon.svg';
-import alertIcon from '../icons/alert_icon.svg';
+
+import supportoIcon from '../icons/supporto_icon.svg';
+import invalidazioneIcon from '../icons/invalidazione_icon.svg';
 import './AdminProfileCard.css';
 
 interface AdminProfileCardProps {
@@ -84,7 +86,7 @@ const AdminProfileCard: React.FC<AdminProfileCardProps> = ({ selectedSection, on
                     onClick={(e) => handleNavigation('supporto', e)}
                 >
                     <div className="nav-icon-container">
-                        <img src={alertIcon} alt="" className="nav-icon-img" />
+                        <img src={supportoIcon} alt="" className="nav-icon-img" />
                     </div>
                     <span className="nav-label">Supporto Tecnico</span>
                 </button>
@@ -114,7 +116,7 @@ const AdminProfileCard: React.FC<AdminProfileCardProps> = ({ selectedSection, on
                     onClick={(e) => handleNavigation('richieste', e)}
                 >
                     <div className="nav-icon-container">
-                        <img src={alertIcon} alt="" className="nav-icon-img" />
+                        <img src={invalidazioneIcon} alt="" className="nav-icon-img" />
                     </div>
                     <span className="nav-label">Richieste Invalidazione</span>
                 </button>
