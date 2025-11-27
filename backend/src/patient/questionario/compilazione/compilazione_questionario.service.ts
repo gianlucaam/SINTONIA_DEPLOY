@@ -138,13 +138,107 @@ export class Compilazione_questionarioService {
         };
     }
 
-    // Metodo per validare le risposte del questionario
+    /**
+     * Calcola lo score del questionario in percentuale (base 100)
+     * @param nomeTipologia - Nome della tipologia del questionario
+     * @param risposte - Array di risposte { idDomanda: string, valore: number }
+     * @returns Score in percentuale (0-100)
+     */
+    async calculateScore(nomeTipologia: string, risposte: Array<{ idDomanda: string; valore: number }>): Promise<number> {
+        // Recupera la configurazione punteggio dalla tipologia
+        const tipo = await db
+            .select({
+                punteggio: tipologiaQuestionario.punteggio,
+                domande: tipologiaQuestionario.domande,
+            })
+            .from(tipologiaQuestionario)
+            .where(eq(tipologiaQuestionario.nome, nomeTipologia))
+            .limit(1);
 
-    // Metodo per calcolare il punteggio del questionario in base alle risposte
+        if (!tipo.length) {
+            throw new Error('Tipologia questionario non trovata');
+        }
 
-    // Metodo per salvare il questionario compilato (risposte, score, data_compilazione)
+        let rawPunteggio = tipo[0].punteggio;
+        let punteggi: number[] = [];
 
-    // Metodo per verificare i criteri di cambiamento (se applicabile)
+        // Parse punteggio field (can be string with semicolons or array)
+        if (typeof rawPunteggio === 'string' && rawPunteggio.includes(';')) {
+            punteggi = rawPunteggio.split(';')
+                .map(p => p.trim())
+                .filter(p => p.length > 0)
+                .map(p => parseFloat(p));
+        } else if (Array.isArray(rawPunteggio)) {
+            punteggi = rawPunteggio.map(p => typeof p === 'number' ? p : parseFloat(String(p)));
+        } else if (typeof rawPunteggio === 'object' && rawPunteggio !== null) {
+            // Could be wrapped in object
+            const obj = rawPunteggio as any;
+            if (Array.isArray(obj.punteggi)) {
+                punteggi = obj.punteggi.map((p: any) => parseFloat(String(p)));
+            }
+        }
+
+        // Calcola punteggio totale ottenuto
+        let punteggioOttenuto = 0;
+        for (const risposta of risposte) {
+            const valore = risposta.valore;
+            if (valore >= 0 && valore < punteggi.length) {
+                punteggioOttenuto += punteggi[valore];
+            }
+        }
+
+        // Calcola punteggio massimo possibile
+        const numeroDomande = risposte.length;
+        const punteggioMassimoPossibile = numeroDomande * Math.max(...punteggi);
+
+        // Calcola percentuale (base 100)
+        const scorePercentuale = punteggioMassimoPossibile > 0
+            ? (punteggioOttenuto / punteggioMassimoPossibile) * 100
+            : 0;
+
+        return Math.round(scorePercentuale * 100) / 100; // Arrotonda a 2 decimali
+    }
+
+    /**
+     * Salva il questionario compilato nel database
+     * @param idPaziente - ID del paziente
+     * @param nomeTipologia - Nome della tipologia del questionario
+     * @param risposte - Array di risposte
+     * @returns ID del questionario salvato e score calcolato
+     */
+    async submitQuestionario(
+        idPaziente: string,
+        nomeTipologia: string,
+        risposte: Array<{ idDomanda: string; valore: number }>
+    ): Promise<{ idQuestionario: string; score: number }> {
+        // Calcola lo score
+        const score = await this.calculateScore(nomeTipologia, risposte);
+
+        // Prepara le risposte in formato JSON
+        const risposteJson = risposte.reduce((acc, r) => {
+            acc[r.idDomanda] = r.valore;
+            return acc;
+        }, {} as Record<string, number>);
+
+        // Salva nel database
+        const inserted = await db
+            .insert(questionario)
+            .values({
+                idPaziente,
+                nomeTipologia,
+                score,
+                risposte: risposteJson,
+                cambiamento: false, // TODO: implementare logica di cambiamento se necessario
+            })
+            .returning({ id: questionario.idQuestionario });
+
+        const id = inserted[0]?.id;
+        if (!id) {
+            throw new Error('Impossibile salvare il questionario');
+        }
+
+        return { idQuestionario: id, score };
+    }
 
     /**
      * Recupera le domande per la tipologia specificata senza creare un record su DB

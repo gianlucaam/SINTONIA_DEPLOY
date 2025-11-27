@@ -69,7 +69,7 @@ const QuestionnaireCompilation: React.FC = () => {
         const isLastQuestion = currentQuestionIndex === questionario.domande.length - 1;
 
         if (isLastQuestion) {
-            // Submit questionnaire - create record and save answers
+            // Submit questionnaire - send to backend for scoring and save
             setSubmitting(true);
             try {
                 const risposte: Risposta[] = Array.from(answers.entries()).map(([idDomanda, valore]) => ({
@@ -77,15 +77,30 @@ const QuestionnaireCompilation: React.FC = () => {
                     valore,
                 }));
 
-                // TODO: Need backend endpoint to create questionnaire and submit in one call
-                // For now, we'll need the nomeTipologia from the questionario
-                console.log('Submitting answers for tipologia:', questionario.nomeTipologia);
-                console.log('Risposte:', risposte);
+                // Submit to backend - it will calculate score and save
+                const token = localStorage.getItem('patient_token');
+                const response = await fetch('http://localhost:3000/paziente/questionario/submit', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({
+                        nomeTipologia: questionario.nomeTipologia,
+                        risposte: risposte,
+                    }),
+                });
 
-                // This will need to be updated when backend submit endpoint is ready
-                // await submitQuestionario(questionario.nomeTipologia, risposte);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
 
-                navigate('/questionari'); // Return to questionnaires list for now
+                const result = await response.json();
+                console.log('Questionario submitted successfully:', result);
+                console.log('Score ottenuto:', result.score);
+
+                // Navigate back to questionnaires list
+                navigate('/questionari');
             } catch (err) {
                 console.error('Error submitting questionario:', err);
                 setError('Errore nell\'invio del questionario');

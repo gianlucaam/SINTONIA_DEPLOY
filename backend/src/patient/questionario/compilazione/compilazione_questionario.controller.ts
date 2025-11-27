@@ -15,14 +15,25 @@ export class Compilazione_questionarioController {
         return this.questionarioService.getQuestionarioDto(idQuestionario);
     }
 
-    // POST /paziente/questionario/:idQuestionario/submit - Invia le risposte del questionario compilato
-
-    // GET /paziente/questionario/tipologie - Ottiene le tipologie di questionari disponibili (opzionale)
+    /**
+     * Invia le risposte del questionario compilato
+     * Body: { nomeTipologia: string, risposte: Array<{ idDomanda: string, valore: number }> }
+     * Ritorna: { idQuestionario: string, score: number }
+     */
+    @Post('submit')
+    @UseGuards(JwtAuthGuard)
+    async submitQuestionario(
+        @Req() req: Request,
+        @Body() body: { nomeTipologia: string; risposte: Array<{ idDomanda: string; valore: number }> },
+    ): Promise<{ idQuestionario: string; score: number }> {
+        const userId = (req as any).user?.id as string;
+        return this.questionarioService.submitQuestionario(userId, body.nomeTipologia, body.risposte);
+    }
 
     /**
      * Avvia la compilazione creando un record di questionario per la tipologia richiesta
      * Body: { nomeTipologia: string }
-     * Ritorna: { idQuestionario: string }
+     * Ritorna: il DTO completo del questionario
      */
     @Post('start')
     @UseGuards(JwtAuthGuard)
