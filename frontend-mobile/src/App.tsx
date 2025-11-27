@@ -6,6 +6,9 @@ import Welcome from './pages/Welcome';
 import SPIDInfo from './pages/SPIDInfo';
 import SPIDCallback from './pages/SPIDCallback';
 import Home from './pages/Home';
+import QuestionnaireCompilation from './pages/QuestionnaireCompilation';
+import QuestionnaireComplete from './pages/QuestionnaireComplete';
+import QuestionnaireCompilationDemo from './pages/QuestionnaireCompilationDemo';
 import './App.css';
 
 import Terms from './pages/Terms';
@@ -44,6 +47,25 @@ function App() {
           element={
             <PrivateRoute>
               <Home />
+            </PrivateRoute>
+          }
+        />
+        {/* DEMO route per testare UI senza backend */}
+        <Route path="/questionario-demo" element={<QuestionnaireCompilationDemo />} />
+
+        <Route
+          path="/questionario/:idQuestionario"
+          element={
+            <PrivateRoute>
+              <QuestionnaireCompilation />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/questionario/complete"
+          element={
+            <PrivateRoute>
+              <QuestionnaireComplete />
             </PrivateRoute>
           }
         />
