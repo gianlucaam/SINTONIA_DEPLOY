@@ -45,7 +45,7 @@ export const psicologo = pgTable('psicologo', {
     cognome: varchar('cognome', { length: 64 }).notNull(),
     aslAppartenenza: char('asl_appartenenza', { length: 6 }).notNull(),
     stato: boolean('stato').default(true).notNull(),
-    immagineProfilo: varchar('immagine_profilo', { length: 256 }).notNull(),
+    immagineProfilo: varchar('immagine_profilo', { length: 256 }).notNull()
 });
 
 export const amministratore = pgTable('amministratore', {
