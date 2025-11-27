@@ -1,16 +1,14 @@
 .dashboard-container {
-    height: 100vh;
+    min-height: 100vh;
     background-color: #F5F5F5;
     padding: 40px 20px;
-    overflow: hidden;
-    box-sizing: border-box;
 }
 
 .dashboard-grid {
-    max-width: 100%;
+    max-width: 1400px;
     margin: 0 auto;
     display: grid;
-    grid-template-columns: 480px 1fr;
+    grid-template-columns: 320px 1fr;
     gap: 32px;
     align-items: start;
 }

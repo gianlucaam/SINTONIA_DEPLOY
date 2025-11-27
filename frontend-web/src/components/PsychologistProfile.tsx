@@ -3,16 +3,52 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fetchDashboardData } from '../services/psychologist.service';
-import { getCurrentUser } from '../services/auth.service';
-import type { PsychologistDashboardData, LoadingState } from '../types/adminDashboard.types';
-import profilePhoto from '../icons/profile_picture.svg';
-import notificationIcon from '../icons/notification_icon.svg';
-import editIcon from '../icons/edit_icon.svg';
-import patientIcon from '../icons/pazienti_icon.svg';
-import questionnaireIcon from '../icons/questionario_icon.svg';
-import alertIcon from '../icons/alert_icon.svg';
-import forumIcon from '../icons/forum_icon.svg';
+import { getCurrentUser, logout } from '../services/auth.service';
+import type { PsychologistDashboardData, LoadingState } from '../types/psychologist';
+import profilePhoto from '../images/psychologist-photo.png';
+import notificationIcon from '../images/psi-notification.png';
+import editIcon from '../images/psi-edit_profile.png';
 import '../css/PsychologistProfile.css';
+
+// Modern SVG Icons
+const PatientIcon = () => (
+    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M16 11C17.66 11 18.99 9.66 18.99 8C18.99 6.34 17.66 5 16 5C14.34 5 13 6.34 13 8C13 9.66 14.34 11 16 11ZM8 11C9.66 11 10.99 9.66 10.99 8C10.99 6.34 9.66 5 8 5C6.34 5 5 6.34 5 8C5 9.66 6.34 11 8 11ZM8 13C5.67 13 1 14.17 1 16.5V19H15V16.5C15 14.17 10.33 13 8 13ZM16 13C15.71 13 15.38 13.02 15.03 13.05C16.19 13.89 17 15.02 17 16.5V19H23V16.5C23 14.17 18.33 13 16 13Z" fill="currentColor" />
+    </svg>
+);
+
+const QuestionnaireIcon = () => (
+    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.89 22 5.99 22H18C19.1 22 20 21.1 20 20V8L14 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M14 2V8H20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M9 13H15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+        <path d="M9 17H15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+);
+
+const AlertIcon = () => (
+    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2L3 7V11C3 16.55 6.84 21.74 12 23C17.16 21.74 21 16.55 21 11V7L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M12 8V13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+        <circle cx="12" cy="16" r="0.5" fill="currentColor" stroke="currentColor" strokeWidth="2" />
+    </svg>
+);
+
+const ForumIcon = () => (
+    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M20 2H4C2.9 2 2.01 2.9 2.01 4L2 22L6 18H20C21.1 18 22 17.1 22 16V4C22 2.9 21.1 2 20 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M7 9H17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+        <path d="M7 13H14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+);
+
+const LogoutIcon = () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M9 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M16 17L21 12L16 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M21 12H9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+);
 
 const PsychologistProfile: React.FC = () => {
     const navigate = useNavigate();
@@ -31,10 +67,7 @@ const PsychologistProfile: React.FC = () => {
         setDashboardState(prev => ({ ...prev, loading: true, error: null }));
         try {
             const user = getCurrentUser();
-            const cf = user?.fiscalCode || user?.email; // Fallback or use specific field
-            // Note: backend expects 'cf' query param. 
-            // If user is logged in via SPID, fiscalCode should be in the token/user object.
-            // If logged in via standard login, it might be email or we need to fetch profile first.
+            const cf = user?.fiscalCode || user?.email;
 
             const data = await fetchDashboardData(cf || undefined);
             setDashboardState({ data, loading: false, error: null });
@@ -52,15 +85,18 @@ const PsychologistProfile: React.FC = () => {
         console.log('Navigate to:', section);
         setSelectedSection(section);
 
-        // Navigate to appropriate pages
         if (section === 'questionari') {
             navigate('/questionnaires');
         }
-        // TODO: Add other navigation routes as needed
     };
 
     const handleBackgroundClick = () => {
         setSelectedSection(null);
+    };
+
+    const handleLogout = () => {
+        logout();
+        navigate('/login');
     };
 
     // Show loading state
@@ -121,14 +157,23 @@ const PsychologistProfile: React.FC = () => {
             <div className="profile-info">
                 <h2 className="profile-name">{fullName}</h2>
                 <p className="profile-role">{role}</p>
+
+                {/* Modern Logout Button */}
+                <button
+                    onClick={(e) => { e.stopPropagation(); handleLogout(); }}
+                    className="modern-logout-btn"
+                >
+                    <LogoutIcon />
+                    <span>Esci</span>
+                </button>
             </div>
 
-            <div className="navigation-grid">
+            <div className="navigation-grid navigation-grid-2col">
                 <button
                     className={`nav-card ${selectedSection === 'pazienti' ? 'selected' : ''}`}
                     onClick={(e) => handleNavigation('pazienti', e)}
                 >
-                    <img src={patientIcon} alt="" className="nav-icon-img patient-icon" />
+                    <div className="nav-icon"><PatientIcon /></div>
                     <span className="nav-label">Pazienti</span>
                 </button>
 
@@ -136,7 +181,7 @@ const PsychologistProfile: React.FC = () => {
                     className={`nav-card ${selectedSection === 'questionari' ? 'selected' : ''}`}
                     onClick={(e) => handleNavigation('questionari', e)}
                 >
-                    <img src={questionnaireIcon} alt="" className="nav-icon-img" />
+                    <div className="nav-icon"><QuestionnaireIcon /></div>
                     <span className="nav-label">Questionari</span>
                     {pendingQuestionnairesCount > 0 && (
                         <span className="notification-badge">{pendingQuestionnairesCount}</span>
@@ -147,7 +192,7 @@ const PsychologistProfile: React.FC = () => {
                     className={`nav-card ${selectedSection === 'alert' ? 'selected' : ''}`}
                     onClick={(e) => handleNavigation('alert', e)}
                 >
-                    <img src={alertIcon} alt="" className="nav-icon-img" />
+                    <div className="nav-icon"><AlertIcon /></div>
                     <span className="nav-label">Alert Clinici</span>
                     {alertsCount > 0 && (
                         <span className="notification-badge">{alertsCount}</span>
@@ -158,7 +203,7 @@ const PsychologistProfile: React.FC = () => {
                     className={`nav-card ${selectedSection === 'forum' ? 'selected' : ''}`}
                     onClick={(e) => handleNavigation('forum', e)}
                 >
-                    <img src={forumIcon} alt="" className="nav-icon-img" />
+                    <div className="nav-icon"><ForumIcon /></div>
                     <span className="nav-label">Forum</span>
                     {unreadMessagesCount > 0 && (
                         <span className="notification-badge">{unreadMessagesCount}</span>
@@ -170,4 +215,3 @@ const PsychologistProfile: React.FC = () => {
 };
 
 export default PsychologistProfile;
-
