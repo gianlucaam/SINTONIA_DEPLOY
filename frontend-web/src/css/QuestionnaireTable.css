@@ -55,6 +55,19 @@
     border-bottom: none;
 }
 
+/* Questionnaire ID Cell */
+.questionnaire-id-cell {
+    font-family: 'Courier New', Consolas, monospace;
+    cursor: help;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 13px;
+}
+
+.questionnaire-id-cell:hover {
+    color: #ffffff;
+    text-decoration: underline dotted;
+}
+
 /* Status Badge */
 .status-badge {
     display: inline-block;
