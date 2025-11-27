@@ -52,7 +52,7 @@ export class Visualizzazione_questionariService {
 
   /**
    * Restituisce TUTTI i questionari non invalidati E non revisionati
-   * (indipendentemente dallo psicologo)
+   * (indipendentemente dall' assegnazione del paziente allo psicologo)
    */
   async getTuttiNonInvalidati() {
     const rows = await db
@@ -76,6 +76,38 @@ export class Visualizzazione_questionariService {
       .where(and(
         eq(questionario.invalidato, false),
         eq(questionario.revisionato, false),
+      ));
+
+    return rows;
+  }
+
+
+  /**
+   * Restituisce TUTTI i questionari non invalidati di uno specifico paziente, indipendentemente dall' assegnazione del paziente allo psicologo
+   * (Questa ci serve per visualizzare i questionari di un paziente in particolare, requisito UG2)
+   */
+  async getQuestionariByPaziente(idPaziente: string) {
+    const rows = await db
+      .select({
+        idQuestionario: questionario.idQuestionario,
+        idPaziente: questionario.idPaziente,
+        nomeTipologia: questionario.nomeTipologia,
+        score: questionario.score,
+        risposte: questionario.risposte,
+        cambiamento: questionario.cambiamento,
+        dataCompilazione: questionario.dataCompilazione,
+        revisionato: questionario.revisionato,
+        invalidato: questionario.invalidato,
+        noteInvalidazione: questionario.noteInvalidazione,
+        dataInvalidazione: questionario.dataInvalidazione,
+        idPsicologoRevisione: questionario.idPsicologoRevisione,
+        idPsicologoRichiedente: questionario.idPsicologoRichiedente,
+        idAmministratoreConferma: questionario.idAmministratoreConferma,
+      })
+      .from(questionario)
+      .where(and(
+        eq(questionario.idPaziente, idPaziente),
+        eq(questionario.invalidato, false)
       ));
 
     return rows;
