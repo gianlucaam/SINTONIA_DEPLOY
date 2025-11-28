@@ -1,12 +1,12 @@
 import { Controller, Post, Body, Request, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../../auth/jwt-auth.guard.js';
-import { Inserimento_domandaService } from './inserimento_domanda.service.js';
+import { InserimentoDomandaService } from './inserimento_domanda.service.js';
 import { InserisciDomandaDto, DomandaInseritaDto } from './dto/inserimento_domanda.dto.js';
 
 @Controller('paziente/forum')
-export class Inserimento_domandaController {
+export class InserimentoDomandaController {
     constructor(
-        private readonly inserimentoDomandaService: Inserimento_domandaService
+        private readonly inserimentoDomandaService: InserimentoDomandaService
     ) { }
 
     /**
