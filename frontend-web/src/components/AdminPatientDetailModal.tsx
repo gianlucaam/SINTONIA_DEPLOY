@@ -97,7 +97,7 @@ const AdminPatientDetailModal: React.FC<AdminPatientDetailModalProps> = ({
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
                     <div className="modal-title-section">
-                        <h2 className="modal-title">Dettagli Paziente (Admin)</h2>
+                        <h2 className="modal-title">Dettagli Paziente</h2>
                     </div>
                     <button className="modal-close-btn" onClick={onClose} aria-label="Chiudi">
                         ✕

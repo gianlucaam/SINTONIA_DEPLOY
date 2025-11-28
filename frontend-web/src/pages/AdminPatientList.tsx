@@ -3,9 +3,9 @@ import AdminPatientTable from '../components/AdminPatientTable';
 import AdminPatientDetailModal from '../components/AdminPatientDetailModal';
 import type { PatientData, LoadingState } from '../types/patient';
 import { fetchPatients } from '../services/patient.service';
+import { User, Eye, LayoutGrid, List } from 'lucide-react';
 import '../css/QuestionnaireManagement.css'; // Reuse existing layout styles
-
-const ITEMS_PER_PAGE = 10;
+import '../css/AdminPatientList.css';
 
 const AdminPatientList: React.FC = () => {
     const [patientsState, setPatientsState] = useState<LoadingState<PatientData[]>>({
@@ -13,9 +13,39 @@ const AdminPatientList: React.FC = () => {
         loading: true,
         error: null,
     });
-    const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
     const [viewingPatient, setViewingPatient] = useState<PatientData | null>(null);
+    const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
+    const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
     const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage, setItemsPerPage] = useState(8);
+
+    // Calcolo dinamico degli elementi per pagina
+    useEffect(() => {
+        const calculateItemsPerPage = () => {
+            if (viewMode === 'grid') {
+                setItemsPerPage(8);
+            } else {
+                // List view calculation
+                const headerHeight = 80; // Navbar
+                const titleSearchHeight = 140; // Title + Search bar
+                const paginationHeight = 80; // Pagination controls
+                const padding = 40; // Container padding
+
+                const availableHeight = window.innerHeight - (headerHeight + titleSearchHeight + paginationHeight + padding);
+                const rowHeight = 60; // Approximate height of a table row
+                const tableHeaderHeight = 50;
+                const listAvailableHeight = availableHeight - tableHeaderHeight;
+
+                const rows = Math.max(5, Math.floor(listAvailableHeight / rowHeight));
+                setItemsPerPage(rows);
+            }
+        };
+
+        calculateItemsPerPage();
+        window.addEventListener('resize', calculateItemsPerPage);
+
+        return () => window.removeEventListener('resize', calculateItemsPerPage);
+    }, [viewMode]);
 
     // Stati per la ricerca live
     const [searchQuery, setSearchQuery] = useState<string>('');
@@ -62,6 +92,7 @@ const AdminPatientList: React.FC = () => {
         }
     };
 
+
     const handleSelectPatient = (id: string) => {
         setSelectedPatientId(id);
     };
@@ -89,9 +120,9 @@ const AdminPatientList: React.FC = () => {
 
     // Pagination logic sui pazienti filtrati
     const totalPatients = filteredPatients.length;
-    const totalPages = Math.ceil(totalPatients / ITEMS_PER_PAGE);
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-    const endIndex = startIndex + ITEMS_PER_PAGE;
+    const totalPages = Math.ceil(totalPatients / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
     const currentPatients = filteredPatients.slice(startIndex, endIndex);
 
     const handlePreviousPage = () => {
@@ -146,8 +177,8 @@ const AdminPatientList: React.FC = () => {
     };
 
     return (
-        <div className="content-panel" style={{ height: '100%', boxSizing: 'border-box' }}>
-            <h2 className="panel-title">Lista Pazienti (Admin)</h2>
+        <div className="content-panel-flex">
+            <h2 className="panel-title">Gestione Pazienti</h2>
 
             {patientsState.loading && (
                 <div className="loading-state">Caricamento pazienti...</div>
@@ -184,6 +215,23 @@ const AdminPatientList: React.FC = () => {
                         </div>
 
                         <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                            <div className="view-toggle">
+                                <button
+                                    className={`toggle-btn ${viewMode === 'grid' ? 'active' : ''}`}
+                                    onClick={() => setViewMode('grid')}
+                                    title="Vista Griglia"
+                                >
+                                    <LayoutGrid size={18} />
+                                </button>
+                                <button
+                                    className={`toggle-btn ${viewMode === 'list' ? 'active' : ''}`}
+                                    onClick={() => setViewMode('list')}
+                                    title="Vista Lista"
+                                >
+                                    <List size={18} />
+                                </button>
+                            </div>
+
                             <input
                                 type="text"
                                 value={searchQuery}
@@ -209,15 +257,39 @@ const AdminPatientList: React.FC = () => {
                         </div>
                     </div>
 
-                    {/* Tabella pazienti o messaggio vuoto */}
+                    {/* Griglia pazienti o messaggio vuoto */}
                     {currentPatients.length > 0 ? (
                         <>
-                            <AdminPatientTable
-                                patients={currentPatients}
-                                selectedId={selectedPatientId}
-                                onSelect={handleSelectPatient}
-                                onView={handleView}
-                            />
+                            {viewMode === 'grid' ? (
+                                <div className="patient-grid">
+                                    {currentPatients.map((patient) => (
+                                        <div key={patient.idPaziente} className="patient-card">
+                                            <div className="patient-avatar">
+                                                <User size={32} />
+                                            </div>
+                                            <div className="patient-info">
+                                                <h3 className="patient-name">{patient.nome} {patient.cognome}</h3>
+                                            </div>
+                                            <button
+                                                className="profile-btn"
+                                                onClick={() => handleView(patient.idPaziente)}
+                                            >
+                                                <Eye size={16} />
+                                                Profilo
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div style={{ flex: 1, overflowY: 'auto' }}>
+                                    <AdminPatientTable
+                                        patients={currentPatients}
+                                        selectedId={selectedPatientId}
+                                        onSelect={handleSelectPatient}
+                                        onView={handleView}
+                                    />
+                                </div>
+                            )}
 
                             {/* Pagination Controls */}
                             {totalPages > 1 && (

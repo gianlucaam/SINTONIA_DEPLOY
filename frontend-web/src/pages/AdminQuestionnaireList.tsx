@@ -83,7 +83,7 @@ const AdminQuestionnaireList: React.FC = () => {
 
     return (
         <div className="content-panel" style={{ height: '100%', boxSizing: 'border-box' }}>
-            <h2 className="panel-title">Lista Questionari (Admin)</h2>
+            <h2 className="panel-title">Lista Questionari</h2>
 
             <div className="management-header">
                 <div className="header-actions">
