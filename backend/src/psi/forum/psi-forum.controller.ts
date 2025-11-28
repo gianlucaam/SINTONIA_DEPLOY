@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, UseGuards, Request, Query } from '@nestjs/common';
 import { PsiForumService } from './psi-forum.service.js';
 import { JwtAuthGuard } from '../../auth/jwt-auth.guard.js';
 import { RolesGuard } from '../../auth/roles.guard.js';
@@ -12,19 +12,19 @@ export class PsiForumController {
 
     @Get('all')
     // Ritorna tutte le domande
-    async getAllQuestions() {
-        return this.forumService.getAllQuestions();
+    async getAllQuestions(@Query('categoria') categoria?: string) {
+        return this.forumService.getAllQuestions(categoria);
     }
 
     @Get('my-answers')
     // Ritorna domande a cui lo psicologo ha risposto
-    async getMyAnswers(@Request() req) {
-        return this.forumService.getMyAnswers(req.user.id);
+    async getMyAnswers(@Request() req, @Query('categoria') categoria?: string) {
+        return this.forumService.getMyAnswers(req.user.id, categoria);
     }
 
     @Get('unanswered')
     // Ritorna domande che non hanno alcuna risposta
-    async getUnansweredQuestions() {
-        return this.forumService.getUnansweredQuestions();
+    async getUnansweredQuestions(@Query('categoria') categoria?: string) {
+        return this.forumService.getUnansweredQuestions(categoria);
     }
 }
