@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import PsychologistPatientTable from '../components/PsychologistPatientTable';
+import PsychologistPatientDetailModal from '../components/PsychologistPatientDetailModal';
 import type { PatientData, LoadingState } from '../types/patient';
 import { fetchPatientsByPsychologist } from '../services/patient.service';
 import '../css/QuestionnaireManagement.css'; // Reuse existing layout styles
@@ -13,6 +14,7 @@ const PsychologistPatientList: React.FC = () => {
         error: null,
     });
     const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
+    const [viewingPatient, setViewingPatient] = useState<PatientData | null>(null);
     const [currentPage, setCurrentPage] = useState(1);
 
     // Stati per la ricerca live
@@ -67,8 +69,14 @@ const PsychologistPatientList: React.FC = () => {
     };
 
     const handleView = (id: string) => {
-        // Placeholder for future implementation
-        alert(`Visualizza dettagli paziente: ${id.substring(0, 8)}...`);
+        const patient = patientsState.data?.find(p => p.idPaziente === id);
+        if (patient) {
+            setViewingPatient(patient);
+        }
+    };
+
+    const handleCloseModal = () => {
+        setViewingPatient(null);
     };
 
     // Gestione input ricerca (live)
@@ -303,6 +311,14 @@ const PsychologistPatientList: React.FC = () => {
                         </div>
                     )}
                 </>
+            )}
+
+            {/* Modal for viewing patient details */}
+            {viewingPatient && (
+                <PsychologistPatientDetailModal
+                    patient={viewingPatient}
+                    onClose={handleCloseModal}
+                />
             )}
         </div>
     );

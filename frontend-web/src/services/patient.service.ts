@@ -45,6 +45,54 @@ export const searchPatientById = async (id: string): Promise<PatientData> => {
 };
 
 /**
+ * Get detailed patient information (admin only)
+ * @param id - UUID del paziente
+ */
+export const getPatientDetails = async (id: string): Promise<any> => {
+    try {
+        const token = getCurrentUser()?.access_token as string | undefined;
+        const response = await axios.get(`${API_URL}/admin/patients/${id}`, {
+            headers: {
+                ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                'Content-Type': 'application/json',
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching patient details:', error);
+        throw error;
+    }
+};
+
+/**
+ * Update patient information (admin only)
+ * @param id - UUID del paziente
+ * @param updates - Campi da aggiornare
+ */
+export const updatePatient = async (
+    id: string,
+    updates: {
+        email?: string;
+        residenza?: string;
+        idPsicologo?: string;
+    }
+): Promise<any> => {
+    try {
+        const token = getCurrentUser()?.access_token as string | undefined;
+        const response = await axios.patch(`${API_URL}/admin/patients/${id}`, updates, {
+            headers: {
+                ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                'Content-Type': 'application/json',
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error updating patient:', error);
+        throw error;
+    }
+};
+
+/**
  * Fetch patients for a specific psychologist
  */
 export const fetchPatientsByPsychologist = async (): Promise<PatientData[]> => {
@@ -84,6 +132,28 @@ export const searchPatientByIdForPsychologist = async (id: string): Promise<Pati
         return response.data;
     } catch (error) {
         console.error('Error searching patient:', error);
+        throw error;
+    }
+};
+
+/**
+ * Get detailed patient information for psychologist (only assigned patients)
+ * @param id - UUID del paziente
+ */
+export const getPatientDetailsByPsychologist = async (id: string): Promise<any> => {
+    try {
+        const token = getCurrentUser()?.access_token as string | undefined;
+        const cf = getCurrentUser()?.fiscalCode || getCurrentUser()?.email;
+
+        const response = await axios.get(`${API_URL}/psi/patients/${id}?cf=${cf}`, {
+            headers: {
+                ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                'Content-Type': 'application/json',
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching patient details:', error);
         throw error;
     }
 };

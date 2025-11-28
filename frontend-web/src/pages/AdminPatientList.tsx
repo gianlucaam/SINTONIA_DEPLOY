@@ -316,6 +316,7 @@ const AdminPatientList: React.FC = () => {
                 <AdminPatientDetailModal
                     patient={viewingPatient}
                     onClose={handleCloseModal}
+                    onUpdate={loadPatients}
                 />
             )}
         </div>

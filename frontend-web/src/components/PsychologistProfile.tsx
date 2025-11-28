@@ -132,7 +132,7 @@ const PsychologistProfile: React.FC<PsychologistProfileProps> = ({ onSelectSecti
         return null;
     }
 
-    const { fullName, profileImageUrl, role, alertsCount, pendingQuestionnairesCount, unreadMessagesCount } = dashboardState.data;
+    const { fullName, profileImageUrl, role } = dashboardState.data;
 
     return (
         <div className="psychologist-profile" onClick={handleBackgroundClick}>
@@ -188,9 +188,6 @@ const PsychologistProfile: React.FC<PsychologistProfileProps> = ({ onSelectSecti
                 >
                     <div className="nav-icon"><QuestionnaireIcon /></div>
                     <span className="nav-label">Questionari</span>
-                    {pendingQuestionnairesCount > 0 && (
-                        <span className="notification-badge">{pendingQuestionnairesCount}</span>
-                    )}
                 </button>
 
                 <button
@@ -199,9 +196,6 @@ const PsychologistProfile: React.FC<PsychologistProfileProps> = ({ onSelectSecti
                 >
                     <div className="nav-icon"><AlertIcon /></div>
                     <span className="nav-label">Alert Clinici</span>
-                    {alertsCount > 0 && (
-                        <span className="notification-badge">{alertsCount}</span>
-                    )}
                 </button>
 
                 <button
@@ -210,9 +204,6 @@ const PsychologistProfile: React.FC<PsychologistProfileProps> = ({ onSelectSecti
                 >
                     <div className="nav-icon"><ForumIcon /></div>
                     <span className="nav-label">Forum</span>
-                    {unreadMessagesCount > 0 && (
-                        <span className="notification-badge">{unreadMessagesCount}</span>
-                    )}
                 </button>
             </div>
         </div>

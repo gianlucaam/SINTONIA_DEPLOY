@@ -4,52 +4,47 @@ import { paziente, psicologo } from '../../drizzle/schema.js';
 import { eq } from 'drizzle-orm';
 
 @Injectable()
-export class Visualizzazione_pazientiService {
+export class Modifica_paziente_amministratoreService {
     /**
-     * Restituisce i pazienti assegnati a uno specifico psicologo
-     * @param idPsicologo - Codice fiscale dello psicologo
+     * Aggiorna i campi modificabili di un paziente
      */
-    async getPazientiByPsicologo(idPsicologo: string) {
-        const rows = await db
-            .select({
-                idPaziente: paziente.idPaziente,
-                nome: paziente.nome,
-                cognome: paziente.cognome,
-                email: paziente.email,
-                dataNascita: paziente.dataNascita,
-                dataIngresso: paziente.dataIngresso,
-                score: paziente.score,
-                idPsicologo: paziente.idPsicologo,
-                // Informazioni psicologo (sempre lo stesso in questo caso)
-                nomePsicologo: psicologo.nome,
-                cognomePsicologo: psicologo.cognome,
-            })
+    async aggiornaPaziente(
+        idPaziente: string,
+        updates: {
+            email?: string;
+            residenza?: string;
+            idPsicologo?: string;
+        }
+    ) {
+        // Verifica che il paziente esista
+        const existingPatient = await db
+            .select()
             .from(paziente)
-            .leftJoin(psicologo, eq(paziente.idPsicologo, psicologo.codFiscale))
-            .where(eq(paziente.idPsicologo, idPsicologo));
+            .where(eq(paziente.idPaziente, idPaziente))
+            .limit(1);
 
-        // Formatta i risultati per il frontend
-        return rows.map(row => ({
-            idPaziente: row.idPaziente,
-            nome: row.nome,
-            cognome: row.cognome,
-            email: row.email,
-            dataNascita: row.dataNascita,
-            dataIngresso: row.dataIngresso,
-            score: row.score,
-            idPsicologo: row.idPsicologo,
-            nomePsicologo: row.nomePsicologo && row.cognomePsicologo
-                ? `Dr. ${row.nomePsicologo} ${row.cognomePsicologo}`
-                : null,
-        }));
+        if (existingPatient.length === 0) {
+            throw new NotFoundException(`Paziente con ID ${idPaziente} non trovato`);
+        }
+
+        // Aggiorna solo i campi forniti
+        const updateData: any = {};
+        if (updates.email !== undefined) updateData.email = updates.email;
+        if (updates.residenza !== undefined) updateData.residenza = updates.residenza;
+        if (updates.idPsicologo !== undefined) updateData.idPsicologo = updates.idPsicologo;
+
+        await db
+            .update(paziente)
+            .set(updateData)
+            .where(eq(paziente.idPaziente, idPaziente));
+
+        return { success: true, message: 'Paziente aggiornato con successo' };
     }
 
     /**
-     * Ottiene i dettagli completi di un singolo paziente (solo se assegnato allo psicologo)
-     * @param idPaziente - UUID del paziente
-     * @param idPsicologo - Codice fiscale dello psicologo
+     * Ottiene i dettagli completi di un singolo paziente
      */
-    async getDettaglioPaziente(idPaziente: string, idPsicologo: string) {
+    async getDettaglioPaziente(idPaziente: string) {
         const rows = await db
             .select({
                 idPaziente: paziente.idPaziente,
@@ -79,12 +74,6 @@ export class Visualizzazione_pazientiService {
         }
 
         const row = rows[0];
-
-        // Verifica che il paziente sia assegnato a questo psicologo
-        if (row.idPsicologo !== idPsicologo) {
-            throw new NotFoundException(`Paziente non assegnato a questo psicologo`);
-        }
-
         return {
             idPaziente: row.idPaziente,
             nome: row.nome,

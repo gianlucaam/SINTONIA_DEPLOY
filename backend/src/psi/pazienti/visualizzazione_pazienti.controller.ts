@@ -1,4 +1,4 @@
-import { Controller, Get, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Query, Param, UseGuards } from '@nestjs/common';
 import { Visualizzazione_pazientiService } from './visualizzazione_pazienti.service.js';
 import { JwtAuthGuard } from '../../auth/jwt-auth.guard.js';
 import { RolesGuard } from '../../auth/roles.guard.js';
@@ -21,5 +21,21 @@ export class Visualizzazione_pazientiController {
             throw new Error('Codice fiscale psicologo richiesto');
         }
         return this.service.getPazientiByPsicologo(cf);
+    }
+
+    /**
+     * Ottiene i dettagli completi di un paziente (solo se assegnato allo psicologo)
+     * Endpoint: GET /psi/patients/:id?cf={codiceFiscalePsicologo}
+     * @param id - UUID del paziente
+     * @param cf - Codice fiscale dello psicologo (query param)
+     */
+    @Get(':id')
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles('psychologist')
+    async getDettaglio(@Param('id') id: string, @Query('cf') cf: string) {
+        if (!cf) {
+            throw new Error('Codice fiscale psicologo richiesto');
+        }
+        return this.service.getDettaglioPaziente(id, cf);
     }
 }
