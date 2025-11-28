@@ -64,3 +64,26 @@ export const fetchPatientsByPsychologist = async (): Promise<PatientData[]> => {
         throw error;
     }
 };
+
+/**
+ * Cerca un paziente specifico per ID (psicologo - solo suoi pazienti)
+ * @param id - UUID del paziente da cercare
+ * @returns Dati del paziente trovato
+ */
+export const searchPatientByIdForPsychologist = async (id: string): Promise<PatientData> => {
+    try {
+        const token = getCurrentUser()?.access_token as string | undefined;
+        const cf = getCurrentUser()?.fiscalCode || getCurrentUser()?.email;
+
+        const response = await axios.get(`${API_URL}/psi/patients/search/${id}?cf=${cf}`, {
+            headers: {
+                ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                'Content-Type': 'application/json',
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error searching patient:', error);
+        throw error;
+    }
+};

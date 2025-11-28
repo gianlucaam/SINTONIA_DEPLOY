@@ -15,15 +15,43 @@ const PsychologistPatientList: React.FC = () => {
     const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
     const [currentPage, setCurrentPage] = useState(1);
 
+    // Stati per la ricerca live
+    const [searchQuery, setSearchQuery] = useState<string>('');
+    const [filteredPatients, setFilteredPatients] = useState<PatientData[]>([]);
+
     useEffect(() => {
         loadPatients();
     }, []);
+
+    // Effetto per filtrare pazienti in tempo reale
+    useEffect(() => {
+        if (!patientsState.data) return;
+
+        const query = searchQuery.trim().toLowerCase();
+
+        if (!query) {
+            // Nessuna ricerca, mostra tutti
+            setFilteredPatients(patientsState.data);
+        } else {
+            // Filtra per ID, nome o cognome (case insensitive)
+            const filtered = patientsState.data.filter(patient =>
+                patient.idPaziente.toLowerCase().includes(query) ||
+                patient.nome.toLowerCase().includes(query) ||
+                patient.cognome.toLowerCase().includes(query)
+            );
+            setFilteredPatients(filtered);
+        }
+
+        // Reset alla prima pagina quando cambia il filtro
+        setCurrentPage(1);
+    }, [searchQuery, patientsState.data]);
 
     const loadPatients = async () => {
         setPatientsState({ data: null, loading: true, error: null });
         try {
             const data = await fetchPatientsByPsychologist();
             setPatientsState({ data, loading: false, error: null });
+            setFilteredPatients(data);
             setCurrentPage(1);
         } catch (error) {
             setPatientsState({
@@ -43,12 +71,22 @@ const PsychologistPatientList: React.FC = () => {
         alert(`Visualizza dettagli paziente: ${id.substring(0, 8)}...`);
     };
 
-    // Pagination logic
-    const totalPatients = patientsState.data?.length || 0;
+    // Gestione input ricerca (live)
+    const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchQuery(e.target.value);
+    };
+
+    // Reset ricerca
+    const handleReset = () => {
+        setSearchQuery('');
+    };
+
+    // Pagination logic sui pazienti filtrati
+    const totalPatients = filteredPatients.length;
     const totalPages = Math.ceil(totalPatients / ITEMS_PER_PAGE);
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
     const endIndex = startIndex + ITEMS_PER_PAGE;
-    const currentPatients = patientsState.data?.slice(startIndex, endIndex) || [];
+    const currentPatients = filteredPatients.slice(startIndex, endIndex);
 
     const handlePreviousPage = () => {
         setCurrentPage(prev => Math.max(1, prev - 1));
@@ -68,38 +106,42 @@ const PsychologistPatientList: React.FC = () => {
         const maxPagesToShow = 5;
 
         if (totalPages <= maxPagesToShow) {
+            // Show all pages if total is small
             for (let i = 1; i <= totalPages; i++) {
                 pages.push(i);
             }
         } else {
+            // Show first page
             pages.push(1);
+
             if (currentPage > 3) {
                 pages.push('...');
             }
+
+            // Show pages around current page
             const start = Math.max(2, currentPage - 1);
             const end = Math.min(totalPages - 1, currentPage + 1);
+
             for (let i = start; i <= end; i++) {
                 pages.push(i);
             }
+
             if (currentPage < totalPages - 2) {
                 pages.push('...');
             }
+
+            // Show last page
             if (totalPages > 1) {
                 pages.push(totalPages);
             }
         }
+
         return pages;
     };
 
     return (
         <div className="content-panel" style={{ height: '100%', boxSizing: 'border-box' }}>
             <h2 className="panel-title">I Miei Pazienti</h2>
-
-            <div className="management-header">
-                <div className="header-actions">
-                    {/* Future: Add patient filters or actions here */}
-                </div>
-            </div>
 
             {patientsState.loading && (
                 <div className="loading-state">Caricamento pazienti...</div>
@@ -116,81 +158,148 @@ const PsychologistPatientList: React.FC = () => {
 
             {patientsState.data && !patientsState.loading && (
                 <>
-                    <div className="filter-controls">
-                        <p style={{ color: '#666', fontSize: '14px' }}>
-                            Totale pazienti: {totalPatients} {totalPages > 1 && `| Pagina ${currentPage} di ${totalPages} `}
-                        </p>
+                    {/* Barra di ricerca compatta - sopra la tabella a destra */}
+                    <div style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        marginBottom: '16px',
+                        gap: '16px'
+                    }}>
+                        <div className="filter-controls" style={{ margin: 0 }}>
+                            <p style={{ color: '#666', fontSize: '14px', margin: 0 }}>
+                                {searchQuery ? (
+                                    <>Trovati: {totalPatients} pazienti</>
+                                ) : (
+                                    <>Totale pazienti: {totalPatients}</>
+                                )}
+                                {totalPages > 1 && <> | Pagina {currentPage} di {totalPages}</>}
+                            </p>
+                        </div>
+
+                        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                            <input
+                                type="text"
+                                value={searchQuery}
+                                onChange={handleSearchInputChange}
+                                placeholder="🔍 Cerca per ID, nome o cognome..."
+                                style={{
+                                    padding: '10px 16px',
+                                    borderRadius: '8px',
+                                    border: '2px solid #ddd',
+                                    fontSize: '14px',
+                                    width: '280px',
+                                    transition: 'border-color 0.2s ease',
+                                    outline: 'none',
+                                }}
+                                onFocus={(e) => e.target.style.borderColor = '#83B9C1'}
+                                onBlur={(e) => e.target.style.borderColor = '#ddd'}
+                            />
+                            {searchQuery && (
+                                <button onClick={handleReset} className="clear-filter-btn">
+                                    ↺ Reset
+                                </button>
+                            )}
+                        </div>
                     </div>
 
-                    <PsychologistPatientTable
-                        patients={currentPatients}
-                        selectedId={selectedPatientId}
-                        onSelect={handleSelectPatient}
-                        onView={handleView}
-                    />
+                    {/* Tabella pazienti o messaggio vuoto */}
+                    {currentPatients.length > 0 ? (
+                        <>
+                            <PsychologistPatientTable
+                                patients={currentPatients}
+                                selectedId={selectedPatientId}
+                                onSelect={handleSelectPatient}
+                                onView={handleView}
+                            />
 
-                    {/* Pagination Controls */}
-                    {totalPages > 1 && (
-                        <div style={{
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            gap: '8px',
-                            marginTop: '20px',
-                            padding: '16px'
-                        }}>
-                            <button
-                                onClick={handlePreviousPage}
-                                disabled={currentPage === 1}
-                                style={{
-                                    padding: '8px 16px',
-                                    border: '1px solid #ddd',
-                                    borderRadius: '4px',
-                                    background: currentPage === 1 ? '#f5f5f5' : '#fff',
-                                    cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
-                                    fontSize: '14px'
-                                }}
-                            >
-                                ← Precedente
-                            </button>
-
-                            {getPageNumbers().map((page, index) => (
-                                page === '...' ? (
-                                    <span key={`ellipsis - ${index} `} style={{ padding: '0 8px' }}>...</span>
-                                ) : (
+                            {/* Pagination Controls */}
+                            {totalPages > 1 && (
+                                <div style={{
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    gap: '8px',
+                                    marginTop: '20px',
+                                    padding: '16px'
+                                }}>
                                     <button
-                                        key={page}
-                                        onClick={() => handlePageClick(page as number)}
+                                        onClick={handlePreviousPage}
+                                        disabled={currentPage === 1}
                                         style={{
-                                            padding: '8px 12px',
+                                            padding: '8px 16px',
                                             border: '1px solid #ddd',
                                             borderRadius: '4px',
-                                            background: currentPage === page ? '#7FB77E' : '#fff',
-                                            color: currentPage === page ? '#fff' : '#333',
-                                            cursor: 'pointer',
-                                            fontSize: '14px',
-                                            fontWeight: currentPage === page ? 'bold' : 'normal'
+                                            background: currentPage === 1 ? '#f5f5f5' : '#fff',
+                                            cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
+                                            fontSize: '14px'
                                         }}
                                     >
-                                        {page}
+                                        ← Precedente
                                     </button>
-                                )
-                            ))}
 
-                            <button
-                                onClick={handleNextPage}
-                                disabled={currentPage === totalPages}
-                                style={{
-                                    padding: '8px 16px',
-                                    border: '1px solid #ddd',
-                                    borderRadius: '4px',
-                                    background: currentPage === totalPages ? '#f5f5f5' : '#fff',
-                                    cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
-                                    fontSize: '14px'
-                                }}
-                            >
-                                Successiva →
-                            </button>
+                                    {getPageNumbers().map((page, index) => (
+                                        page === '...' ? (
+                                            <span key={`ellipsis-${index}`} style={{ padding: '0 8px' }}>...</span>
+                                        ) : (
+                                            <button
+                                                key={page}
+                                                onClick={() => handlePageClick(page as number)}
+                                                style={{
+                                                    padding: '8px 12px',
+                                                    border: '1px solid #ddd',
+                                                    borderRadius: '4px',
+                                                    background: currentPage === page ? '#7FB77E' : '#fff',
+                                                    color: currentPage === page ? '#fff' : '#333',
+                                                    cursor: 'pointer',
+                                                    fontSize: '14px',
+                                                    fontWeight: currentPage === page ? 'bold' : 'normal'
+                                                }}
+                                            >
+                                                {page}
+                                            </button>
+                                        )
+                                    ))}
+
+                                    <button
+                                        onClick={handleNextPage}
+                                        disabled={currentPage === totalPages}
+                                        style={{
+                                            padding: '8px 16px',
+                                            border: '1px solid #ddd',
+                                            borderRadius: '4px',
+                                            background: currentPage === totalPages ? '#f5f5f5' : '#fff',
+                                            cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
+                                            fontSize: '14px'
+                                        }}
+                                    >
+                                        Successiva →
+                                    </button>
+                                </div>
+                            )}
+                        </>
+                    ) : (
+                        <div style={{
+                            textAlign: 'center',
+                            padding: '40px 20px',
+                            background: '#f8f9fa',
+                            borderRadius: '8px',
+                            marginTop: '20px'
+                        }}>
+                            <p style={{
+                                fontSize: '16px',
+                                color: '#666',
+                                margin: 0
+                            }}>
+                                🔍 Nessun paziente trovato con "<strong>{searchQuery}</strong>"
+                            </p>
+                            <p style={{
+                                fontSize: '14px',
+                                color: '#999',
+                                marginTop: '8px'
+                            }}>
+                                Prova con un altro nome o cognome, oppure clicca Reset
+                            </p>
                         </div>
                     )}
                 </>

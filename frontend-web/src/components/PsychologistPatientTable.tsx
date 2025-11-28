@@ -26,6 +26,8 @@ const PsychologistPatientTable: React.FC<PsychologistPatientTableProps> = ({
                 <thead>
                     <tr>
                         <th>ID Paziente</th>
+                        <th>Nome</th>
+                        <th>Cognome</th>
                         <th>Data Ingresso</th>
                         <th>Score</th>
                         <th>Azioni</th>
@@ -47,6 +49,8 @@ const PsychologistPatientTable: React.FC<PsychologistPatientTableProps> = ({
                                 >
                                     {p.idPaziente.substring(0, 8)}...
                                 </td>
+                                <td>{p.nome}</td>
+                                <td>{p.cognome}</td>
                                 <td>{formatDate(p.dataIngresso)}</td>
                                 <td>{p.score !== null ? p.score : '-'}</td>
                                 <td className="actions-cell">
