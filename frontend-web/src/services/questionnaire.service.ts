@@ -154,3 +154,26 @@ export const uploadQuestionnaireType = async (data: any): Promise<void> => {
         throw error;
     }
 };
+/**
+ * Cancel a revision (admin only)
+ * Note: Backend endpoint might not exist yet.
+ */
+export const cancelRevision = async (id: string): Promise<void> => {
+    try {
+        const token = getCurrentUser()?.access_token as string | undefined;
+        // Placeholder endpoint - this will likely fail until backend is implemented
+        await axios.post(
+            `${API_URL}/admin/questionnaires/${id}/cancel-revision`,
+            {},
+            {
+                headers: {
+                    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                    'Content-Type': 'application/json',
+                },
+            },
+        );
+    } catch (error) {
+        console.error('Error cancelling revision:', error);
+        throw error;
+    }
+};

@@ -61,7 +61,11 @@ const LogoutIcon = () => (
     </svg>
 );
 
-const AdminProfile: React.FC = () => {
+interface AdminProfileProps {
+    onSelectSection?: (section: string) => void;
+}
+
+const AdminProfile: React.FC<AdminProfileProps> = ({ onSelectSection }) => {
     const navigate = useNavigate();
     const [selectedSection, setSelectedSection] = useState<string | null>(null);
     const [adminInfo, setAdminInfo] = useState<{ name: string; email: string } | null>(null);
@@ -86,6 +90,9 @@ const AdminProfile: React.FC = () => {
         event.stopPropagation();
         console.log('Navigate to:', section);
         setSelectedSection(section);
+        if (onSelectSection) {
+            onSelectSection(section);
+        }
     };
 
     const handleBackgroundClick = () => {
