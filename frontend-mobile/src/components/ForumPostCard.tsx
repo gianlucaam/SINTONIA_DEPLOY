@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import type { ForumPost } from '../types/forum';
 import { formatRelativeTime, categoryInfo } from '../services/forum.service';
+import ConfirmDeleteModal from './ConfirmDeleteModal';
 import '../css/ForumPostCard.css';
 
 interface ForumPostCardProps {
@@ -12,6 +13,7 @@ interface ForumPostCardProps {
 
 const ForumPostCard: React.FC<ForumPostCardProps> = ({ post, isOwnPost = false, onEdit, onDelete }) => {
     const [showMenu, setShowMenu] = useState(false);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
 
     const category = categoryInfo.find(c => c.id === post.category);
     const categoryColor = category?.color || '#888';
@@ -24,10 +26,15 @@ const ForumPostCard: React.FC<ForumPostCardProps> = ({ post, isOwnPost = false, 
     };
 
     const handleDelete = () => {
-        if (onDelete && window.confirm('Sei sicuro di voler eliminare questa domanda?')) {
+        setShowMenu(false);
+        setShowDeleteModal(true);
+    };
+
+    const confirmDelete = () => {
+        if (onDelete) {
             onDelete(post.id);
         }
-        setShowMenu(false);
+        setShowDeleteModal(false);
     };
 
     return (
@@ -54,9 +61,12 @@ const ForumPostCard: React.FC<ForumPostCardProps> = ({ post, isOwnPost = false, 
                         </button>
                         {showMenu && (
                             <div className="menu-dropdown">
-                                <button onClick={handleEdit} className="menu-item edit">
-                                    Modifica
-                                </button>
+                                {/* Mostra "Modifica" SOLO se NON ci sono risposte */}
+                                {(!post.answers || post.answers.length === 0) && (
+                                    <button onClick={handleEdit} className="menu-item edit">
+                                        Modifica
+                                    </button>
+                                )}
                                 <button onClick={handleDelete} className="menu-item delete">
                                     Elimina
                                 </button>
@@ -81,6 +91,14 @@ const ForumPostCard: React.FC<ForumPostCardProps> = ({ post, isOwnPost = false, 
                         </div>
                     ))}
                 </div>
+            )}
+
+            {/* Modal conferma eliminazione */}
+            {showDeleteModal && (
+                <ConfirmDeleteModal
+                    onConfirm={confirmDelete}
+                    onCancel={() => setShowDeleteModal(false)}
+                />
             )}
         </div>
     );

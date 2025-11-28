@@ -17,24 +17,34 @@
     margin-bottom: 24px;
 }
 
-.back-arrow-btn {
-    background: transparent;
+/* Bottone back circolare bianco con icona */
+.back-arrow-btn-circle {
+    background: white;
     border: none;
-    color: white;
-    font-size: 28px;
     cursor: pointer;
-    padding: 8px 12px;
+    padding: 0;
     transition: opacity 0.2s;
     line-height: 1;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.back-arrow-btn:hover:not(:disabled) {
+.back-arrow-btn-circle:hover:not(:disabled) {
     opacity: 0.8;
 }
 
-.back-arrow-btn:disabled {
+.back-arrow-btn-circle:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+}
+
+.back-arrow-btn-circle img {
+    width: 10px;
+    height: 14px;
 }
 
 .create-post-title-white {
@@ -54,23 +64,24 @@
     margin-bottom: 24px;
 }
 
-/* Label più leggere */
-.form-label-light {
+/* Label grassetto */
+.form-label-bold {
     display: block;
-    font-size: 13px;
-    font-weight: 500;
-    color: #888;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-dark);
     margin-bottom: 8px;
 }
 
-/* Input con icona edit */
+/* Input wrapper per icona */
 .input-with-icon {
     position: relative;
 }
 
+/* Input titolo */
 .form-input-new {
     width: 100%;
-    padding: 12px 40px 12px 16px;
+    padding: 12px 16px;
     border: 1px solid rgba(0, 0, 0, 0.15);
     border-radius: 12px;
     font-size: 16px;
@@ -89,15 +100,6 @@
 .form-input-new::placeholder {
     color: var(--text-gray);
     opacity: 0.6;
-}
-
-.edit-icon {
-    position: absolute;
-    right: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 18px;
-    pointer-events: none;
 }
 
 /* Textarea container con card style e contatore */
@@ -139,6 +141,7 @@
 
 /* Selettore categoria cliccabile */
 .category-selector {
+    position: relative;
     display: flex;
     justify-content: space-between;
     align-items: center;

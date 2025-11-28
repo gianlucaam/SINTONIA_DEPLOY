@@ -52,8 +52,16 @@ const Forum: React.FC = () => {
 
     const handleCategoryChange = (categories: ForumCategory[]) => {
         setSelectedCategories(categories);
-        // Funzionalità filtering rimandata - i bottoni sono visibili ma non funzionali
     };
+
+    // Filtra le domande in base alle categorie selezionate
+    const filteredMyQuestions = selectedCategories.length > 0
+        ? myQuestions.filter(q => selectedCategories.includes(q.category))
+        : myQuestions;
+
+    const filteredPublicQuestions = selectedCategories.length > 0
+        ? publicQuestions.filter(q => selectedCategories.includes(q.category))
+        : publicQuestions;
 
     if (loading) {
         return <div className="loading-screen">Caricamento...</div>;
@@ -61,18 +69,18 @@ const Forum: React.FC = () => {
 
     return (
         <div className="forum-page">
-            <ForumHeader postCount={myQuestions.length + publicQuestions.length} onAddPost={handleAddPost} />
+            <ForumHeader postCount={filteredMyQuestions.length + filteredPublicQuestions.length} onAddPost={handleAddPost} />
             <CategoryFilters
                 selectedCategories={selectedCategories}
                 onCategoryChange={handleCategoryChange}
             />
             <div className="forum-content">
                 {/* Sezione Le Mie Domande */}
-                {myQuestions.length > 0 && (
+                {filteredMyQuestions.length > 0 && (
                     <div className="forum-section">
                         <h2 className="section-title">Le Mie Domande</h2>
                         <div className="posts-list">
-                            {myQuestions.map(post => (
+                            {filteredMyQuestions.map(post => (
                                 <ForumPostCard
                                     key={post.id}
                                     post={post}
@@ -86,11 +94,11 @@ const Forum: React.FC = () => {
                 )}
 
                 {/* Sezione Domande Pubbliche */}
-                {publicQuestions.length > 0 && (
+                {filteredPublicQuestions.length > 0 && (
                     <div className="forum-section">
                         <h2 className="section-title">Domande Pubbliche</h2>
                         <div className="posts-list">
-                            {publicQuestions.map(post => (
+                            {filteredPublicQuestions.map(post => (
                                 <ForumPostCard
                                     key={post.id}
                                     post={post}
@@ -102,10 +110,14 @@ const Forum: React.FC = () => {
                 )}
 
                 {/* Messaggio se non ci sono domande */}
-                {myQuestions.length === 0 && publicQuestions.length === 0 && (
+                {filteredMyQuestions.length === 0 && filteredPublicQuestions.length === 0 && (
                     <div className="no-posts">
                         <p>Nessuna domanda trovata.</p>
-                        <p className="no-posts-hint">Aggiungi la tua prima domanda!</p>
+                        {selectedCategories.length === 0 ? (
+                            <p className="no-posts-hint">Aggiungi la tua prima domanda!</p>
+                        ) : (
+                            <p className="no-posts-hint">Prova a selezionare altre categorie.</p>
+                        )}
                     </div>
                 )}
             </div>

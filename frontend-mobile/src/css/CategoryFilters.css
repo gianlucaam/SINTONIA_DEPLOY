@@ -49,11 +49,11 @@
 }
 
 .category-chip {
-    padding: 8px 20px;
+    padding: 7px 14px;
     border-radius: 20px;
     border: 2px solid;
     background: transparent;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
     cursor: pointer;
     white-space: nowrap;

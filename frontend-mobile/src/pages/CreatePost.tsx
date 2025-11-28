@@ -5,6 +5,7 @@ import { categoryInfo } from '../services/forum.service';
 import CategoryModal from '../components/CategoryModal';
 import type { ForumCategory, CreatePostDto } from '../types/forum';
 import '../css/CreatePost.css';
+import LeftArrowIcon from '../assets/icons/LeftArrow.svg';
 
 const CreatePost: React.FC = () => {
     const navigate = useNavigate();
@@ -57,21 +58,21 @@ const CreatePost: React.FC = () => {
             {/* Header blu scuro */}
             <div className="create-post-header-blue">
                 <button
-                    className="back-arrow-btn"
+                    className="back-arrow-btn-circle"
                     onClick={handleCancel}
                     disabled={isSubmitting}
                     aria-label="Torna indietro"
                 >
-                    ←
+                    <img src={LeftArrowIcon} alt="Back" />
                 </button>
                 <h1 className="create-post-title-white">Nuova domanda</h1>
             </div>
 
             {/* Form */}
             <form className="create-post-form" onSubmit={handleSubmit}>
-                {/* Campo Titolo con icona edit */}
+                {/* Campo Titolo */}
                 <div className="form-group">
-                    <label htmlFor="title" className="form-label-light">Titolo</label>
+                    <label htmlFor="title" className="form-label-bold">Titolo</label>
                     <div className="input-with-icon">
                         <input
                             id="title"
@@ -83,13 +84,12 @@ const CreatePost: React.FC = () => {
                             maxLength={64}
                             disabled={isSubmitting}
                         />
-                        <span className="edit-icon">✏️</span>
                     </div>
                 </div>
 
                 {/* Campo Contenuto con contatore */}
                 <div className="form-group">
-                    <label htmlFor="content" className="form-label-light">Contenuto</label>
+                    <label htmlFor="content" className="form-label-bold">Contenuto</label>
                     <div className="textarea-container card">
                         <textarea
                             id="content"
@@ -114,7 +114,6 @@ const CreatePost: React.FC = () => {
                         <span className="category-label">
                             {category ? getCategoryLabel(category) : 'Seleziona una categoria'}
                         </span>
-                        <span className="edit-icon">✏️</span>
                     </div>
                 </div>
             </form>

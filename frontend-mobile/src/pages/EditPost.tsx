@@ -2,15 +2,18 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { updatePost, getForumPosts } from '../services/forum.service';
 import { categoryInfo } from '../services/forum.service';
-import type { ForumCategory, UpdatePostDto, ForumPost } from '../types/forum';
+import CategoryModal from '../components/CategoryModal';
+import type { ForumCategory, UpdatePostDto } from '../types/forum';
 import '../css/EditPost.css';
+import LeftArrowIcon from '../assets/icons/LeftArrow.svg';
 
 const EditPost: React.FC = () => {
     const navigate = useNavigate();
     const { id } = useParams<{ id: string }>();
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
-    const [category, setCategory] = useState<ForumCategory>('ansia');
+    const [category, setCategory] = useState<ForumCategory | null>(null);
+    const [showCategoryModal, setShowCategoryModal] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -49,6 +52,11 @@ const EditPost: React.FC = () => {
             return;
         }
 
+        if (!category) {
+            alert('Per favore seleziona una categoria');
+            return;
+        }
+
         if (!id) {
             alert('ID domanda mancante');
             return;
@@ -75,33 +83,40 @@ const EditPost: React.FC = () => {
         navigate('/forum');
     };
 
+    const getCategoryLabel = (catId: ForumCategory) => {
+        return categoryInfo.find((c) => c.id === catId)?.label || catId;
+    };
+
     if (isLoading) {
         return <div className="loading-screen">Caricamento...</div>;
     }
 
     return (
         <div className="edit-post-page">
-            <div className="edit-post-header">
-                <button className="back-button" onClick={handleCancel} aria-label="Indietro">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M15 18l-6-6 6-6" />
-                    </svg>
+            {/* Header blu scuro */}
+            <div className="edit-post-header-blue">
+                <button
+                    className="back-arrow-btn-circle"
+                    onClick={handleCancel}
+                    disabled={isSubmitting}
+                    aria-label="Torna indietro"
+                >
+                    <img src={LeftArrowIcon} alt="Back" />
                 </button>
-                <h1 className="edit-post-title">Modifica Domanda</h1>
+                <h1 className="edit-post-title-white">Modifica domanda</h1>
             </div>
 
+            {/* Form */}
             <form className="edit-post-form" onSubmit={handleSubmit}>
-                <div className="form-section">
-                    <label className="form-label">Titolo</label>
+                {/* Campo Titolo */}
+                <div className="form-group">
+                    <label htmlFor="title" className="form-label-bold">Titolo</label>
                     <div className="input-with-icon">
-                        <svg className="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                            <polyline points="14 2 14 8 20 8" />
-                        </svg>
                         <input
+                            id="title"
                             type="text"
-                            className="form-input"
-                            placeholder="Rottura recente..."
+                            className="form-input-new"
+                            placeholder="Inserisci un titolo"
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
                             maxLength={64}
@@ -110,53 +125,58 @@ const EditPost: React.FC = () => {
                     </div>
                 </div>
 
-                <div className="form-section">
-                    <label className="form-label">Contenuto</label>
-                    <div className="textarea-container">
+                {/* Campo Contenuto con contatore */}
+                <div className="form-group">
+                    <label htmlFor="content" className="form-label-bold">Contenuto</label>
+                    <div className="textarea-container card">
                         <textarea
-                            className="form-textarea"
-                            placeholder="Come faccio a superare una rottura dopo una relazione durata 12 anni?"
+                            id="content"
+                            className="form-textarea-new"
+                            placeholder="Descrivi la tua domanda in dettaglio..."
                             value={content}
                             onChange={(e) => setContent(e.target.value)}
-                            rows={8}
                             maxLength={300}
+                            rows={6}
                             disabled={isSubmitting}
                         />
-                        <div className="char-counter">
-                            {content.length}/300
-                        </div>
+                        <span className="char-counter">{content.length}/300</span>
                     </div>
                 </div>
 
-                <div className="form-section">
-                    <label className="form-label">Seleziona una categoria</label>
-                    <div className="category-dropdown">
-                        <select
-                            className="category-select"
-                            value={category}
-                            onChange={(e) => setCategory(e.target.value as ForumCategory)}
-                            disabled={isSubmitting}
-                        >
-                            {categoryInfo.map((cat) => (
-                                <option key={cat.id} value={cat.id}>
-                                    {cat.label}
-                                </option>
-                            ))}
-                        </select>
-                        <svg className="dropdown-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
-                        </svg>
+                {/* Selezione categoria (campo cliccabile) */}
+                <div className="form-group">
+                    <div
+                        className="category-selector"
+                        onClick={() => !isSubmitting && setShowCategoryModal(true)}
+                    >
+                        <span className="category-label">
+                            {category ? getCategoryLabel(category) : 'Seleziona una categoria'}
+                        </span>
                     </div>
                 </div>
-
-                <button
-                    type="submit"
-                    className="submit-button"
-                    disabled={isSubmitting || !title.trim() || !content.trim()}
-                >
-                    {isSubmitting ? 'Modifica in corso...' : 'Modifica Domanda'}
-                </button>
             </form>
+
+            {/* Bottone fisso in fondo */}
+            <button
+                className="publish-button-fixed"
+                onClick={handleSubmit}
+                disabled={isSubmitting || !title.trim() || !content.trim() || !category}
+            >
+                {isSubmitting ? 'Modifica in corso...' : 'Modifica Domanda'}
+            </button>
+
+            {/* Modal per selezione categoria */}
+            {showCategoryModal && (
+                <CategoryModal
+                    categories={categoryInfo}
+                    selectedCategory={category}
+                    onSelect={(cat) => {
+                        setCategory(cat);
+                        setShowCategoryModal(false);
+                    }}
+                    onClose={() => setShowCategoryModal(false)}
+                />
+            )}
         </div>
     );
 };
