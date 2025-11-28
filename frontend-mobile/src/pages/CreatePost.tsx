@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPost } from '../services/forum.service';
 import { categoryInfo } from '../services/forum.service';
+import CategoryModal from '../components/CategoryModal';
 import type { ForumCategory, CreatePostDto } from '../types/forum';
 import '../css/CreatePost.css';
 
@@ -9,7 +10,8 @@ const CreatePost: React.FC = () => {
     const navigate = useNavigate();
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
-    const [category, setCategory] = useState<ForumCategory>('ansia');
+    const [category, setCategory] = useState<ForumCategory | null>(null);
+    const [showCategoryModal, setShowCategoryModal] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -17,6 +19,11 @@ const CreatePost: React.FC = () => {
 
         if (!title.trim() || !content.trim()) {
             alert('Per favore compila tutti i campi');
+            return;
+        }
+
+        if (!category) {
+            alert('Per favore seleziona una categoria');
             return;
         }
 
@@ -41,79 +48,98 @@ const CreatePost: React.FC = () => {
         navigate('/forum');
     };
 
+    const getCategoryLabel = (catId: ForumCategory) => {
+        return categoryInfo.find((c) => c.id === catId)?.label || catId;
+    };
+
     return (
         <div className="create-post-page">
-            <div className="create-post-header">
+            {/* Header blu scuro */}
+            <div className="create-post-header-blue">
                 <button
-                    className="cancel-button"
+                    className="back-arrow-btn"
                     onClick={handleCancel}
                     disabled={isSubmitting}
+                    aria-label="Torna indietro"
                 >
-                    Annulla
+                    ←
                 </button>
-                <h1 className="create-post-title">Nuova Domanda</h1>
-                <button
-                    className="submit-button"
-                    onClick={handleSubmit}
-                    disabled={isSubmitting || !title.trim() || !content.trim()}
-                >
-                    {isSubmitting ? 'Invio...' : 'Pubblica'}
-                </button>
+                <h1 className="create-post-title-white">Nuova domanda</h1>
             </div>
 
+            {/* Form */}
             <form className="create-post-form" onSubmit={handleSubmit}>
+                {/* Campo Titolo con icona edit */}
                 <div className="form-group">
-                    <label htmlFor="title" className="form-label">Titolo</label>
-                    <input
-                        id="title"
-                        type="text"
-                        className="form-input"
-                        placeholder="Inserisci il titolo della domanda"
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                        maxLength={100}
-                        disabled={isSubmitting}
-                    />
-                </div>
-
-                <div className="form-group">
-                    <label htmlFor="category" className="form-label">Categoria</label>
-                    <div className="category-select-grid">
-                        {categoryInfo.map((cat) => {
-                            const isSelected = category === cat.id;
-                            return (
-                                <button
-                                    key={cat.id}
-                                    type="button"
-                                    className={`category-select-btn ${isSelected ? 'selected' : ''}`}
-                                    style={{
-                                        backgroundColor: isSelected ? cat.color : 'transparent',
-                                        borderColor: cat.color,
-                                        color: isSelected ? 'white' : cat.color,
-                                    }}
-                                    onClick={() => setCategory(cat.id)}
-                                    disabled={isSubmitting}
-                                >
-                                    {cat.label}
-                                </button>
-                            );
-                        })}
+                    <label htmlFor="title" className="form-label-light">Titolo</label>
+                    <div className="input-with-icon">
+                        <input
+                            id="title"
+                            type="text"
+                            className="form-input-new"
+                            placeholder="Inserisci un titolo"
+                            value={title}
+                            onChange={(e) => setTitle(e.target.value)}
+                            maxLength={64}
+                            disabled={isSubmitting}
+                        />
+                        <span className="edit-icon">✏️</span>
                     </div>
                 </div>
 
+                {/* Campo Contenuto con contatore */}
                 <div className="form-group">
-                    <label htmlFor="content" className="form-label">Domanda</label>
-                    <textarea
-                        id="content"
-                        className="form-textarea"
-                        placeholder="Descrivi la tua domanda in dettaglio..."
-                        value={content}
-                        onChange={(e) => setContent(e.target.value)}
-                        rows={10}
-                        disabled={isSubmitting}
-                    />
+                    <label htmlFor="content" className="form-label-light">Contenuto</label>
+                    <div className="textarea-container card">
+                        <textarea
+                            id="content"
+                            className="form-textarea-new"
+                            placeholder="Descrivi la tua domanda in dettaglio..."
+                            value={content}
+                            onChange={(e) => setContent(e.target.value)}
+                            maxLength={300}
+                            rows={6}
+                            disabled={isSubmitting}
+                        />
+                        <span className="char-counter">{content.length}/300</span>
+                    </div>
+                </div>
+
+                {/* Selezione categoria (campo cliccabile) */}
+                <div className="form-group">
+                    <div
+                        className="category-selector"
+                        onClick={() => !isSubmitting && setShowCategoryModal(true)}
+                    >
+                        <span className="category-label">
+                            {category ? getCategoryLabel(category) : 'Seleziona una categoria'}
+                        </span>
+                        <span className="edit-icon">✏️</span>
+                    </div>
                 </div>
             </form>
+
+            {/* Bottone fisso in fondo */}
+            <button
+                className="publish-button-fixed"
+                onClick={handleSubmit}
+                disabled={isSubmitting || !title.trim() || !content.trim() || !category}
+            >
+                {isSubmitting ? 'Invio in corso...' : 'Pubblica Domanda'}
+            </button>
+
+            {/* Modal per selezione categoria */}
+            {showCategoryModal && (
+                <CategoryModal
+                    categories={categoryInfo}
+                    selectedCategory={category}
+                    onSelect={(cat) => {
+                        setCategory(cat);
+                        setShowCategoryModal(false);
+                    }}
+                    onClose={() => setShowCategoryModal(false)}
+                />
+            )}
         </div>
     );
 };
