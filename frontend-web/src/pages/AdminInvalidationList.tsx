@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import AdminInvalidationTable from '../components/AdminInvalidationTable';
+import AdminInvalidationDetailModal from '../components/AdminInvalidationDetailModal';
 import type { InvalidationRequestData, InvalidationLoadingState } from '../types/invalidation';
 import { fetchInvalidationRequests } from '../services/invalidation.service';
 import '../css/QuestionnaireManagement.css'; // Reuse existing layout styles
@@ -12,6 +13,7 @@ const AdminInvalidationList: React.FC = () => {
     });
     const [selectedRequestId, setSelectedRequestId] = useState<string | null>(null);
     const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'approved' | 'rejected'>('all');
+    const [viewingRequest, setViewingRequest] = useState<InvalidationRequestData | null>(null);
 
     useEffect(() => {
         loadRequests();
@@ -36,9 +38,32 @@ const AdminInvalidationList: React.FC = () => {
     };
 
     const handleView = (id: string) => {
-        // Placeholder per visualizzazione dettagli
-        alert(`Visualizza richiesta: ${id.substring(0, 8)}...`);
+        const request = requestsState.data?.find(r => r.idRichiesta === id);
+        if (request) {
+            setViewingRequest(request);
+        }
     };
+
+    const handleCloseModal = () => {
+        setViewingRequest(null);
+    };
+
+    const handleAccept = async (id: string) => {
+        // TODO: Implement API call to accept invalidation request
+        console.log('Accept invalidation request:', id);
+        alert(`Richiesta ${id.substring(0, 8)}... accettata (placeholder - implementare API)`);
+        // Reload requests after accepting
+        await loadRequests();
+    };
+
+    const handleReject = async (id: string) => {
+        // TODO: Implement API call to reject invalidation request
+        console.log('Reject invalidation request:', id);
+        alert(`Richiesta ${id.substring(0, 8)}... rifiutata (placeholder - implementare API)`);
+        // Reload requests after rejecting
+        await loadRequests();
+    };
+
 
     const handleFilterChange = (filter: 'all' | 'pending' | 'approved' | 'rejected') => {
         setStatusFilter(filter);
@@ -159,6 +184,16 @@ const AdminInvalidationList: React.FC = () => {
                         </div>
                     )}
                 </>
+            )}
+
+            {/* Modal for viewing request details */}
+            {viewingRequest && (
+                <AdminInvalidationDetailModal
+                    request={viewingRequest}
+                    onClose={handleCloseModal}
+                    onAccept={handleAccept}
+                    onReject={handleReject}
+                />
             )}
         </div>
     );
