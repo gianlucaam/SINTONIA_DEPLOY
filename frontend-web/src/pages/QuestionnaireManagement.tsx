@@ -167,11 +167,25 @@ const QuestionnaireManagement: React.FC = () => {
                                         disabled={!selectedQuestionnaireId}
                                         title={selectedQuestionnaireId ? "Filtra questionari per questo paziente" : "Seleziona un questionario per filtrare"}
                                     >
-                                        🔍 Filtra per Paziente
+                                        <svg
+                                            width="16"
+                                            height="16"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            strokeWidth="2"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            style={{ marginRight: '8px', verticalAlign: 'middle' }}
+                                        >
+                                            <circle cx="11" cy="11" r="8"></circle>
+                                            <path d="m21 21-4.35-4.35"></path>
+                                        </svg>
+                                        Filtra per Paziente
                                     </button>
                                     {patientFilter && (
                                         <div className="active-filter">
-                                            <span>Filtro attivo: Paziente {patientFilter.substring(0, 8)}...</span>
+                                            <span>Filtro attivo</span>
                                             <button className="reset-filter-btn" onClick={handleResetFilter}>
                                                 ✕ Rimuovi Filtro
                                             </button>
