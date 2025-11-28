@@ -7,6 +7,7 @@ import { ForumModule } from './forum/forum.module.js';
 
 import { SpidAuthModule } from '../spid-auth/spid-auth.module.js';
 import { QuestionarioModule } from './questionario/questionario.module.js';
+import { ForumModule } from './forum/forum.module.js';
 
 @Module({
     imports: [SpidAuthModule, QuestionarioModule, ForumModule],
