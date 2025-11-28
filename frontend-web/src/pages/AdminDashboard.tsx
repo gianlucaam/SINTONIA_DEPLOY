@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import AdminProfile from '../components/AdminProfile';
 import EmptyState from '../components/EmptyState';
 import AdminQuestionnaireList from './AdminQuestionnaireList';
+import AdminPatientList from './AdminPatientList';
 import '../css/PsychologistDashboard.css'; // Reuse layout styles
 
 const AdminDashboard: React.FC = () => {
@@ -11,6 +12,8 @@ const AdminDashboard: React.FC = () => {
         switch (activeSection) {
             case 'questionari':
                 return <AdminQuestionnaireList />;
+            case 'pazienti':
+                return <AdminPatientList />;
             default:
                 return <EmptyState />;
         }
