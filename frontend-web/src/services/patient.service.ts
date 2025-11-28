@@ -24,6 +24,27 @@ export const fetchPatients = async (): Promise<PatientData[]> => {
 };
 
 /**
+ * Cerca un paziente specifico per ID (admin only)
+ * @param id - UUID del paziente da cercare
+ * @returns Dati del paziente trovato
+ */
+export const searchPatientById = async (id: string): Promise<PatientData> => {
+    try {
+        const token = getCurrentUser()?.access_token as string | undefined;
+        const response = await axios.get(`${API_URL}/admin/patients/search/${id}`, {
+            headers: {
+                ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                'Content-Type': 'application/json',
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error searching patient:', error);
+        throw error;
+    }
+};
+
+/**
  * Fetch patients for a specific psychologist
  */
 export const fetchPatientsByPsychologist = async (): Promise<PatientData[]> => {
