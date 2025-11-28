@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import AdminInvalidationTable from '../components/AdminInvalidationTable';
 import AdminInvalidationDetailModal from '../components/AdminInvalidationDetailModal';
 import type { InvalidationRequestData, InvalidationLoadingState } from '../types/invalidation';
-import { fetchInvalidationRequests } from '../services/invalidation.service';
+import { fetchInvalidationRequests, acceptInvalidationRequest, rejectInvalidationRequest } from '../services/invalidation.service';
 import '../css/QuestionnaireManagement.css'; // Reuse existing layout styles
 
 const AdminInvalidationList: React.FC = () => {
@@ -49,19 +49,34 @@ const AdminInvalidationList: React.FC = () => {
     };
 
     const handleAccept = async (id: string) => {
-        // TODO: Implement API call to accept invalidation request
-        console.log('Accept invalidation request:', id);
-        alert(`Richiesta ${id.substring(0, 8)}... accettata (placeholder - implementare API)`);
-        // Reload requests after accepting
-        await loadRequests();
+        try {
+            await acceptInvalidationRequest(id);
+            // Reload requests after accepting
+            await loadRequests();
+            // Close modal if open
+            if (viewingRequest?.idRichiesta === id) {
+                setViewingRequest(null);
+            }
+        } catch (error) {
+            console.error('Error accepting invalidation request:', error);
+            alert('Errore durante l\'accettazione della richiesta. Riprova.');
+        }
     };
 
+
     const handleReject = async (id: string) => {
-        // TODO: Implement API call to reject invalidation request
-        console.log('Reject invalidation request:', id);
-        alert(`Richiesta ${id.substring(0, 8)}... rifiutata (placeholder - implementare API)`);
-        // Reload requests after rejecting
-        await loadRequests();
+        try {
+            await rejectInvalidationRequest(id);
+            // Reload requests after rejecting
+            await loadRequests();
+            // Close modal if open
+            if (viewingRequest?.idRichiesta === id) {
+                setViewingRequest(null);
+            }
+        } catch (error) {
+            console.error('Error rejecting invalidation request:', error);
+            alert('Errore durante il rifiuto della richiesta. Riprova.');
+        }
     };
 
 

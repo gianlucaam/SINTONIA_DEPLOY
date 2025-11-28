@@ -22,3 +22,39 @@ export const fetchInvalidationRequests = async (): Promise<InvalidationRequestDa
         throw error;
     }
 };
+
+/**
+ * Accept an invalidation request (admin only)
+ */
+export const acceptInvalidationRequest = async (id: string): Promise<void> => {
+    try {
+        const token = getCurrentUser()?.access_token as string | undefined;
+        await axios.post(`${API_URL}/admin/invalidation-requests/${id}/accept`, {}, {
+            headers: {
+                ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                'Content-Type': 'application/json',
+            },
+        });
+    } catch (error) {
+        console.error('Error accepting invalidation request:', error);
+        throw error;
+    }
+};
+
+/**
+ * Reject an invalidation request (admin only)
+ */
+export const rejectInvalidationRequest = async (id: string): Promise<void> => {
+    try {
+        const token = getCurrentUser()?.access_token as string | undefined;
+        await axios.post(`${API_URL}/admin/invalidation-requests/${id}/reject`, {}, {
+            headers: {
+                ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                'Content-Type': 'application/json',
+            },
+        });
+    } catch (error) {
+        console.error('Error rejecting invalidation request:', error);
+        throw error;
+    }
+};
