@@ -2,6 +2,8 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../css/ForumHeader.css';
 
+import LeftArrowIcon from '../assets/icons/LeftArrow.svg';
+
 interface ForumHeaderProps {
     postCount: number;
     onAddPost: () => void;
@@ -18,7 +20,7 @@ const ForumHeader: React.FC<ForumHeaderProps> = ({ postCount, onAddPost }) => {
                     onClick={() => navigate('/home')}
                     aria-label="Torna indietro"
                 >
-                    ←
+                    <img src={LeftArrowIcon} alt="Back" />
                 </button>
                 <div className="forum-title-section">
                     <h1 className="forum-title">Forum</h1>

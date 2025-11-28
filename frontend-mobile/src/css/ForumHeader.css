@@ -18,7 +18,7 @@
 
 .back-button {
     background: transparent;
-    border: none;
+    border: 2px solid white;
     color: white;
     font-size: 28px;
     font-weight: 300;
@@ -30,6 +30,18 @@
     justify-content: center;
     padding: 0;
     flex-shrink: 0;
+    border-radius: 50%;
+    transition: background 0.2s ease;
+}
+
+.back-button:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.back-button img {
+    width: 16px;
+    height: 16px;
+    filter: brightness(0) invert(1);
 }
 
 .forum-title-section {
