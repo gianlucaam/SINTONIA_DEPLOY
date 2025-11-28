@@ -34,6 +34,8 @@ const QuestionnaireTable: React.FC<QuestionnaireTableProps> = ({
                         <th>ID Questionario</th>
                         {role === 'admin' && <th>Autore (ID Paziente)</th>}
                         <th>Tipologia</th>
+                        <th>Data Compilazione</th>
+                        <th>Score</th>
                         {role === 'admin' && <th>Data Revisione</th>}
                         <th>Azioni</th>
                     </tr>
@@ -56,6 +58,8 @@ const QuestionnaireTable: React.FC<QuestionnaireTableProps> = ({
                                 </td>
                                 {role === 'admin' && <td>{q.idPaziente}</td>}
                                 <td>{q.nomeTipologia}</td>
+                                <td>{formatDate(q.dataCompilazione)}</td>
+                                <td>{q.score !== null ? q.score : '-'}</td>
                                 {role === 'admin' && <td>{formatDate(q.dataInvalidazione)}</td>}
                                 <td className="actions-cell">
                                     <button
