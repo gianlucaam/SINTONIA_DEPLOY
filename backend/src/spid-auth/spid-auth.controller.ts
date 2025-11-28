@@ -468,6 +468,14 @@ export class SpidAuthController {
         tokenData = await this.spidAuthService.generateToken(user, 'psychologist');
       } else {
         user = await this.spidAuthService.validatePatient(spidProfile);
+
+        // Check if patient already has an assigned psychologist
+        if (user.idPsicologo) {
+          console.warn(`Access denied for patient ${user.codFiscale}: already assigned to psychologist ${user.idPsicologo}`);
+          const errorMessage = 'Accesso negato: Sei già in cura con uno psicologo assegnato.';
+          return res.redirect(`${frontendUrl}/spid-error?message=` + encodeURIComponent(errorMessage));
+        }
+
         tokenData = await this.spidAuthService.generateToken(user, 'patient');
       }
 

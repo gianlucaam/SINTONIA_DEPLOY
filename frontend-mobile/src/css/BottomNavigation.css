@@ -9,12 +9,12 @@ body,
 .bottom-nav-container {
     position: fixed;
     bottom: 0;
-    left: 0;
-    right: 0;
+    left: 50%;
+    transform: translateX(-50%);
     /* ensure stretch to both edges */
     /* Full-bleed to screen edges without 100vw issues */
     width: 100%;
-    max-width: none;
+    max-width: 500px;
     /* Match SVG intrinsic height (123) with small cushion for shadows */
     height: 130px;
     z-index: 100;
@@ -99,17 +99,34 @@ body,
     cursor: pointer;
     /* center by both axes */
     transform: translate(-50%, -50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hit-btn img {
+    width: 24px;
+    height: 24px;
+    /* Apply teal tint to match design */
+    filter: invert(49%) sepia(17%) saturate(743%) hue-rotate(131deg) brightness(95%) contrast(89%);
+}
+
+.hit-center img {
+    width: 32px;
+    height: 32px;
+    /* Darker teal for home */
+    filter: invert(16%) sepia(12%) saturate(2093%) hue-rotate(152deg) brightness(88%) contrast(96%);
 }
 
 /* Positions derived from SVG centers (viewBox 375x123):
    leftmost (40,83), left (108,83), center (188,44), right (267,84), rightmost (335,88) */
 .hit-leftmost {
-    left: 10.667%;
+    left: 18.667%;
     top: 67.48%;
 }
 
 .hit-left {
-    left: 28.800%;
+    left: 32.8%;
     top: 67.48%;
 }
 
@@ -121,13 +138,13 @@ body,
 }
 
 .hit-right {
-    left: 71.200%;
+    left: 67.2%;
     top: 68.293%;
 }
 
 .hit-rightmost {
-    left: 89.333%;
-    top: 71.545%;
+    left: 81.333%;
+    top: 68.545%;
 }
 
 /* Icon theming via inline SVG currentColor */
