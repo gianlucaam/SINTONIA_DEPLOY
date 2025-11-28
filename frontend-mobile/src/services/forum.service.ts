@@ -1,56 +1,6 @@
-import type { ForumPost, CreatePostDto, ForumCategory, CategoryInfo } from '../types/forum';
+import type { ForumPost, CreatePostDto, ForumCategory, CategoryInfo, UpdatePostDto } from '../types/forum';
 
-// Mock data per testing
-const mockPosts: ForumPost[] = [
-    {
-        id: '1',
-        title: 'Sentirsi soli',
-        content: 'Mi sento sempre più stanco, demotivato, e ho la sensazione che non importa a nessuno se peggioro. È normale sentirsi così "abbandonati" dal sistema? Ho paura di non riuscire ad apprezzare ancora. C\'è qualcuno che si sente come me?',
-        category: 'tristezza',
-        author: 'User123',
-        createdAt: new Date(Date.now() - 5 * 60 * 1000), // 5 minuti fa
-    },
-    {
-        id: '2',
-        title: 'Tensione',
-        content: 'Sono sempre teso, rispondo male al mia partner e ai miei colleghi per cose banali, e un minuto dopo mi sento terribilmente in colpa. C\'è un modo "emergenza" per fermarmi prima di scattare?',
-        category: 'stress',
-        author: 'User456',
-        createdAt: new Date(Date.now() - 3 * 60 * 60 * 1000), // 3 ore fa
-    },
-    {
-        id: '3',
-        title: 'Attacchi di panico',
-        content: 'Quasi ogni sera, quando cerco di dormire, mi vengono quelli che chiamano "attacchi di panico" (cuore a mille, sensazione di soffocare, paura). Esistono esercizi di respirazione o tecniche specifiche che posso usare in quei momenti per calmarmi, piuttosto che parlare con uno specialista? Grazie',
-        category: 'ansia',
-        author: 'User789',
-        createdAt: new Date(Date.now() - 60 * 60 * 1000), // 1 ora fa
-    },
-    {
-        id: '4',
-        title: 'Comunicazione difficile',
-        content: 'Io e il mio partner non riusciamo più a comunicare senza litigare. Ogni discussione finisce male. Come possiamo migliorare?',
-        category: 'vita_di_coppia',
-        author: 'User234',
-        createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 giorni fa
-    },
-    {
-        id: '5',
-        title: 'Preoccupazioni costanti',
-        content: 'Non riesco a smettere di preoccuparmi per tutto. Anche le piccole cose diventano enormi nella mia mente.',
-        category: 'ansia',
-        author: 'User567',
-        createdAt: new Date(Date.now() - 4 * 60 * 60 * 1000), // 4 ore fa
-    },
-    {
-        id: '6',
-        title: 'Lavoro e vita privata',
-        content: 'Il mio lavoro mi consuma completamente. Non ho più tempo per me stesso o per la mia famiglia.',
-        category: 'stress',
-        author: 'User890',
-        createdAt: new Date(Date.now() - 6 * 60 * 60 * 1000), // 6 ore fa
-    },
-];
+const API_BASE_URL = 'http://localhost:3000';
 
 export const categoryInfo: CategoryInfo[] = [
     { id: 'ansia', label: 'Ansia', color: '#FB923C' },
@@ -59,39 +9,166 @@ export const categoryInfo: CategoryInfo[] = [
     { id: 'vita_di_coppia', label: 'Vita di coppia', color: '#10B981' },
 ];
 
-// Simula una chiamata API
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-
-export const getForumPosts = async (): Promise<ForumPost[]> => {
-    await delay(300);
-    return [...mockPosts];
-};
-
-export const getForumPostsByCategory = async (categories: ForumCategory[]): Promise<ForumPost[]> => {
-    await delay(300);
-    if (categories.length === 0) {
-        return [...mockPosts];
+// Helper per gestire autenticazione
+const getAuthHeaders = (): HeadersInit => {
+    const token = localStorage.getItem('patient_token');
+    if (!token) {
+        window.location.href = '/spid-info';
+        throw new Error('Missing auth token. Redirecting to login...');
     }
-    return mockPosts.filter(post => categories.includes(post.category));
-};
-
-export const createPost = async (data: CreatePostDto): Promise<ForumPost> => {
-    await delay(300);
-    const newPost: ForumPost = {
-        id: Date.now().toString(),
-        ...data,
-        author: 'CurrentUser',
-        createdAt: new Date(),
+    return {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
     };
-    mockPosts.unshift(newPost);
-    return newPost;
 };
 
+// Helper per gestire errori di autenticazione
+const handleAuthError = (response: Response) => {
+    if (response.status === 401 || response.status === 403) {
+        localStorage.removeItem('patient_token');
+        window.location.href = '/spid-info';
+        throw new Error('Unauthorized. Redirecting to login...');
+    }
+};
+
+// Mapping da backend DTO a frontend type
+const mapQuestionToPost = (question: any): ForumPost => {
+    return {
+        id: question.idDomanda,
+        title: question.titolo,
+        content: question.testo,
+        category: question.categoria as ForumCategory,
+        author: 'User', // Il backend non ritorna l'autore per la privacy
+        createdAt: new Date(question.dataInserimento),
+        answers: question.risposte || [],
+    };
+};
+
+/**
+ * Get all forum posts (user's questions + public questions with answers)
+ */
+export const getForumPosts = async (): Promise<{ myQuestions: ForumPost[], publicQuestions: ForumPost[] }> => {
+    try {
+        const headers = getAuthHeaders();
+
+        // Chiamate parallele per ottimizzazione
+        const [myQuestionsRes, publicQuestionsRes] = await Promise.all([
+            fetch(`${API_BASE_URL}/patient/forum/my-questions`, { headers }),
+            fetch(`${API_BASE_URL}/patient/forum/public-questions`, { headers }),
+        ]);
+
+        handleAuthError(myQuestionsRes);
+        handleAuthError(publicQuestionsRes);
+
+        if (!myQuestionsRes.ok || !publicQuestionsRes.ok) {
+            throw new Error('Failed to fetch forum posts');
+        }
+
+        const myQuestionsData = await myQuestionsRes.json();
+        const publicQuestionsData = await publicQuestionsRes.json();
+
+        return {
+            myQuestions: myQuestionsData.map(mapQuestionToPost),
+            publicQuestions: publicQuestionsData.map(mapQuestionToPost),
+        };
+    } catch (error) {
+        console.error('Error fetching forum posts:', error);
+        throw error;
+    }
+};
+
+/**
+ * Create a new forum post
+ */
+export const createPost = async (data: CreatePostDto): Promise<ForumPost> => {
+    try {
+        const headers = getAuthHeaders();
+
+        const payload = {
+            titolo: data.title,
+            testo: data.content,
+            categoria: data.category,
+        };
+
+        const response = await fetch(`${API_BASE_URL}/paziente/forum/domanda`, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify(payload),
+        });
+
+        handleAuthError(response);
+
+        if (!response.ok) {
+            throw new Error(`Failed to create post: ${response.status}`);
+        }
+
+        const result = await response.json();
+
+        // Costruisci il post dalla risposta
+        return {
+            id: result.idDomanda,
+            title: data.title,
+            content: data.content,
+            category: data.category,
+            author: 'CurrentUser',
+            createdAt: new Date(),
+            answers: [],
+        };
+    } catch (error) {
+        console.error('Error creating post:', error);
+        throw error;
+    }
+};
+
+/**
+ * Update an existing forum post
+ */
+export const updatePost = async (id: string, data: UpdatePostDto): Promise<void> => {
+    try {
+        const headers = getAuthHeaders();
+
+        const payload: any = {};
+        if (data.title !== undefined) payload.titolo = data.title;
+        if (data.content !== undefined) payload.testo = data.content;
+        if (data.category !== undefined) payload.categoria = data.category;
+
+        const response = await fetch(`${API_BASE_URL}/paziente/forum/domanda/${id}`, {
+            method: 'PATCH',
+            headers,
+            body: JSON.stringify(payload),
+        });
+
+        handleAuthError(response);
+
+        if (!response.ok) {
+            throw new Error(`Failed to update post: ${response.status}`);
+        }
+    } catch (error) {
+        console.error('Error updating post:', error);
+        throw error;
+    }
+};
+
+/**
+ * Delete a forum post
+ */
 export const deletePost = async (id: string): Promise<void> => {
-    await delay(300);
-    const index = mockPosts.findIndex(post => post.id === id);
-    if (index !== -1) {
-        mockPosts.splice(index, 1);
+    try {
+        const headers = getAuthHeaders();
+
+        const response = await fetch(`${API_BASE_URL}/paziente/forum/domanda/${id}`, {
+            method: 'DELETE',
+            headers,
+        });
+
+        handleAuthError(response);
+
+        if (!response.ok) {
+            throw new Error(`Failed to delete post: ${response.status}`);
+        }
+    } catch (error) {
+        console.error('Error deleting post:', error);
+        throw error;
     }
 };
 

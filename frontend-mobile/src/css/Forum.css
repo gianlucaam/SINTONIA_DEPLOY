@@ -8,6 +8,18 @@
     padding: 16px 20px;
 }
 
+.forum-section {
+    margin-bottom: 32px;
+}
+
+.section-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin: 0 0 16px 0;
+    padding: 0 4px;
+}
+
 .posts-list {
     display: flex;
     flex-direction: column;

@@ -5,17 +5,26 @@ import '../css/ForumPostCard.css';
 
 interface ForumPostCardProps {
     post: ForumPost;
+    isOwnPost?: boolean;
+    onEdit?: (id: string) => void;
     onDelete?: (id: string) => void;
 }
 
-const ForumPostCard: React.FC<ForumPostCardProps> = ({ post, onDelete }) => {
+const ForumPostCard: React.FC<ForumPostCardProps> = ({ post, isOwnPost = false, onEdit, onDelete }) => {
     const [showMenu, setShowMenu] = useState(false);
 
     const category = categoryInfo.find(c => c.id === post.category);
     const categoryColor = category?.color || '#888';
 
+    const handleEdit = () => {
+        if (onEdit) {
+            onEdit(post.id);
+        }
+        setShowMenu(false);
+    };
+
     const handleDelete = () => {
-        if (onDelete) {
+        if (onDelete && window.confirm('Sei sicuro di voler eliminare questa domanda?')) {
             onDelete(post.id);
         }
         setShowMenu(false);
@@ -34,24 +43,45 @@ const ForumPostCard: React.FC<ForumPostCardProps> = ({ post, onDelete }) => {
                         <span className="post-timestamp">{formatRelativeTime(post.createdAt)}</span>
                     </div>
                 </div>
-                <div className="post-menu-container">
-                    <button
-                        className="menu-button"
-                        onClick={() => setShowMenu(!showMenu)}
-                        aria-label="Menu post"
-                    >
-                        ⋮
-                    </button>
-                    {showMenu && (
-                        <div className="menu-dropdown">
-                            <button onClick={handleDelete} className="menu-item delete">
-                                Elimina
-                            </button>
-                        </div>
-                    )}
-                </div>
+                {isOwnPost && (
+                    <div className="post-menu-container">
+                        <button
+                            className="menu-button"
+                            onClick={() => setShowMenu(!showMenu)}
+                            aria-label="Menu post"
+                        >
+                            ⋮
+                        </button>
+                        {showMenu && (
+                            <div className="menu-dropdown">
+                                <button onClick={handleEdit} className="menu-item edit">
+                                    Modifica
+                                </button>
+                                <button onClick={handleDelete} className="menu-item delete">
+                                    Elimina
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                )}
             </div>
             <p className="post-content">{post.content}</p>
+
+            {/* Mostra risposte se presenti */}
+            {post.answers && post.answers.length > 0 && (
+                <div className="post-answers">
+                    <h4 className="answers-title">Risp from {post.answers.length} psicologo{post.answers.length > 1 ? 'i' : ''}</h4>
+                    {post.answers.map((answer) => (
+                        <div key={answer.idRisposta} className="answer-card">
+                            <div className="answer-header">
+                                <strong>Dr. {answer.nomePsicologo} {answer.cognomePsicologo}</strong>
+                                <span className="answer-date">{formatRelativeTime(new Date(answer.dataRisposta))}</span>
+                            </div>
+                            <p className="answer-content">{answer.testo}</p>
+                        </div>
+                    ))}
+                </div>
+            )}
         </div>
     );
 };
