@@ -23,7 +23,13 @@ const QuestionnaireTable: React.FC<QuestionnaireTableProps> = ({
 }) => {
     const formatDate = (dateString: string | null) => {
         if (!dateString) return '-';
-        return dateString;
+        return new Date(dateString).toLocaleString('it-IT', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
     };
 
     return (

@@ -61,7 +61,13 @@ const AdminQuestionnaireDetailModal: React.FC<AdminQuestionnaireDetailModalProps
                             </div>
                             <div className="info-item">
                                 <label>Data Compilazione:</label>
-                                <span>{questionnaire.dataCompilazione}</span>
+                                <span>{new Date(questionnaire.dataCompilazione).toLocaleString('it-IT', {
+                                    day: '2-digit',
+                                    month: '2-digit',
+                                    year: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                })}</span>
                             </div>
                             {questionnaire.score !== null && (
                                 <div className="info-item">
