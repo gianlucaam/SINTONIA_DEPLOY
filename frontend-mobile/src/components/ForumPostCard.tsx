@@ -50,7 +50,8 @@ const ForumPostCard: React.FC<ForumPostCardProps> = ({ post, isOwnPost = false, 
                         <span className="post-timestamp">{formatRelativeTime(post.createdAt)}</span>
                     </div>
                 </div>
-                {isOwnPost && (
+                {/* Mostra il menu SOLO se è una domanda propria E NON ha risposte */}
+                {isOwnPost && (!post.answers || post.answers.length === 0) && (
                     <div className="post-menu-container">
                         <button
                             className="menu-button"
@@ -61,12 +62,9 @@ const ForumPostCard: React.FC<ForumPostCardProps> = ({ post, isOwnPost = false, 
                         </button>
                         {showMenu && (
                             <div className="menu-dropdown">
-                                {/* Mostra "Modifica" SOLO se NON ci sono risposte */}
-                                {(!post.answers || post.answers.length === 0) && (
-                                    <button onClick={handleEdit} className="menu-item edit">
-                                        Modifica
-                                    </button>
-                                )}
+                                <button onClick={handleEdit} className="menu-item edit">
+                                    Modifica
+                                </button>
                                 <button onClick={handleDelete} className="menu-item delete">
                                     Elimina
                                 </button>
@@ -80,7 +78,9 @@ const ForumPostCard: React.FC<ForumPostCardProps> = ({ post, isOwnPost = false, 
             {/* Mostra risposte se presenti */}
             {post.answers && post.answers.length > 0 && (
                 <div className="post-answers">
-                    <h4 className="answers-title">Risp from {post.answers.length} psicologo{post.answers.length > 1 ? 'i' : ''}</h4>
+                    <h4 className="answers-title">
+                        Risposto da {post.answers.length} {post.answers.length > 1 ? 'psicologi' : 'psicologo'}
+                    </h4>
                     {post.answers.map((answer) => (
                         <div key={answer.idRisposta} className="answer-card">
                             <div className="answer-header">

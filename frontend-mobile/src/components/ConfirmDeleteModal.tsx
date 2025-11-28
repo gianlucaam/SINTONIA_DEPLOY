@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import ReactDOM from 'react-dom';
 import '../css/ConfirmDeleteModal.css';
 
 interface ConfirmDeleteModalProps {
@@ -25,9 +26,17 @@ const ConfirmDeleteModal: React.FC<ConfirmDeleteModalProps> = ({ onConfirm, onCa
         onConfirm();
     };
 
-    return (
-        <div className="confirm-modal-overlay">
-            <div className="confirm-modal-box">
+    // Usa un portale per renderizzare il modal direttamente nel body
+    // Questo evita problemi di posizionamento con container parent
+    return ReactDOM.createPortal(
+        <div
+            className="confirm-modal-overlay"
+            onClick={(e) => e.stopPropagation()}
+        >
+            <div
+                className="confirm-modal-box"
+                onClick={(e) => e.stopPropagation()}
+            >
                 <div className="confirm-modal-buttons">
                     <button
                         className="confirm-modal-btn cancel-btn"
@@ -43,7 +52,8 @@ const ConfirmDeleteModal: React.FC<ConfirmDeleteModalProps> = ({ onConfirm, onCa
                     </button>
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 };
 
