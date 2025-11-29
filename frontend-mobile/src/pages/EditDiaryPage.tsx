@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import LeftArrow from '../assets/icons/LeftArrow.svg';
+import { updateDiaryPage } from '../services/diary.service';
 import '../css/EditDiaryPage.css';
 
 interface LocationState {
@@ -18,6 +19,7 @@ const EditDiaryPage: React.FC = () => {
 
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
     const maxContentLength = 2000;
 
     useEffect(() => {
@@ -34,14 +36,20 @@ const EditDiaryPage: React.FC = () => {
         navigate('/diary');
     };
 
-    const handleSubmit = () => {
-        // TODO: Implementare salvataggio con backend
-        // Per ora usa dati mock
-        console.log('Updating diary page:', { id: state.page.id, title, content });
+    const handleSubmit = async () => {
+        if (!isFormValid || isLoading) return;
 
-        // Mock: simula salvataggio e torna al diario
-        alert('Pagina modificata con successo!');
-        navigate('/diary');
+        setIsLoading(true);
+        try {
+            await updateDiaryPage(state.page.id, { title, content });
+            alert('Pagina modificata con successo!');
+            navigate('/diary');
+        } catch (error) {
+            console.error('Error updating diary page:', error);
+            alert('Errore durante la modifica. Riprova.');
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const isFormValid = title.trim().length > 0 && content.trim().length > 0;
@@ -97,9 +105,9 @@ const EditDiaryPage: React.FC = () => {
                 <button
                     className="submit-button"
                     onClick={handleSubmit}
-                    disabled={!isFormValid}
+                    disabled={!isFormValid || isLoading}
                 >
-                    Continua →
+                    {isLoading ? 'Salvataggio...' : 'Continua →'}
                 </button>
             </div>
         </div>

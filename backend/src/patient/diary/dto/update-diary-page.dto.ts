@@ -1,4 +1,4 @@
-export class CreateDiaryPageDto {
+export class UpdateDiaryPageDto {
     title: string;
     content: string;
 

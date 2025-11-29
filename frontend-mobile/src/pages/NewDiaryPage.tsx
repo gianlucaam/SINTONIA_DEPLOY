@@ -1,26 +1,34 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import LeftArrow from '../assets/icons/LeftArrow.svg';
+import { createDiaryPage } from '../services/diary.service';
 import '../css/NewDiaryPage.css';
 
 const NewDiaryPage: React.FC = () => {
     const navigate = useNavigate();
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
     const maxContentLength = 2000;
 
     const handleBack = () => {
         navigate('/diary');
     };
 
-    const handleSubmit = () => {
-        // TODO: Implementare salvataggio con backend
-        // Per ora usa dati mock
-        console.log('Saving diary page:', { title, content });
+    const handleSubmit = async () => {
+        if (!isFormValid || isLoading) return;
 
-        // Mock: simula salvataggio e torna al diario
-        alert('Pagina salvata con successo!');
-        navigate('/diary');
+        setIsLoading(true);
+        try {
+            await createDiaryPage({ title, content });
+            alert('Pagina salvata con successo!');
+            navigate('/diary');
+        } catch (error) {
+            console.error('Error saving diary page:', error);
+            alert('Errore durante il salvataggio. Riprova.');
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const isFormValid = title.trim().length > 0 && content.trim().length > 0;
@@ -76,9 +84,9 @@ const NewDiaryPage: React.FC = () => {
                 <button
                     className="submit-button"
                     onClick={handleSubmit}
-                    disabled={!isFormValid}
+                    disabled={!isFormValid || isLoading}
                 >
-                    Continua →
+                    {isLoading ? 'Salvataggio...' : 'Continua →'}
                 </button>
             </div>
         </div>
