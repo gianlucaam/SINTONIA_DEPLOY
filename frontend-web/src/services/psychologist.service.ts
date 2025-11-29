@@ -107,6 +107,9 @@ export interface PsychologistOption {
     codFiscale: string;
     nome: string;
     cognome: string;
+    aslAppartenenza?: string;
+    stato?: 'attivo' | 'sospeso';
+    immagineProfilo?: string | null;
 }
 
 /**

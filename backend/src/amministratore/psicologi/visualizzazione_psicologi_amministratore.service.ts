@@ -13,6 +13,9 @@ export class Visualizzazione_psicologi_amministratoreService {
                 codFiscale: psicologo.codFiscale,
                 nome: psicologo.nome,
                 cognome: psicologo.cognome,
+                aslAppartenenza: psicologo.aslAppartenenza,
+                stato: psicologo.stato,
+                immagineProfilo: psicologo.immagineProfilo,
             })
             .from(psicologo);
 

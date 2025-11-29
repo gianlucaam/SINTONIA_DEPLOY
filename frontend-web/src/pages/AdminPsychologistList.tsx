@@ -4,6 +4,7 @@ import AdminPsychologistDetailModal from '../components/AdminPsychologistDetailM
 import { User, Eye, LayoutGrid, List } from 'lucide-react';
 import '../css/QuestionnaireManagement.css'; // Reuse existing layout styles
 import '../css/AdminPsychologistList.css';
+import { fetchAllPsychologists, type PsychologistOption } from '../services/psychologist.service';
 
 interface PsychologistData {
     codiceFiscale: string;
@@ -13,102 +14,43 @@ interface PsychologistData {
     stato: 'Attivo' | 'Disattivato';
 }
 
-// Mock data per psicologi - corrispondente ai campi database
-const MOCK_PSYCHOLOGISTS: PsychologistData[] = [
-    {
-        codiceFiscale: 'RSSMRA80A01H501U',
-        nome: 'Mario',
-        cognome: 'Rossi',
-        aslAppartenenza: 'ASL Roma 1',
-        stato: 'Attivo'
-    },
-    {
-        codiceFiscale: 'VRDLRA85M15F205Z',
-        nome: 'Laura',
-        cognome: 'Verdi',
-        aslAppartenenza: 'ASL Milano 2',
-        stato: 'Attivo'
-    },
-    {
-        codiceFiscale: 'BNCGVN78C10D612W',
-        nome: 'Giovanni',
-        cognome: 'Bianchi',
-        aslAppartenenza: 'ASL Napoli 1',
-        stato: 'Disattivato'
-    },
-    {
-        codiceFiscale: 'FRRSFN90L20H501X',
-        nome: 'Stefania',
-        cognome: 'Ferrari',
-        aslAppartenenza: 'ASL Torino 3',
-        stato: 'Attivo'
-    },
-    {
-        codiceFiscale: 'MRTNDR82D15A783Y',
-        nome: 'Andrea',
-        cognome: 'Martini',
-        aslAppartenenza: 'ASL Bologna',
-        stato: 'Attivo'
-    },
-    {
-        codiceFiscale: 'GLLFNC88H25L219V',
-        nome: 'Francesca',
-        cognome: 'Galli',
-        aslAppartenenza: 'ASL Firenze',
-        stato: 'Attivo'
-    },
-    {
-        codiceFiscale: 'RCCMRC75B12F839K',
-        nome: 'Marco',
-        cognome: 'Ricci',
-        aslAppartenenza: 'ASL Genova',
-        stato: 'Disattivato'
-    },
-    {
-        codiceFiscale: 'CSTCHR92E18D969L',
-        nome: 'Chiara',
-        cognome: 'Castelli',
-        aslAppartenenza: 'ASL Venezia',
-        stato: 'Attivo'
-    },
-    {
-        codiceFiscale: 'BRBLCU83T05B791M',
-        nome: 'Luca',
-        cognome: 'Barbieri',
-        aslAppartenenza: 'ASL Verona',
-        stato: 'Attivo'
-    },
-    {
-        codiceFiscale: 'PLLELN87A42C351N',
-        nome: 'Elena',
-        cognome: 'Pellegrini',
-        aslAppartenenza: 'ASL Palermo 1',
-        stato: 'Attivo'
-    },
-    {
-        codiceFiscale: 'CRBPLO79M08G224P',
-        nome: 'Paolo',
-        cognome: 'Colombo',
-        aslAppartenenza: 'ASL Bari',
-        stato: 'Attivo'
-    },
-    {
-        codiceFiscale: 'MNTSRT91P48H703Q',
-        nome: 'Sara',
-        cognome: 'Monti',
-        aslAppartenenza: 'ASL Catania',
-        stato: 'Disattivato'
-    }
-];
+// Helper function to normalize backend data to frontend format
+const normalizePsychologist = (psy: PsychologistOption): PsychologistData => ({
+    codiceFiscale: psy.codFiscale,
+    nome: psy.nome,
+    cognome: psy.cognome,
+    aslAppartenenza: psy.aslAppartenenza || 'N/D',
+    stato: psy.stato === 'attivo' ? 'Attivo' : 'Disattivato'
+});
 
 const AdminPsychologistList: React.FC = () => {
-    const [psychologists] = useState<PsychologistData[]>(MOCK_PSYCHOLOGISTS);
-    const [loading] = useState(false);
+    const [psychologists, setPsychologists] = useState<PsychologistData[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
     const [viewingPsychologist, setViewingPsychologist] = useState<PsychologistData | null>(null);
     const [selectedPsychologistId, setSelectedPsychologistId] = useState<string | null>(null);
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(8);
+
+    // Fetch psychologists from backend on mount
+    useEffect(() => {
+        const loadPsychologists = async () => {
+            try {
+                setLoading(true);
+                setError(null);
+                const data = await fetchAllPsychologists();
+                const normalized = data.map(normalizePsychologist);
+                setPsychologists(normalized);
+            } catch (err) {
+                console.error('Error loading psychologists:', err);
+                setError('Errore nel caricamento degli psicologi. Riprova più tardi.');
+            } finally {
+                setLoading(false);
+            }
+        };
+        loadPsychologists();
+    }, []);
 
     // Calcolo dinamico degli elementi per pagina
     useEffect(() => {
@@ -140,7 +82,7 @@ const AdminPsychologistList: React.FC = () => {
 
     // Stati per la ricerca live
     const [searchQuery, setSearchQuery] = useState<string>('');
-    const [filteredPsychologists, setFilteredPsychologists] = useState<PsychologistData[]>(MOCK_PSYCHOLOGISTS);
+    const [filteredPsychologists, setFilteredPsychologists] = useState<PsychologistData[]>([]);
 
     useEffect(() => {
         setFilteredPsychologists(psychologists);
@@ -258,7 +200,20 @@ const AdminPsychologistList: React.FC = () => {
                 <div className="loading-state">Caricamento psicologi...</div>
             )}
 
-            {!loading && (
+            {error && !loading && (
+                <div style={{
+                    padding: '20px',
+                    background: '#fee',
+                    border: '1px solid #fcc',
+                    borderRadius: '8px',
+                    color: '#c00',
+                    textAlign: 'center'
+                }}>
+                    {error}
+                </div>
+            )}
+
+            {!loading && !error && (
                 <>
                     {/* Barra di ricerca compatta - sopra la tabella a destra */}
                     <div style={{
