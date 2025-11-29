@@ -18,14 +18,8 @@ const ForumQuestionCard: React.FC<ForumQuestionCardProps> = ({
     onDeleteAnswer
 }) => {
     const getCategoryColor = (categoria: string): string => {
-        const colors: Record<string, string> = {
-            'Ansia': '#8b5cf6',
-            'Stress': '#f97316',
-            'Tristezza': '#eab308',
-            'Vita di coppia': '#ec4899',
-            'Altro': '#10b981'
-        };
-        return colors[categoria] || '#6b7280';
+        // Uniform color for all categories
+        return '#61A889';
     };
 
     const getTimeAgo = (dateString: string): string => {
