@@ -269,7 +269,7 @@
 
 @keyframes barGrow {
     from {
-        transform: scale Y(0);
+        transform: scaleY(0);
     }
 
     to {
