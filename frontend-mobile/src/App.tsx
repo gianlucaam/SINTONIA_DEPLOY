@@ -14,6 +14,9 @@ import './App.css';
 
 import Terms from './pages/Terms';
 import { getCurrentPatient } from './services/spid-auth.service';
+import Forum from './pages/Forum';
+import CreatePost from './pages/CreatePost';
+import EditPost from './pages/EditPost';
 
 // Protected Route Component
 const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
@@ -75,6 +78,37 @@ function App() {
             </PrivateRoute>
           }
         />
+        <Route
+          path="/forum"
+          element={
+            <PrivateRoute>
+              <Forum />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/forum/create"
+          element={
+            <PrivateRoute>
+              <CreatePost />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/forum/edit/:id"
+          element={
+            <PrivateRoute>
+              <EditPost />
+            </PrivateRoute>
+          }
+        />
+        <Route path="/spid-error" element={
+          <div style={{ padding: '20px', textAlign: 'center' }}>
+            <h1>Errore autenticazione SPID</h1>
+            <p>Si è verificato un errore durante l'autenticazione.</p>
+            <a href="/">Torna alla home</a>
+          </div>
+        } />
         <Route path="/spid-error" element={<SPIDError />} />
       </Routes>
     </Router>
