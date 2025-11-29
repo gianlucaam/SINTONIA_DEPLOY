@@ -3,9 +3,9 @@ import PsychologistPatientTable from '../components/PsychologistPatientTable';
 import PsychologistPatientDetailModal from '../components/PsychologistPatientDetailModal';
 import type { PatientData, LoadingState } from '../types/patient';
 import { fetchPatientsByPsychologist } from '../services/patient.service';
+import { User, Eye, LayoutGrid, List } from 'lucide-react';
 import '../css/QuestionnaireManagement.css'; // Reuse existing layout styles
-
-const ITEMS_PER_PAGE = 10;
+import '../css/AdminPatientList.css'; // Reuse Admin styles for grid/list view
 
 const PsychologistPatientList: React.FC = () => {
     const [patientsState, setPatientsState] = useState<LoadingState<PatientData[]>>({
@@ -13,9 +13,39 @@ const PsychologistPatientList: React.FC = () => {
         loading: true,
         error: null,
     });
-    const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
     const [viewingPatient, setViewingPatient] = useState<PatientData | null>(null);
+    const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
+    const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
     const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage, setItemsPerPage] = useState(8);
+
+    // Calcolo dinamico degli elementi per pagina
+    useEffect(() => {
+        const calculateItemsPerPage = () => {
+            if (viewMode === 'grid') {
+                setItemsPerPage(8);
+            } else {
+                // List view calculation
+                const headerHeight = 80; // Navbar
+                const titleSearchHeight = 140; // Title + Search bar
+                const paginationHeight = 80; // Pagination controls
+                const padding = 40; // Container padding
+
+                const availableHeight = window.innerHeight - (headerHeight + titleSearchHeight + paginationHeight + padding);
+                const rowHeight = 60; // Approximate height of a table row
+                const tableHeaderHeight = 50;
+                const listAvailableHeight = availableHeight - tableHeaderHeight;
+
+                const rows = Math.max(5, Math.floor(listAvailableHeight / rowHeight));
+                setItemsPerPage(rows);
+            }
+        };
+
+        calculateItemsPerPage();
+        window.addEventListener('resize', calculateItemsPerPage);
+
+        return () => window.removeEventListener('resize', calculateItemsPerPage);
+    }, [viewMode]);
 
     // Stati per la ricerca live
     const [searchQuery, setSearchQuery] = useState<string>('');
@@ -64,6 +94,7 @@ const PsychologistPatientList: React.FC = () => {
         }
     };
 
+
     const handleSelectPatient = (id: string) => {
         setSelectedPatientId(id);
     };
@@ -91,9 +122,9 @@ const PsychologistPatientList: React.FC = () => {
 
     // Pagination logic sui pazienti filtrati
     const totalPatients = filteredPatients.length;
-    const totalPages = Math.ceil(totalPatients / ITEMS_PER_PAGE);
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-    const endIndex = startIndex + ITEMS_PER_PAGE;
+    const totalPages = Math.ceil(totalPatients / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
     const currentPatients = filteredPatients.slice(startIndex, endIndex);
 
     const handlePreviousPage = () => {
@@ -148,7 +179,7 @@ const PsychologistPatientList: React.FC = () => {
     };
 
     return (
-        <div className="content-panel" style={{ height: '100%', boxSizing: 'border-box' }}>
+        <div className="content-panel-flex">
             <h2 className="panel-title">I Miei Pazienti</h2>
 
             {patientsState.loading && (
@@ -158,7 +189,7 @@ const PsychologistPatientList: React.FC = () => {
             {patientsState.error && (
                 <div className="error-state">
                     <p>Errore: {patientsState.error}</p>
-                    <button onClick={() => window.location.reload()} className="retry-btn">
+                    <button onClick={() => loadPatients()} className="retry-btn">
                         Riprova
                     </button>
                 </div>
@@ -186,6 +217,23 @@ const PsychologistPatientList: React.FC = () => {
                         </div>
 
                         <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                            <div className="view-toggle">
+                                <button
+                                    className={`toggle-btn ${viewMode === 'grid' ? 'active' : ''}`}
+                                    onClick={() => setViewMode('grid')}
+                                    title="Vista Griglia"
+                                >
+                                    <LayoutGrid size={18} />
+                                </button>
+                                <button
+                                    className={`toggle-btn ${viewMode === 'list' ? 'active' : ''}`}
+                                    onClick={() => setViewMode('list')}
+                                    title="Vista Lista"
+                                >
+                                    <List size={18} />
+                                </button>
+                            </div>
+
                             <input
                                 type="text"
                                 value={searchQuery}
@@ -211,15 +259,39 @@ const PsychologistPatientList: React.FC = () => {
                         </div>
                     </div>
 
-                    {/* Tabella pazienti o messaggio vuoto */}
+                    {/* Griglia pazienti o messaggio vuoto */}
                     {currentPatients.length > 0 ? (
                         <>
-                            <PsychologistPatientTable
-                                patients={currentPatients}
-                                selectedId={selectedPatientId}
-                                onSelect={handleSelectPatient}
-                                onView={handleView}
-                            />
+                            {viewMode === 'grid' ? (
+                                <div className="patient-grid">
+                                    {currentPatients.map((patient) => (
+                                        <div key={patient.idPaziente} className="patient-card">
+                                            <div className="patient-avatar">
+                                                <User size={32} />
+                                            </div>
+                                            <div className="patient-info">
+                                                <h3 className="patient-name">{patient.nome} {patient.cognome}</h3>
+                                            </div>
+                                            <button
+                                                className="profile-btn"
+                                                onClick={() => handleView(patient.idPaziente)}
+                                            >
+                                                <Eye size={16} />
+                                                Profilo
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div style={{ flex: 1, overflowY: 'auto' }}>
+                                    <PsychologistPatientTable
+                                        patients={currentPatients}
+                                        selectedId={selectedPatientId}
+                                        onSelect={handleSelectPatient}
+                                        onView={handleView}
+                                    />
+                                </div>
+                            )}
 
                             {/* Pagination Controls */}
                             {totalPages > 1 && (

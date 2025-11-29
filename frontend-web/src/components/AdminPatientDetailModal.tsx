@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import type { PatientData } from '../types/patient';
 import { getPatientDetails, updatePatient } from '../services/patient.service';
+import { fetchAllPsychologists, type PsychologistOption } from '../services/psychologist.service';
 import '../css/QuestionnaireDetailModal.css'; // Reuse existing styles
 
 interface AdminPatientDetailModalProps {
@@ -19,16 +20,34 @@ const AdminPatientDetailModal: React.FC<AdminPatientDetailModalProps> = ({
     const [isEditing, setIsEditing] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
 
+    // Psychologists list
+    const [psychologists, setPsychologists] = useState<PsychologistOption[]>([]);
+    const [loadingPsychologists, setLoadingPsychologists] = useState(false);
+
     // Editable fields
     const [editedEmail, setEditedEmail] = useState('');
     const [editedResidenza, setEditedResidenza] = useState('');
     const [editedPsicologo, setEditedPsicologo] = useState('');
+    const [psychologistSearch, setPsychologistSearch] = useState('');
 
     useEffect(() => {
         if (patient) {
             loadPatientDetails();
+            loadPsychologists();
         }
     }, [patient]);
+
+    const loadPsychologists = async () => {
+        setLoadingPsychologists(true);
+        try {
+            const data = await fetchAllPsychologists();
+            setPsychologists(data);
+        } catch (error) {
+            console.error('Error loading psychologists:', error);
+        } finally {
+            setLoadingPsychologists(false);
+        }
+    };
 
     const loadPatientDetails = async () => {
         if (!patient) return;
@@ -97,7 +116,7 @@ const AdminPatientDetailModal: React.FC<AdminPatientDetailModalProps> = ({
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
                     <div className="modal-title-section">
-                        <h2 className="modal-title">Dettagli Paziente (Admin)</h2>
+                        <h2 className="modal-title">Dettagli Paziente</h2>
                     </div>
                     <button className="modal-close-btn" onClick={onClose} aria-label="Chiudi">
                         ✕
@@ -181,19 +200,150 @@ const AdminPatientDetailModal: React.FC<AdminPatientDetailModalProps> = ({
                                     <div className="info-item">
                                         <label>Psicologo Assegnato:</label>
                                         {isEditing ? (
-                                            <input
-                                                type="text"
-                                                value={editedPsicologo}
-                                                onChange={(e) => setEditedPsicologo(e.target.value)}
-                                                placeholder="Codice Fiscale Psicologo"
-                                                style={{
-                                                    padding: '6px 10px',
-                                                    border: '2px solid #7FB77E',
-                                                    borderRadius: '4px',
-                                                    fontSize: '14px',
-                                                    width: '100%'
-                                                }}
-                                            />
+                                            <div style={{ position: 'relative', width: '100%' }}>
+                                                {/* Search/Display Input */}
+                                                <input
+                                                    type="text"
+                                                    value={psychologistSearch}
+                                                    onChange={(e) => setPsychologistSearch(e.target.value)}
+                                                    onFocus={() => setPsychologistSearch('')}
+                                                    placeholder={
+                                                        editedPsicologo
+                                                            ? psychologists.find(p => p.codFiscale === editedPsicologo)
+                                                                ? `${psychologists.find(p => p.codFiscale === editedPsicologo)!.codFiscale} - Dr. ${psychologists.find(p => p.codFiscale === editedPsicologo)!.nome} ${psychologists.find(p => p.codFiscale === editedPsicologo)!.cognome}`
+                                                                : 'Non assegnato'
+                                                            : '🔍 Cerca per codice fiscale o nome...'
+                                                    }
+                                                    disabled={loadingPsychologists}
+                                                    className="modal-input"
+                                                    style={{
+                                                        fontSize: '13px',
+                                                        padding: '8px 12px',
+                                                    }}
+                                                />
+
+                                                {/* Dropdown List */}
+                                                {psychologistSearch && !loadingPsychologists && (
+                                                    <div style={{
+                                                        position: 'absolute',
+                                                        top: '100%',
+                                                        left: 0,
+                                                        right: 0,
+                                                        marginTop: '4px',
+                                                        backgroundColor: 'white',
+                                                        border: '2px solid #E0E0E0',
+                                                        borderRadius: '6px',
+                                                        maxHeight: '200px',
+                                                        overflowY: 'auto',
+                                                        zIndex: 1000,
+                                                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)'
+                                                    }}>
+                                                        {/* Non assegnato option */}
+                                                        <div
+                                                            onClick={() => {
+                                                                setEditedPsicologo('');
+                                                                setPsychologistSearch('');
+                                                            }}
+                                                            style={{
+                                                                padding: '10px 12px',
+                                                                cursor: 'pointer',
+                                                                borderBottom: '1px solid #f0f0f0',
+                                                                fontSize: '13px',
+                                                                color: '#999',
+                                                                fontStyle: 'italic'
+                                                            }}
+                                                            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f8f9fa'}
+                                                            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'white'}
+                                                        >
+                                                            -- Non assegnato --
+                                                        </div>
+
+                                                        {/* Filtered psychologists */}
+                                                        {psychologists
+                                                            .filter(psy =>
+                                                                psy.codFiscale.toLowerCase().includes(psychologistSearch.toLowerCase()) ||
+                                                                `${psy.nome} ${psy.cognome}`.toLowerCase().includes(psychologistSearch.toLowerCase())
+                                                            )
+                                                            .map(psy => (
+                                                                <div
+                                                                    key={psy.codFiscale}
+                                                                    onClick={() => {
+                                                                        setEditedPsicologo(psy.codFiscale);
+                                                                        setPsychologistSearch('');
+                                                                    }}
+                                                                    style={{
+                                                                        padding: '10px 12px',
+                                                                        cursor: 'pointer',
+                                                                        borderBottom: '1px solid #f0f0f0',
+                                                                        fontSize: '13px',
+                                                                        backgroundColor: editedPsicologo === psy.codFiscale ? '#e8f5e9' : 'white'
+                                                                    }}
+                                                                    onMouseEnter={(e) => {
+                                                                        if (editedPsicologo !== psy.codFiscale) {
+                                                                            e.currentTarget.style.backgroundColor = '#f8f9fa';
+                                                                        }
+                                                                    }}
+                                                                    onMouseLeave={(e) => {
+                                                                        if (editedPsicologo !== psy.codFiscale) {
+                                                                            e.currentTarget.style.backgroundColor = 'white';
+                                                                        }
+                                                                    }}
+                                                                >
+                                                                    <div style={{ fontWeight: 500, color: '#333' }}>
+                                                                        {psy.codFiscale}
+                                                                    </div>
+                                                                    <div style={{ fontSize: '11px', color: '#666', marginTop: '2px' }}>
+                                                                        Dr. {psy.nome} {psy.cognome}
+                                                                    </div>
+                                                                </div>
+                                                            ))
+                                                        }
+
+                                                        {/* No results message */}
+                                                        {psychologists.filter(psy =>
+                                                            psy.codFiscale.toLowerCase().includes(psychologistSearch.toLowerCase()) ||
+                                                            `${psy.nome} ${psy.cognome}`.toLowerCase().includes(psychologistSearch.toLowerCase())
+                                                        ).length === 0 && (
+                                                                <div style={{
+                                                                    padding: '20px',
+                                                                    textAlign: 'center',
+                                                                    color: '#999',
+                                                                    fontSize: '13px'
+                                                                }}>
+                                                                    Nessun psicologo trovato
+                                                                </div>
+                                                            )}
+                                                    </div>
+                                                )}
+
+                                                {/* Loading indicator */}
+                                                {loadingPsychologists && (
+                                                    <span style={{
+                                                        fontSize: '12px',
+                                                        color: '#7FB77E',
+                                                        fontStyle: 'italic',
+                                                        display: 'block',
+                                                        marginTop: '4px'
+                                                    }}>
+                                                        ⏳ Caricamento psicologi...
+                                                    </span>
+                                                )}
+
+                                                {/* Helper text */}
+                                                {!loadingPsychologists && !psychologistSearch && psychologists.length > 0 && (
+                                                    <span style={{
+                                                        fontSize: '11px',
+                                                        color: '#999',
+                                                        display: 'block',
+                                                        marginTop: '4px'
+                                                    }}>
+                                                        {editedPsicologo
+                                                            ? `Selezionato: ${psychologists.find(p => p.codFiscale === editedPsicologo)?.codFiscale || 'Non assegnato'}`
+                                                            : `${psychologists.length} psicologi disponibili`
+                                                        }
+                                                    </span>
+                                                )}
+                                            </div>
                                         ) : (
                                             <span>{patientDetails.nomePsicologo || 'Non assegnato'}</span>
                                         )}
