@@ -11,6 +11,7 @@ const PsychologistDashboard: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const [activeSection, setActiveSection] = useState<string | null>(null);
+    const [refreshKey, setRefreshKey] = useState(0);
 
     useEffect(() => {
         // Check if we received a section from navigation state
@@ -30,17 +31,22 @@ const PsychologistDashboard: React.FC = () => {
         }
     };
 
+    const handleProfileUpdate = () => {
+        setRefreshKey(prev => prev + 1);
+    };
+
     return (
         <div className="dashboard-container">
             <div className="dashboard-grid">
                 <div className="dashboard-left">
                     <PsychologistProfile
+                        key={refreshKey}
                         onSelectSection={handleSectionSelect}
                         activeSection={activeSection}
                     />
                 </div>
                 <div className="dashboard-right fade-in" key={activeSection || 'empty'}>
-                    {activeSection === 'area-personale' && <PsychologistPersonalArea />}
+                    {activeSection === 'area-personale' && <PsychologistPersonalArea onProfileUpdate={handleProfileUpdate} />}
                     {activeSection === 'pazienti' && <PsychologistPatientList />}
                     {activeSection === 'questionari' && <QuestionnaireManagement />}
                     {activeSection === 'alert' && (

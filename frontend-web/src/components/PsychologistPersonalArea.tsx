@@ -1,21 +1,70 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import profilePhoto from '../images/psychologist-photo.png';
 import '../css/PsychologistPersonalArea.css';
+import { getProfile, updateProfile } from '../services/psychologist.service';
+import { getCurrentUser } from '../services/auth.service';
 
-// Mock data for psychologist personal info
-const MOCK_PSYCHOLOGIST_DATA = {
-    codiceFiscale: 'RSSMRA80A01H501Z',
-    nome: 'Mario',
-    cognome: 'Rossi',
-    asl: 'ASL Roma 1',
-    email: 'mario.rossi@aslroma1.it',
-    profileImageUrl: profilePhoto
-};
+interface PsychologistPersonalAreaProps {
+    onProfileUpdate?: () => void;
+}
 
-const PsychologistPersonalArea: React.FC = () => {
+const PsychologistPersonalArea: React.FC<PsychologistPersonalAreaProps> = ({ onProfileUpdate }) => {
     const [isEditing, setIsEditing] = useState(false);
-    const [formData, setFormData] = useState(MOCK_PSYCHOLOGIST_DATA);
-    const [originalData, setOriginalData] = useState(MOCK_PSYCHOLOGIST_DATA);
+    const [formData, setFormData] = useState<{
+        codiceFiscale: string;
+        nome: string;
+        cognome: string;
+        asl: string;
+        email: string;
+        profileImageUrl: string;
+        profileImageFile?: File | null;
+    }>({
+        codiceFiscale: '',
+        nome: '',
+        cognome: '',
+        asl: '',
+        email: '',
+        profileImageUrl: profilePhoto,
+        profileImageFile: null
+    });
+    const [originalData, setOriginalData] = useState(formData);
+
+    useEffect(() => {
+        const loadData = async () => {
+            try {
+                const user = getCurrentUser();
+                const cf = user?.fiscalCode || user?.id || user?.email;
+                if (cf) {
+                    const data = await getProfile(cf);
+                    // Construct full URL if it's a filename
+                    let imageUrl = profilePhoto;
+                    if (data.immagineProfilo) {
+                        if (data.immagineProfilo.startsWith('http')) {
+                            imageUrl = data.immagineProfilo;
+                        } else {
+                            // Assuming backend serves uploads at /uploads/
+                            imageUrl = `http://localhost:3000/uploads/${data.immagineProfilo}`;
+                        }
+                    }
+
+                    const mappedData = {
+                        codiceFiscale: data.codFiscale,
+                        nome: data.nome,
+                        cognome: data.cognome,
+                        asl: data.aslAppartenenza,
+                        email: data.email,
+                        profileImageUrl: imageUrl,
+                        profileImageFile: null
+                    };
+                    setFormData(mappedData);
+                    setOriginalData(mappedData);
+                }
+            } catch (error) {
+                console.error('Error loading profile:', error);
+            }
+        };
+        loadData();
+    }, []);
 
     const handleEdit = () => {
         setIsEditing(true);
@@ -27,12 +76,30 @@ const PsychologistPersonalArea: React.FC = () => {
         setIsEditing(false);
     };
 
-    const handleSave = () => {
-        // In a real app, this would make an API call to save the data
-        console.log('Saving data:', formData);
-        setIsEditing(false);
-        // Simulate successful save
-        alert('Dati salvati con successo!');
+    const handleSave = async () => {
+        try {
+            const user = getCurrentUser();
+            const cf = user?.fiscalCode || user?.email;
+            if (cf) {
+                await updateProfile(cf, {
+                    email: formData.email,
+                    immagineProfilo: formData.profileImageFile
+                });
+
+                // Refresh data or update state
+                setOriginalData({ ...formData, profileImageFile: null });
+                setIsEditing(false);
+                alert('Dati salvati con successo!');
+
+                // Notify parent to refresh profile
+                if (onProfileUpdate) {
+                    onProfileUpdate();
+                }
+            }
+        } catch (error) {
+            console.error('Error updating profile:', error);
+            alert('Errore durante il salvataggio dei dati');
+        }
     };
 
     const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -44,7 +111,11 @@ const PsychologistPersonalArea: React.FC = () => {
         if (file) {
             const reader = new FileReader();
             reader.onloadend = () => {
-                setFormData({ ...formData, profileImageUrl: reader.result as string });
+                setFormData({
+                    ...formData,
+                    profileImageUrl: reader.result as string,
+                    profileImageFile: file
+                });
             };
             reader.readAsDataURL(file);
         }

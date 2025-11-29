@@ -73,7 +73,11 @@ const PsychologistProfile: React.FC<PsychologistProfileProps> = ({ onSelectSecti
             const user = getCurrentUser();
             const cf = user?.fiscalCode || user?.email;
 
-            const data = await fetchDashboardData(cf || undefined);
+            if (!cf) {
+                throw new Error('Codice Fiscale non trovato nel profilo utente');
+            }
+
+            const data = await fetchDashboardData(cf);
             setDashboardState({ data, loading: false, error: null });
         } catch (error) {
             setDashboardState({
@@ -159,7 +163,11 @@ const PsychologistProfile: React.FC<PsychologistProfileProps> = ({ onSelectSecti
 
                     <div className="profile-photo">
                         <img
-                            src={profileImageUrl || profilePhoto}
+                            src={
+                                profileImageUrl && !profileImageUrl.startsWith('http')
+                                    ? `http://localhost:3000/uploads/${profileImageUrl}`
+                                    : profileImageUrl || profilePhoto
+                            }
                             alt={fullName}
                             onError={(e) => {
                                 e.currentTarget.src = profilePhoto;
