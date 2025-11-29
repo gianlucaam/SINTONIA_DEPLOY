@@ -7,7 +7,6 @@ import { getCurrentUser, logout } from '../services/auth.service';
 import type { PsychologistDashboardData, LoadingState } from '../types/psychologist';
 import profilePhoto from '../images/psychologist-photo.png';
 import notificationIcon from '../images/psi-notification.png';
-import editIcon from '../images/psi-edit_profile.png';
 import '../css/PsychologistProfile.css';
 
 // Modern SVG Icons
@@ -145,7 +144,17 @@ const PsychologistProfile: React.FC<PsychologistProfileProps> = ({ onSelectSecti
                         aria-label="Edit Profile"
                         onClick={(e) => handleNavigation('area-personale', e)}
                     >
-                        <img src={editIcon} alt="Edit" className="side-btn-icon edit-icon" />
+                        <svg
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="side-btn-icon edit-icon"
+                        >
+                            <circle cx="12" cy="7" r="4" fill="currentColor" />
+                            <path d="M12 14C8.13 14 5 15.79 5 18V20H19V18C19 15.79 15.87 14 12 14Z" fill="currentColor" />
+                        </svg>
                     </button>
 
                     <div className="profile-photo">
