@@ -1,13 +1,34 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import LeftArrow from '../assets/icons/LeftArrow.svg';
-import '../css/NewDiaryPage.css';
+import '../css/EditDiaryPage.css';
 
-const NewDiaryPage: React.FC = () => {
+interface LocationState {
+    page: {
+        id: string;
+        title: string;
+        content: string;
+    };
+}
+
+const EditDiaryPage: React.FC = () => {
     const navigate = useNavigate();
+    const location = useLocation();
+    const state = location.state as LocationState;
+
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
     const maxContentLength = 2000;
+
+    useEffect(() => {
+        if (state?.page) {
+            setTitle(state.page.title);
+            setContent(state.page.content);
+        } else {
+            // Se non ci sono dati, torna al diario
+            navigate('/diary');
+        }
+    }, [state, navigate]);
 
     const handleBack = () => {
         navigate('/diary');
@@ -16,26 +37,26 @@ const NewDiaryPage: React.FC = () => {
     const handleSubmit = () => {
         // TODO: Implementare salvataggio con backend
         // Per ora usa dati mock
-        console.log('Saving diary page:', { title, content });
+        console.log('Updating diary page:', { id: state.page.id, title, content });
 
         // Mock: simula salvataggio e torna al diario
-        alert('Pagina salvata con successo!');
+        alert('Pagina modificata con successo!');
         navigate('/diary');
     };
 
     const isFormValid = title.trim().length > 0 && content.trim().length > 0;
 
     return (
-        <div className="new-diary-page">
-            <div className="new-diary-header">
+        <div className="edit-diary-page">
+            <div className="edit-diary-header">
                 <button className="back-button" onClick={handleBack} aria-label="Indietro">
                     <img src={LeftArrow} alt="" />
                 </button>
                 <h1 className="page-subtitle">Indietro</h1>
             </div>
 
-            <div className="new-diary-content">
-                <h2 className="main-title">Cosa succede oggi?</h2>
+            <div className="edit-diary-content">
+                <h2 className="main-title">Modifica contenuto diario</h2>
 
                 <div className="form-section">
                     <label className="form-label">Titolo pagina</label>
@@ -85,4 +106,4 @@ const NewDiaryPage: React.FC = () => {
     );
 };
 
-export default NewDiaryPage;
+export default EditDiaryPage;

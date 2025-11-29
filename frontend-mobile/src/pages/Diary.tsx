@@ -134,8 +134,10 @@ const Diary: React.FC = () => {
     };
 
     const handleEdit = (id: string) => {
-        // TODO: verrà implementato successivamente
-        console.log('Edit page:', id);
+        const page = pages.find(p => p.id === id);
+        if (page) {
+            navigate('/edit-diary-page', { state: { page } });
+        }
     };
 
     const handleDelete = (id: string) => {
