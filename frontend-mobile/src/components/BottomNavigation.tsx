@@ -12,7 +12,7 @@ const BottomNavigation: React.FC = () => {
                 <img src={bottomBarSvg} alt="" aria-hidden="true" className="nav-curve-img" />
             </div>
 
-            {/* Positioned hit areas over the SVG icons */}
+            {/* Positioned buttons with explicit icons */}
             <div className="nav-hit-areas">
                 <button className="hit-btn hit-leftmost" aria-label="Community" onClick={() => navigate('/forum')} />
                 <button className="hit-btn hit-left" aria-label="Notes" />

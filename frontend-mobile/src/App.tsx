@@ -9,6 +9,7 @@ import Home from './pages/Home';
 import Profile from './pages/Profile';
 import Questionari from './pages/Questionari';
 import QuestionnaireCompilation from './pages/QuestionnaireCompilation';
+import SPIDError from './pages/SPIDError';
 import './App.css';
 
 import Terms from './pages/Terms';
@@ -108,6 +109,7 @@ function App() {
             <a href="/">Torna alla home</a>
           </div>
         } />
+        <Route path="/spid-error" element={<SPIDError />} />
       </Routes>
     </Router>
   );
