@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import AdminPsychologistTable from '../components/AdminPsychologistTable';
 import AdminPsychologistDetailModal from '../components/AdminPsychologistDetailModal';
-import { User, Eye, LayoutGrid, List } from 'lucide-react';
+import AddPsychologistModal from '../components/AddPsychologistModal';
+import { User, Eye, LayoutGrid, List, UserPlus } from 'lucide-react';
 import '../css/QuestionnaireManagement.css'; // Reuse existing layout styles
 import '../css/AdminPsychologistList.css';
 import { fetchAllPsychologists, type PsychologistOption } from '../services/psychologist.service';
@@ -32,6 +33,7 @@ const AdminPsychologistList: React.FC = () => {
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(8);
+    const [showAddModal, setShowAddModal] = useState(false);
 
     // Fetch psychologists from backend on mount
     useEffect(() => {
@@ -122,6 +124,20 @@ const AdminPsychologistList: React.FC = () => {
 
     const handleCloseModal = () => {
         setViewingPsychologist(null);
+    };
+
+    const handleOpenAddModal = () => {
+        setShowAddModal(true);
+    };
+
+    const handleCloseAddModal = () => {
+        setShowAddModal(false);
+    };
+
+    const handleAddPsychologist = (newPsychologist: PsychologistData) => {
+        // Add the new psychologist to the list (mock data - no backend call)
+        setPsychologists(prev => [newPsychologist, ...prev]);
+        setShowAddModal(false);
     };
 
     // Gestione input ricerca (live)
@@ -215,12 +231,12 @@ const AdminPsychologistList: React.FC = () => {
 
             {!loading && !error && (
                 <>
-                    {/* Barra di ricerca compatta - sopra la tabella a destra */}
+                    {/* Riga con informazioni e pulsante aggiungi */}
                     <div style={{
                         display: 'flex',
                         justifyContent: 'space-between',
                         alignItems: 'center',
-                        marginBottom: '16px',
+                        marginBottom: '12px',
                         gap: '16px'
                     }}>
                         <div className="filter-controls" style={{ margin: 0 }}>
@@ -234,47 +250,84 @@ const AdminPsychologistList: React.FC = () => {
                             </p>
                         </div>
 
-                        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                            <div className="view-toggle">
-                                <button
-                                    className={`toggle-btn ${viewMode === 'grid' ? 'active' : ''}`}
-                                    onClick={() => setViewMode('grid')}
-                                    title="Vista Griglia"
-                                >
-                                    <LayoutGrid size={18} />
-                                </button>
-                                <button
-                                    className={`toggle-btn ${viewMode === 'list' ? 'active' : ''}`}
-                                    onClick={() => setViewMode('list')}
-                                    title="Vista Lista"
-                                >
-                                    <List size={18} />
-                                </button>
-                            </div>
+                        <button
+                            onClick={handleOpenAddModal}
+                            style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                padding: '10px 18px',
+                                background: '#0D475D',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '8px',
+                                fontSize: '14px',
+                                fontWeight: '600',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s ease',
+                                boxShadow: '0 2px 8px rgba(13, 71, 93, 0.2)'
+                            }}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.transform = 'translateY(-2px)';
+                                e.currentTarget.style.boxShadow = '0 4px 12px rgba(13, 71, 93, 0.3)';
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.transform = 'translateY(0)';
+                                e.currentTarget.style.boxShadow = '0 2px 8px rgba(13, 71, 93, 0.2)';
+                            }}
+                        >
+                            <UserPlus size={18} />
+                            Aggiungi Psicologo
+                        </button>
+                    </div>
 
-                            <input
-                                type="text"
-                                value={searchQuery}
-                                onChange={handleSearchInputChange}
-                                placeholder="🔍 Cerca per CF, nome o cognome..."
-                                style={{
-                                    padding: '10px 16px',
-                                    borderRadius: '8px',
-                                    border: '2px solid #ddd',
-                                    fontSize: '14px',
-                                    width: '300px',
-                                    transition: 'border-color 0.2s ease',
-                                    outline: 'none',
-                                }}
-                                onFocus={(e) => e.target.style.borderColor = '#83B9C1'}
-                                onBlur={(e) => e.target.style.borderColor = '#ddd'}
-                            />
-                            {searchQuery && (
-                                <button onClick={handleReset} className="clear-filter-btn">
-                                    ↺ Reset
-                                </button>
-                            )}
+                    {/* Barra di ricerca e controlli vista */}
+                    <div style={{
+                        display: 'flex',
+                        justifyContent: 'flex-end',
+                        alignItems: 'center',
+                        marginBottom: '16px',
+                        gap: '12px'
+                    }}>
+                        <div className="view-toggle">
+                            <button
+                                className={`toggle-btn ${viewMode === 'grid' ? 'active' : ''}`}
+                                onClick={() => setViewMode('grid')}
+                                title="Vista Griglia"
+                            >
+                                <LayoutGrid size={18} />
+                            </button>
+                            <button
+                                className={`toggle-btn ${viewMode === 'list' ? 'active' : ''}`}
+                                onClick={() => setViewMode('list')}
+                                title="Vista Lista"
+                            >
+                                <List size={18} />
+                            </button>
                         </div>
+
+                        <input
+                            type="text"
+                            value={searchQuery}
+                            onChange={handleSearchInputChange}
+                            placeholder="🔍 Cerca per CF, nome o cognome..."
+                            style={{
+                                padding: '10px 16px',
+                                borderRadius: '8px',
+                                border: '2px solid #ddd',
+                                fontSize: '14px',
+                                width: '300px',
+                                transition: 'border-color 0.2s ease',
+                                outline: 'none',
+                            }}
+                            onFocus={(e) => e.target.style.borderColor = '#83B9C1'}
+                            onBlur={(e) => e.target.style.borderColor = '#ddd'}
+                        />
+                        {searchQuery && (
+                            <button onClick={handleReset} className="clear-filter-btn">
+                                ↺ Reset
+                            </button>
+                        )}
                     </div>
 
                     {/* Griglia psicologi o messaggio vuoto */}
@@ -409,6 +462,14 @@ const AdminPsychologistList: React.FC = () => {
                 <AdminPsychologistDetailModal
                     psychologist={viewingPsychologist}
                     onClose={handleCloseModal}
+                />
+            )}
+
+            {/* Modal for adding new psychologist */}
+            {showAddModal && (
+                <AddPsychologistModal
+                    onClose={handleCloseAddModal}
+                    onAdd={handleAddPsychologist}
                 />
             )}
         </div>
