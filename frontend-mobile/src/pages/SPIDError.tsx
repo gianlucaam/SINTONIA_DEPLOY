@@ -13,7 +13,7 @@ const SPIDError = () => {
             alignItems: 'center',
             height: '100vh',
             padding: '20px',
-            background: 'linear-gradient(135deg, #0066CC 0%, #004C99 100%)',
+            background: 'linear-gradient(135deg, #0f3e4d 0%, #0f3e4d 100%)',
             color: 'white',
             textAlign: 'center'
         }}>
@@ -49,7 +49,7 @@ const SPIDError = () => {
                     borderRadius: '8px',
                     border: 'none',
                     background: 'white',
-                    color: '#0066CC',
+                    color: '#0f3e4d',
                     fontSize: '16px',
                     fontWeight: '600',
                     cursor: 'pointer',
