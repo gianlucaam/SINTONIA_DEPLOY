@@ -153,6 +153,8 @@
     line-height: 1.6;
     font-family: inherit;
     resize: vertical;
+    min-height: 150px;
+    max-height: 400px;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
