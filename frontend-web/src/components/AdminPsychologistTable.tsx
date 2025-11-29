@@ -12,6 +12,7 @@ interface PsychologistData {
     codiceFiscale: string;
     nome: string;
     cognome: string;
+    email: string;
     aslAppartenenza: string;
     stato: 'Attivo' | 'Disattivato';
 }
@@ -39,6 +40,7 @@ const AdminPsychologistTable: React.FC<AdminPsychologistTableProps> = ({
                         <th>Cognome</th>
                         <th>ASL Appartenenza</th>
                         <th>Stato</th>
+                        <th>Email</th>
                         <th>Azioni</th>
                     </tr>
                 </thead>
@@ -73,6 +75,7 @@ const AdminPsychologistTable: React.FC<AdminPsychologistTableProps> = ({
                                         {psy.stato}
                                     </span>
                                 </td>
+                                <td>{psy.email}</td>
                                 <td className="actions-cell">
                                     <button
                                         className="action-btn view-btn"

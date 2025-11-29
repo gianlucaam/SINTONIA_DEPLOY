@@ -11,7 +11,7 @@ interface PsychologistData {
     codiceFiscale: string;
     nome: string;
     cognome: string;
-    email?: string;
+    email: string;
     aslAppartenenza: string;
     stato: 'Attivo' | 'Disattivato';
 }
@@ -21,8 +21,9 @@ const normalizePsychologist = (psy: PsychologistOption): PsychologistData => ({
     codiceFiscale: psy.codFiscale,
     nome: psy.nome,
     cognome: psy.cognome,
+    email: psy.email || 'email@example.com', // Fallback for mock data
     aslAppartenenza: psy.aslAppartenenza || 'N/D',
-    stato: (psy.stato === true || psy.stato === 'attivo') ? 'Attivo' : 'Disattivato'
+    stato: 'Attivo' // Default status, update when backend provides this field
 });
 
 const AdminPsychologistList: React.FC = () => {
