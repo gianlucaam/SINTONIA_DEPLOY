@@ -12,45 +12,49 @@
     top: 0;
     left: 0;
     right: 0;
-    height: 320px;
+    height: 260px;
     background: linear-gradient(180deg, #A5D6A7 0%, #88B7B5 100%);
     overflow: hidden;
     z-index: 0;
+    border-radius: 0 0 50% 50% / 0 0 20% 20%;
 }
 
 .organic-shape {
     position: absolute;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.2);
 }
 
 .shape-1 {
-    width: 180px;
-    height: 180px;
-    top: -50px;
-    left: -60px;
+    width: 280px;
+    height: 280px;
+    top: -100px;
+    left: -80px;
+    background: rgba(255, 255, 255, 0.25);
 }
 
 .shape-2 {
-    width: 140px;
-    height: 140px;
-    top: 20px;
-    right: 30px;
+    width: 200px;
+    height: 200px;
+    top: -40px;
+    right: -20px;
+    background: rgba(255, 255, 255, 0.2);
 }
 
 .shape-3 {
-    width: 80px;
-    height: 80px;
-    top: 100px;
-    left: 20px;
+    width: 150px;
+    height: 150px;
+    top: 80px;
+    left: -30px;
+    background: rgba(255, 255, 255, 0.15);
 }
 
 .shape-4 {
-    width: 200px;
-    height: 200px;
-    top: 150px;
-    right: -80px;
-    background: rgba(255, 255, 255, 0.1);
+    width: 180px;
+    height: 180px;
+    top: 120px;
+    right: -60px;
+    background: rgba(255, 255, 255, 0.18);
 }
 
 /* ===== Settings Button ===== */
@@ -83,18 +87,18 @@
     position: relative;
     z-index: 5;
     text-align: center;
-    padding-top: 100px;
-    margin-bottom: 60px;
+    padding-top: 200px;
+    margin-bottom: 30px;
 }
 
 .avatar-circle {
-    width: 120px;
-    height: 120px;
+    width: 110px;
+    height: 110px;
     margin: 0 auto 16px;
     background: white;
     border-radius: 50%;
-    padding: 8px;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    padding: 5px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
 }
 
 .avatar-placeholder {
@@ -113,11 +117,11 @@
 }
 
 .user-name {
-    font-size: 28px;
+    font-size: 24px;
     font-weight: 700;
-    color: #FFFFFF;
+    color: #2C2C2C;
     margin: 0;
-    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    text-shadow: none;
 }
 
 /* ===== Cards Grid ===== */
@@ -209,14 +213,15 @@
     display: flex;
     align-items: flex-end;
     justify-content: space-between;
-    gap: 2px;
-    padding: 0 8px;
+    gap: 4px;
+    padding: 0 12px;
     height: 60px;
     margin-bottom: 8px;
 }
 
 .mood-bar {
     flex: 1;
+    max-width: 6px;
     background: white;
     border-radius: 2px 2px 0 0;
     min-height: 10%;
@@ -330,48 +335,6 @@
     margin: 0;
 }
 
-/* ===== Logout Section ===== */
-.logout-section {
-    position: relative;
-    z-index: 5;
-    padding: 20px 20px 0;
-    max-width: 430px;
-    margin: 0 auto;
-}
-
-.logout-button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    background: linear-gradient(135deg, #FF6B6B 0%, #EE5A52 100%);
-    color: white;
-    border: none;
-    border-radius: 16px;
-    padding: 18px 32px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 16px rgba(255, 107, 107, 0.3);
-    width: 100%;
-}
-
-.logout-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
-}
-
-.logout-button:active {
-    transform: translateY(0);
-    box-shadow: 0 3px 12px rgba(255, 107, 107, 0.3);
-}
-
-.logout-button svg {
-    width: 22px;
-    height: 22px;
-}
-
 /* ===== Responsive Adjustments ===== */
 @media (max-width: 380px) {
     .profile-cards-grid {
@@ -384,6 +347,6 @@
     }
 
     .user-name {
-        font-size: 24px;
+        font-size: 22px;
     }
 }

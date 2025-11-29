@@ -1,20 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Settings, Heart, Smile, BookOpen, FileText, Clock } from 'lucide-react';
-import { logout } from '../services/spid-auth.service';
 import { getProfileData } from '../services/profile.service';
 import type { ProfileDto } from '../types/profile';
 import BottomNavigation from '../components/BottomNavigation';
 import '../css/Profile.css';
 
-// Logout SVG Icon
-const LogoutIcon = () => (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M9 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-        <path d="M16 17L21 12L16 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-        <path d="M21 12H9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-);
 
 const Profile: React.FC = () => {
     const navigate = useNavigate();
@@ -38,10 +29,7 @@ const Profile: React.FC = () => {
         fetchData();
     }, []);
 
-    const handleLogout = () => {
-        logout();
-        navigate('/spid-info');
-    };
+
 
     // Loading state
     if (loading) {
@@ -111,7 +99,11 @@ const Profile: React.FC = () => {
             </div>
 
             {/* Settings Icon */}
-            <button className="settings-button" aria-label="Settings">
+            <button
+                className="settings-button"
+                aria-label="Settings"
+                onClick={() => navigate('/settings')}
+            >
                 <Settings size={24} />
             </button>
 
@@ -217,13 +209,6 @@ const Profile: React.FC = () => {
                 </div>
             </div>
 
-            {/* Logout Button */}
-            <div className="logout-section">
-                <button onClick={handleLogout} className="logout-button">
-                    <LogoutIcon />
-                    <span>Disconnetti</span>
-                </button>
-            </div>
             <BottomNavigation />
         </div>
     );

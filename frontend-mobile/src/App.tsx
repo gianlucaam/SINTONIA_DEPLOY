@@ -17,6 +17,7 @@ import { getCurrentPatient } from './services/spid-auth.service';
 import Forum from './pages/Forum';
 import CreatePost from './pages/CreatePost';
 import EditPost from './pages/EditPost';
+import Settings from './pages/Settings';
 
 // Protected Route Component
 const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
@@ -99,6 +100,14 @@ function App() {
           element={
             <PrivateRoute>
               <EditPost />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/settings"
+          element={
+            <PrivateRoute>
+              <Settings />
             </PrivateRoute>
           }
         />
