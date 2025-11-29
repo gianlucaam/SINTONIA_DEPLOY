@@ -5,12 +5,13 @@ import AddPsychologistModal from '../components/AddPsychologistModal';
 import { User, Eye, LayoutGrid, List, UserPlus } from 'lucide-react';
 import '../css/QuestionnaireManagement.css'; // Reuse existing layout styles
 import '../css/AdminPsychologistList.css';
-import { fetchAllPsychologists, type PsychologistOption } from '../services/psychologist.service';
+import { fetchAllPsychologists, createPsychologist, type PsychologistOption } from '../services/psychologist.service';
 
 interface PsychologistData {
     codiceFiscale: string;
     nome: string;
     cognome: string;
+    email?: string;
     aslAppartenenza: string;
     stato: 'Attivo' | 'Disattivato';
 }
@@ -21,7 +22,7 @@ const normalizePsychologist = (psy: PsychologistOption): PsychologistData => ({
     nome: psy.nome,
     cognome: psy.cognome,
     aslAppartenenza: psy.aslAppartenenza || 'N/D',
-    stato: psy.stato === 'attivo' ? 'Attivo' : 'Disattivato'
+    stato: (psy.stato === true || psy.stato === 'attivo') ? 'Attivo' : 'Disattivato'
 });
 
 const AdminPsychologistList: React.FC = () => {
@@ -134,10 +135,33 @@ const AdminPsychologistList: React.FC = () => {
         setShowAddModal(false);
     };
 
-    const handleAddPsychologist = (newPsychologist: PsychologistData) => {
-        // Add the new psychologist to the list (mock data - no backend call)
-        setPsychologists(prev => [newPsychologist, ...prev]);
-        setShowAddModal(false);
+    const handleAddPsychologist = async (newPsychologist: PsychologistData) => {
+        try {
+            setLoading(true);
+            setError(null);
+
+            // Call backend API to create psychologist
+            await createPsychologist({
+                codFiscale: newPsychologist.codiceFiscale,
+                nome: newPsychologist.nome,
+                cognome: newPsychologist.cognome,
+                email: newPsychologist.email || '',
+                aslAppartenenza: newPsychologist.aslAppartenenza,
+            });
+
+            // Reload the psychologists list from backend
+            const data = await fetchAllPsychologists();
+            const normalized = data.map(normalizePsychologist);
+            setPsychologists(normalized);
+
+            setShowAddModal(false);
+        } catch (err: any) {
+            console.error('Error adding psychologist:', err);
+            setError(err.message || 'Errore durante la creazione dello psicologo. Riprova.');
+            // Keep modal open on error so user can retry
+        } finally {
+            setLoading(false);
+        }
     };
 
     // Gestione input ricerca (live)

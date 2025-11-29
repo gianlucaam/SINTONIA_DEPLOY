@@ -6,6 +6,7 @@ interface PsychologistFormData {
     codiceFiscale: string;
     nome: string;
     cognome: string;
+    email: string;
     aslAppartenenza: string;
     stato: 'Attivo' | 'Disattivato';
 }
@@ -20,6 +21,7 @@ const AddPsychologistModal: React.FC<AddPsychologistModalProps> = ({ onClose, on
         codiceFiscale: '',
         nome: '',
         cognome: '',
+        email: '',
         aslAppartenenza: '',
         stato: 'Attivo'
     });
@@ -54,6 +56,12 @@ const AddPsychologistModal: React.FC<AddPsychologistModalProps> = ({ onClose, on
 
         if (!formData.aslAppartenenza.trim()) {
             newErrors.aslAppartenenza = 'L\'ASL di appartenenza è obbligatoria';
+        }
+
+        if (!formData.email.trim()) {
+            newErrors.email = 'L\'email è obbligatoria';
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+            newErrors.email = 'Inserisci un\'email valida';
         }
 
         setErrors(newErrors);
@@ -156,6 +164,26 @@ const AddPsychologistModal: React.FC<AddPsychologistModalProps> = ({ onClose, on
                             />
                             {errors.aslAppartenenza && (
                                 <span className="error-message">{errors.aslAppartenenza}</span>
+                            )}
+                        </div>
+                    </div>
+
+                    <div className="form-row">
+                        <div className="form-group" style={{ flex: 1 }}>
+                            <label htmlFor="email">
+                                Email <span className="required">*</span>
+                            </label>
+                            <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                value={formData.email}
+                                onChange={handleChange}
+                                placeholder="esempio@email.it"
+                                className={errors.email ? 'error' : ''}
+                            />
+                            {errors.email && (
+                                <span className="error-message">{errors.email}</span>
                             )}
                         </div>
                     </div>
