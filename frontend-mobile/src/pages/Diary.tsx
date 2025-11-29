@@ -130,8 +130,7 @@ const Diary: React.FC = () => {
     };
 
     const handleAddPage = () => {
-        // TODO: verrà implementato successivamente
-        console.log('Funzione di aggiunta pagina non ancora implementata');
+        navigate('/new-diary-page');
     };
 
     const handleEdit = (id: string) => {

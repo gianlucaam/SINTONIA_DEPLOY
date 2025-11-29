@@ -18,6 +18,7 @@ import Forum from './pages/Forum';
 import CreatePost from './pages/CreatePost';
 import EditPost from './pages/EditPost';
 import Diary from './pages/Diary';
+import NewDiaryPage from './pages/NewDiaryPage';
 
 // Protected Route Component
 const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
@@ -108,6 +109,14 @@ function App() {
           element={
             <PrivateRoute>
               <Diary />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/new-diary-page"
+          element={
+            <PrivateRoute>
+              <NewDiaryPage />
             </PrivateRoute>
           }
         />
