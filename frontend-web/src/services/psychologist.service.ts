@@ -107,6 +107,10 @@ export interface PsychologistOption {
     codFiscale: string;
     nome: string;
     cognome: string;
+    email?: string;
+    aslAppartenenza?: string;
+    stato?: boolean | 'attivo' | 'sospeso';
+    immagineProfilo?: string | null;
 }
 
 /**
@@ -134,6 +138,26 @@ export const fetchAllPsychologists = async (): Promise<PsychologistOption[]> => 
         throw error;
     }
 };
+
+/**
+ * Create a new psychologist (admin only)
+ * @param psychologistData - Psychologist data to create
+ */
+export const createPsychologist = async (psychologistData: {
+    codFiscale: string;
+    nome: string;
+    cognome: string;
+    email: string;
+    aslAppartenenza: string;
+}): Promise<any> => {
+    try {
+        const token = getCurrentUser()?.access_token as string | undefined;
+        const response = await fetch(`${API_URL}/admin/psychologists`, {
+            method: 'POST',
+        }
+      }catch{}
+};
+                                     
 /**
  * Fetch psychologist profile
  */
