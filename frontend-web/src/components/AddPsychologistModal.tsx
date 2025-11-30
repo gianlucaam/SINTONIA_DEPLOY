@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { X, UserPlus } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { X, UserPlus, Search } from 'lucide-react';
 import '../css/AddPsychologistModal.css';
 
 interface PsychologistFormData {
@@ -10,6 +10,20 @@ interface PsychologistFormData {
     aslAppartenenza: string;
     stato: 'Attivo' | 'Disattivato';
 }
+
+const ASL_OPTIONS = [
+    'NA-1',
+    'NA-2',
+    'NA-3',
+    'SA-1',
+    'SA-2',
+    'SA-3',
+    'AV-1',
+    'AV-2',
+    'BN-1',
+    'CE-1',
+    'CE-2',
+];
 
 interface AddPsychologistModalProps {
     onClose: () => void;
@@ -27,6 +41,36 @@ const AddPsychologistModal: React.FC<AddPsychologistModalProps> = ({ onClose, on
     });
 
     const [errors, setErrors] = useState<Partial<Record<keyof PsychologistFormData, string>>>({});
+    const [aslSearch, setAslSearch] = useState('');
+
+    const [showAslDropdown, setShowAslDropdown] = useState(false);
+    const dropdownRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+                setShowAslDropdown(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
+
+    const filteredAslOptions = ASL_OPTIONS.filter(asl =>
+        asl.toLowerCase().includes(aslSearch.toLowerCase())
+    );
+
+    const handleAslSelect = (asl: string) => {
+        setFormData(prev => ({ ...prev, aslAppartenenza: asl }));
+        setAslSearch('');
+        setShowAslDropdown(false);
+        if (errors.aslAppartenenza) {
+            setErrors(prev => ({ ...prev, aslAppartenenza: undefined }));
+        }
+    };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
@@ -153,15 +197,90 @@ const AddPsychologistModal: React.FC<AddPsychologistModalProps> = ({ onClose, on
                             <label htmlFor="aslAppartenenza">
                                 ASL di Appartenenza <span className="required">*</span>
                             </label>
-                            <input
-                                type="text"
-                                id="aslAppartenenza"
-                                name="aslAppartenenza"
-                                value={formData.aslAppartenenza}
-                                onChange={handleChange}
-                                placeholder="Es: ASL Roma 1"
-                                className={errors.aslAppartenenza ? 'error' : ''}
-                            />
+                            <div style={{ position: 'relative' }} ref={dropdownRef}>
+                                <div style={{ position: 'relative' }}>
+                                    <input
+                                        type="text"
+                                        id="aslAppartenenza"
+                                        name="aslAppartenenza"
+                                        value={formData.aslAppartenenza || aslSearch}
+                                        onChange={(e) => {
+                                            setAslSearch(e.target.value);
+                                            setFormData(prev => ({ ...prev, aslAppartenenza: '' })); // Clear selection when typing
+                                            setShowAslDropdown(true);
+                                        }}
+                                        onFocus={() => setShowAslDropdown(true)}
+                                        placeholder="Cerca ASL..."
+                                        className={errors.aslAppartenenza ? 'error' : ''}
+                                        autoComplete="off"
+                                    />
+                                    <div style={{
+                                        position: 'absolute',
+                                        right: '12px',
+                                        top: '50%',
+                                        transform: 'translateY(-50%)',
+                                        pointerEvents: 'none',
+                                        color: '#999'
+                                    }}>
+                                        <Search size={18} />
+                                    </div>
+                                </div>
+
+                                {showAslDropdown && (
+                                    <div style={{
+                                        position: 'absolute',
+                                        top: '100%',
+                                        left: 0,
+                                        right: 0,
+                                        marginTop: '4px',
+                                        backgroundColor: 'white',
+                                        border: '1px solid #e0e0e0',
+                                        borderRadius: '8px',
+                                        maxHeight: '200px',
+                                        overflowY: 'auto',
+                                        zIndex: 1000,
+                                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
+                                    }}>
+                                        {filteredAslOptions.length > 0 ? (
+                                            filteredAslOptions.map(asl => (
+                                                <div
+                                                    key={asl}
+                                                    onClick={() => handleAslSelect(asl)}
+                                                    style={{
+                                                        padding: '10px 16px',
+                                                        cursor: 'pointer',
+                                                        fontSize: '14px',
+                                                        backgroundColor: formData.aslAppartenenza === asl ? '#f0f9f0' : 'white',
+                                                        color: formData.aslAppartenenza === asl ? '#7FB77E' : '#333',
+                                                        transition: 'background-color 0.2s'
+                                                    }}
+                                                    onMouseEnter={(e) => {
+                                                        if (formData.aslAppartenenza !== asl) {
+                                                            e.currentTarget.style.backgroundColor = '#f8f9fa';
+                                                        }
+                                                    }}
+                                                    onMouseLeave={(e) => {
+                                                        if (formData.aslAppartenenza !== asl) {
+                                                            e.currentTarget.style.backgroundColor = 'white';
+                                                        }
+                                                    }}
+                                                >
+                                                    {asl}
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <div style={{
+                                                padding: '16px',
+                                                textAlign: 'center',
+                                                color: '#999',
+                                                fontSize: '13px'
+                                            }}>
+                                                Nessuna ASL trovata
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
                             {errors.aslAppartenenza && (
                                 <span className="error-message">{errors.aslAppartenenza}</span>
                             )}
