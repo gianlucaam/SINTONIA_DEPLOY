@@ -154,64 +154,66 @@ export const createPsychologist = async (psychologistData: {
         const token = getCurrentUser()?.access_token as string | undefined;
         const response = await fetch(`${API_URL}/admin/psychologists`, {
             method: 'POST',
+        }
+      }catch{}
+};
+                                     
+/**
+ * Fetch psychologist profile
+ */
+export const getProfile = async (codiceFiscale: string): Promise<any> => {
+    try {
+        const url = `${API_URL}/psi/area-personale/me?cf=${encodeURIComponent(codiceFiscale)}`;
+        const token = getCurrentUser()?.access_token as string | undefined;
+
+        const response = await fetch(url, {
             headers: {
                 ...(token ? { Authorization: `Bearer ${token}` } : {}),
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-                codFiscale: psychologistData.codFiscale,
-                nome: psychologistData.nome,
-                cognome: psychologistData.cognome,
-                email: psychologistData.email,
-                aslAppartenenza: psychologistData.aslAppartenenza,
-            }),
         });
 
         if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
-            throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        const data = await response.json();
-        return data;
+        return await response.json();
     } catch (error) {
-        console.error('Error creating psychologist:', error);
+        console.error('Failed to fetch profile:', error);
         throw error;
     }
 };
 
 /**
- * Update an existing psychologist (admin only)
- * @param codFiscale - Codice Fiscale of the psychologist to update
- * @param updateData - Data to update (email, aslAppartenenza)
+ * Update psychologist profile
  */
-export const updatePsychologist = async (
-    codFiscale: string,
-    updateData: {
-        email?: string;
-        aslAppartenenza?: string;
-    }
-): Promise<any> => {
+export const updateProfile = async (codiceFiscale: string, data: { email: string; immagineProfilo?: File | null }): Promise<any> => {
     try {
+        const url = `${API_URL}/psi/area-personale/me?cf=${encodeURIComponent(codiceFiscale)}`;
         const token = getCurrentUser()?.access_token as string | undefined;
-        const response = await fetch(`${API_URL}/admin/psychologists/${codFiscale}`, {
-            method: 'PATCH',
+
+        const formData = new FormData();
+        formData.append('email', data.email);
+        if (data.immagineProfilo) {
+            formData.append('immagineProfilo', data.immagineProfilo);
+        }
+
+        const response = await fetch(url, {
+            method: 'PUT',
             headers: {
                 ...(token ? { Authorization: `Bearer ${token}` } : {}),
-                'Content-Type': 'application/json',
+                // Content-Type is automatically set with boundary for FormData
             },
-            body: JSON.stringify(updateData),
+            body: formData,
         });
 
         if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
-            throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        const data = await response.json();
-        return data;
+        return await response.json();
     } catch (error) {
-        console.error('Error updating psychologist:', error);
+        console.error('Failed to update profile:', error);
         throw error;
     }
 };
