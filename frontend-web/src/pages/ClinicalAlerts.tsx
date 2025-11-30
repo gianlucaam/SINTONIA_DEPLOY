@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { AlertTriangle } from 'lucide-react';
 import PsychologistProfile from '../components/PsychologistProfile';
 import ClinicalAlertsTable from '../components/ClinicalAlertsTable';
 import { fetchClinicalAlerts, acceptClinicalAlert } from '../services/alert-clinici.service';
 import type { ClinicalAlert, LoadingState } from '../types/alert';
 import '../css/ClinicalAlerts.css';
+
+import Toast from '../components/Toast';
 
 const ClinicalAlerts: React.FC = () => {
     const navigate = useNavigate();
@@ -15,6 +18,7 @@ const ClinicalAlerts: React.FC = () => {
     });
     const [confirmingAlertId, setConfirmingAlertId] = useState<string | null>(null);
     const [currentPage, setCurrentPage] = useState(1);
+    const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
     const ALERTS_PER_PAGE = 5;
 
     useEffect(() => {
@@ -72,10 +76,18 @@ const ClinicalAlerts: React.FC = () => {
                 data: prev.data?.filter(alert => alert.idAlert !== confirmingAlertId) || null,
             }));
 
+            setToast({
+                message: 'Alert clinico accettato con successo!',
+                type: 'success'
+            });
+
             setConfirmingAlertId(null);
         } catch (error) {
             console.error('Error accepting alert:', error);
-            alert('Errore durante l\'accettazione dell\'alert');
+            setToast({
+                message: 'Errore durante l\'accettazione dell\'alert',
+                type: 'error'
+            });
         }
     };
 
@@ -108,7 +120,10 @@ const ClinicalAlerts: React.FC = () => {
                 </div>
                 <div className="management-content">
                     <div className="content-panel fade-in">
-                        <h2 className="panel-title">Alert Clinici</h2>
+                        <h2 className="panel-title" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                            <AlertTriangle size={28} color="#E57373" />
+                            Alert Clinici
+                        </h2>
 
                         {alertsState.error && (
                             <div className="error-state">
@@ -185,6 +200,13 @@ const ClinicalAlerts: React.FC = () => {
                     </div>
                 </div>
             </div>
+            {toast && (
+                <Toast
+                    message={toast.message}
+                    type={toast.type}
+                    onClose={() => setToast(null)}
+                />
+            )}
         </div>
     );
 };
