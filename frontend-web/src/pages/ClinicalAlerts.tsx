@@ -14,10 +14,33 @@ const ClinicalAlerts: React.FC = () => {
         error: null,
     });
     const [confirmingAlertId, setConfirmingAlertId] = useState<string | null>(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const ALERTS_PER_PAGE = 5;
 
     useEffect(() => {
         loadAlerts();
     }, []);
+
+    // Reset page when data changes (optional, but good practice if filtering was involved)
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [alertsState.data]);
+
+    const getPaginatedAlerts = () => {
+        if (!alertsState.data) return [];
+        const startIndex = (currentPage - 1) * ALERTS_PER_PAGE;
+        const endIndex = startIndex + ALERTS_PER_PAGE;
+        return alertsState.data.slice(startIndex, endIndex);
+    };
+
+    const getTotalPages = () => {
+        if (!alertsState.data) return 0;
+        return Math.ceil(alertsState.data.length / ALERTS_PER_PAGE);
+    };
+
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page);
+    };
 
     const loadAlerts = async () => {
         setAlertsState({ data: null, loading: true, error: null });
@@ -139,9 +162,31 @@ const ClinicalAlerts: React.FC = () => {
                                 )}
 
                                 <ClinicalAlertsTable
-                                    alerts={alertsState.data}
+                                    alerts={getPaginatedAlerts()}
                                     onAccept={handleAcceptClick}
                                 />
+
+                                {getTotalPages() > 1 && (
+                                    <div className="pagination">
+                                        <button
+                                            className="pagination-button"
+                                            onClick={() => handlePageChange(currentPage - 1)}
+                                            disabled={currentPage === 1}
+                                        >
+                                            ← Precedente
+                                        </button>
+                                        <div className="pagination-info">
+                                            Pagina {currentPage} di {getTotalPages()}
+                                        </div>
+                                        <button
+                                            className="pagination-button"
+                                            onClick={() => handlePageChange(currentPage + 1)}
+                                            disabled={currentPage === getTotalPages()}
+                                        >
+                                            Successiva →
+                                        </button>
+                                    </div>
+                                )}
                             </>
                         )}
                     </div>
