@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { db } from '../../drizzle/db.js';
 import { paziente, psicologo } from '../../drizzle/schema.js';
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 
 @Injectable()
 export class Visualizzazione_pazientiService {
@@ -26,7 +26,7 @@ export class Visualizzazione_pazientiService {
             })
             .from(paziente)
             .leftJoin(psicologo, eq(paziente.idPsicologo, psicologo.codFiscale))
-            .where(eq(paziente.idPsicologo, idPsicologo));
+            .where(and(eq(paziente.idPsicologo, idPsicologo), eq(paziente.stato, true)));
 
         // Formatta i risultati per il frontend
         return rows.map(row => ({
@@ -71,7 +71,7 @@ export class Visualizzazione_pazientiService {
             })
             .from(paziente)
             .leftJoin(psicologo, eq(paziente.idPsicologo, psicologo.codFiscale))
-            .where(eq(paziente.idPaziente, idPaziente))
+            .where(and(eq(paziente.idPaziente, idPaziente), eq(paziente.stato, true)))
             .limit(1);
 
         if (rows.length === 0) {

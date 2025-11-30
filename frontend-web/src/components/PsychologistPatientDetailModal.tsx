@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import type { PatientData } from '../types/patient';
 import type { QuestionnaireData } from '../types/psychologist';
-import { getPatientDetailsByPsychologist } from '../services/patient.service';
+import { getPatientDetailsByPsychologist, terminatePatientCare } from '../services/patient.service';
 import { fetchQuestionnairesByPatient } from '../services/questionnaire.service';
 import QuestionnaireDetailModal from './QuestionnaireDetailModal';
 import Toast from './Toast';
@@ -23,6 +23,7 @@ const PsychologistPatientDetailModal: React.FC<PsychologistPatientDetailModalPro
     const [loadingQuestionnaires, setLoadingQuestionnaires] = useState(true);
     const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
     const [showConfirmModal, setShowConfirmModal] = useState(false);
+    const [isTerminating, setIsTerminating] = useState(false);
 
     useEffect(() => {
         if (patient) {
@@ -335,29 +336,43 @@ const PsychologistPatientDetailModal: React.FC<PsychologistPatientDetailModalPro
                                 Annulla
                             </button>
                             <button
-                                onClick={() => {
-                                    console.log('Cura terminata per il paziente:', patient.idPaziente);
-                                    setToast({
-                                        message: 'Terminazione cura avvenuta con successo',
-                                        type: 'success'
-                                    });
-                                    setShowConfirmModal(false);
-                                    // Delay closing to show the toast
-                                    setTimeout(() => {
-                                        onClose();
-                                    }, 2000);
+                                onClick={async () => {
+                                    setIsTerminating(true);
+                                    try {
+                                        await terminatePatientCare(patient.idPaziente);
+                                        setToast({
+                                            message: 'Terminazione cura avvenuta con successo',
+                                            type: 'success'
+                                        });
+                                        setShowConfirmModal(false);
+                                        // Delay closing to show the toast
+                                        setTimeout(() => {
+                                            onClose();
+                                            // Reload page to refresh patient list
+                                            window.location.reload();
+                                        }, 1500);
+                                    } catch (error: any) {
+                                        setToast({
+                                            message: error.response?.data?.message || 'Errore durante la terminazione della cura',
+                                            type: 'error'
+                                        });
+                                        setShowConfirmModal(false);
+                                    } finally {
+                                        setIsTerminating(false);
+                                    }
                                 }}
+                                disabled={isTerminating}
                                 style={{
                                     padding: '8px 16px',
                                     borderRadius: '6px',
                                     border: 'none',
-                                    background: '#dc3545',
+                                    background: isTerminating ? '#999' : '#dc3545',
                                     color: 'white',
-                                    cursor: 'pointer',
+                                    cursor: isTerminating ? 'not-allowed' : 'pointer',
                                     fontWeight: 'bold'
                                 }}
                             >
-                                Termina
+                                {isTerminating ? 'Terminazione...' : 'Termina'}
                             </button>
                         </div>
                     </div>

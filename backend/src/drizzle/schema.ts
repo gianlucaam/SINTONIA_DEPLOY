@@ -89,6 +89,7 @@ export const paziente = pgTable('paziente', {
     sesso: tipoSessoEnum('sesso').notNull(),
     dataIngresso: date('data_ingresso', { mode: 'string' }).notNull(),
     score: doublePrecision('score'),
+    stato: boolean('stato').default(true).notNull(),
 
     idPriorita: nomePrioritaEnum('id_priorita')
         .notNull()
