@@ -128,6 +128,8 @@ const QuestionnaireManagement: React.FC = () => {
     const handleSectionSelect = (section: string) => {
         if (section === 'forum') {
             navigate('/forum');
+        } else if (section === 'alert') {
+            navigate('/clinical-alerts');
         } else if (section !== 'questionari') {
             navigate('/dashboard', { state: { selectedSection: section } });
         }
