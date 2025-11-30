@@ -39,19 +39,33 @@ export const fetchClinicalAlerts = async (): Promise<ClinicalAlert[]> => {
 };
 
 /**
- * Accept a clinical alert (mock implementation)
- * Since there's no backend endpoint for accepting alerts,
- * this is a mock that simulates the action
+ * Accept a clinical alert
+ * Assigns the alert to the psychologist who accepts it
  * @param id - Alert ID to accept
  */
 export const acceptClinicalAlert = async (id: string): Promise<void> => {
-    // Mock implementation - in real scenario, this would call:
-    // await axiosInstance.patch(`/psi/clinical-alerts/${id}/accept`);
+    try {
+        // Get psychologist's fiscal code from localStorage
+        const userStr = localStorage.getItem('user');
+        if (!userStr) {
+            throw new Error('Utente non autenticato');
+        }
 
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            console.log(`Alert ${id} accepted (mock)`);
-            resolve();
-        }, 500);
-    });
+        const user = JSON.parse(userStr);
+        const codiceFiscalePsicologo = user.fiscalCode; // Corrected: fiscalCode is the correct key
+
+        if (!codiceFiscalePsicologo) {
+            throw new Error('Codice fiscale psicologo non trovato');
+        }
+
+        // Call backend endpoint
+        await axiosInstance.patch(`${API_URL}/${id}/accept`, {
+            codiceFiscalePsicologo
+        });
+
+        console.log(`Alert ${id} accettato con successo da ${codiceFiscalePsicologo}`);
+    } catch (error) {
+        console.error('Errore durante l\'accettazione dell\'alert:', error);
+        throw error;
+    }
 };
