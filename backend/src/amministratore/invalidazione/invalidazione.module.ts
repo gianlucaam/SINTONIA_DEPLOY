@@ -5,8 +5,11 @@ import { Accettazione_invalidazioneController } from './accettazione_invalidazio
 import { Accettazione_invalidazioneService } from './accettazione_invalidazione.service.js';
 import { Rifiuto_invalidazioneController } from './rifiuto_invalidazione.controller.js';
 import { Rifiuto_invalidazioneService } from './rifiuto_invalidazione.service.js';
+import { ScoreModule } from '../../patient/score/score.module.js';
+import { PrioritaModule } from '../../patient/priorita/priorita.module.js';
 
 @Module({
+    imports: [ScoreModule, PrioritaModule],
     controllers: [
         Visualizzazione_invalidazioneController,
         Accettazione_invalidazioneController,

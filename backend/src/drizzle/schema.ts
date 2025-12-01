@@ -218,7 +218,6 @@ export const alertClinico = pgTable('alert_clinico', {
         .notNull()
         .references(() => paziente.idPaziente),
     idPsicologo: char('id_psicologo', { length: 16 })
-        .notNull()
         .references(() => psicologo.codFiscale),
 });
 
