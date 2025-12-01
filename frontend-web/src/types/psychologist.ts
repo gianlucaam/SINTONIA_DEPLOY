@@ -2,6 +2,8 @@
  * Type definitions for the Psychologist Dashboard
  */
 
+import { Lamp } from 'lucide-react';
+
 export interface Psychologist {
     name: string;
     title: string;

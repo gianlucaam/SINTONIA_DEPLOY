@@ -4,9 +4,10 @@ import { Visualizzazione_lista_questionariService } from './visualizzazione_list
 import { Compilazione_questionarioController } from './compilazione/compilazione_questionario.controller.js';
 import { Compilazione_questionarioService } from './compilazione/compilazione_questionario.service.js';
 import { ScoreModule } from '../score/score.module.js';
+import { AlertModule } from '../alert/alert.module.js';
 
 @Module({
-  imports: [ScoreModule],
+  imports: [ScoreModule, AlertModule],
   controllers: [
     Visualizzazione_lista_questionariController,
     Compilazione_questionarioController,

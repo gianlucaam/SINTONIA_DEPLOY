@@ -13,6 +13,7 @@ import { AreaPersonaleModule } from './area-personale/area-personale.module.js';
 import { SettingsModule } from './settings/settings.module.js';
 import { ScoreModule } from './score/score.module.js';
 import { PrioritaModule } from './priorita/priorita.module.js';
+import { AlertModule } from './alert/alert.module.js';
 
 @Module({
     imports: [
@@ -24,6 +25,7 @@ import { PrioritaModule } from './priorita/priorita.module.js';
         BadgeModule,
         ScoreModule,
         PrioritaModule,
+        AlertModule,
         AreaPersonaleModule,
         SettingsModule,
     ],
