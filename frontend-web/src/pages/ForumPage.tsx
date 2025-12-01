@@ -49,6 +49,8 @@ const ForumPage: React.FC = () => {
         // When psychologist selects a non-forum section, navigate back to dashboard with section state
         if (section === 'questionari') {
             navigate('/questionnaires');
+        } else if (section === 'alert') {
+            navigate('/clinical-alerts');
         } else if (section !== 'forum') {
             navigate('/dashboard', { state: { selectedSection: section } });
         }
