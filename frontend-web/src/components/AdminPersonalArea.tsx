@@ -14,9 +14,9 @@ const MOCK_ADMIN_DATA = {
 const AdminPersonalArea: React.FC = () => {
     const [showPasswordModal, setShowPasswordModal] = useState(false);
 
-    const handlePasswordChange = (newPassword: string) => {
+    const handlePasswordChange = (oldPassword: string, newPassword: string) => {
         // In a real app, this would make an API call
-        console.log('Changing password to:', newPassword);
+        console.log('Changing password from:', oldPassword, 'to:', newPassword);
         alert('Password modificata con successo!');
     };
 
@@ -66,8 +66,8 @@ const AdminPersonalArea: React.FC = () => {
                         </div>
                     </div>
 
-                    {/* Email - Read Only */}
-                    <div className="form-row">
+                    {/* Email e Password - Side by Side */}
+                    <div className="form-row form-row-double">
                         <div className="form-field">
                             <label className="field-label">Email</label>
                             <input
@@ -77,10 +77,6 @@ const AdminPersonalArea: React.FC = () => {
                                 className="field-input field-disabled"
                             />
                         </div>
-                    </div>
-
-                    {/* Password - Button to open modal */}
-                    <div className="form-row">
                         <div className="form-field">
                             <label className="field-label">Password</label>
                             <button
