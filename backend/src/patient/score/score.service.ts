@@ -63,19 +63,20 @@ export class ScoreService {
             return null;
         }
 
-        // 2. Ottieni tutti i questionari con tipologia e data
+        // 2. Ottieni tutti i questionari con tipologia e data (escludi invalidati)
         const questionari = await db
             .select({
                 score: questionario.score,
                 nomeTipologia: questionario.nomeTipologia,
                 dataCompilazione: questionario.dataCompilazione,
+                invalidato: questionario.invalidato,
             })
             .from(questionario)
             .where(eq(questionario.idPaziente, idPaziente))
             .orderBy(questionario.dataCompilazione);
 
-        // 3. Filtra solo questionari con score valido
-        const questionariValidi = questionari.filter(q => q.score !== null);
+        // 3. Filtra solo questionari con score valido e NON invalidati
+        const questionariValidi = questionari.filter(q => q.score !== null && q.invalidato === false);
 
         if (questionariValidi.length === 0) {
             return null;
@@ -166,6 +167,20 @@ export class ScoreService {
 
         // Aggiorna la priorità del paziente (se necessario)
         await this.prioritaService.updatePrioritaPaziente(idPaziente, idQuestionario);
+    }
+
+    /**
+     * Aggiorna SOLO lo score del paziente senza modificare la priorità
+     * Usato durante il ricalcolo incrementale per evitare conflitti con cambiamento
+     */
+    async updatePatientScoreOnly(idPaziente: string): Promise<void> {
+        const score = await this.calculatePatientScore(idPaziente);
+
+        // Aggiorna il campo score del paziente
+        await db
+            .update(paziente)
+            .set({ score: score })
+            .where(eq(paziente.idPaziente, idPaziente));
     }
 
     /**

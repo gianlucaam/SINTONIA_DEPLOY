@@ -48,6 +48,27 @@ export class PrioritaService {
     }
 
     /**
+     * Ottiene la fascia di score per una priorità
+     */
+    async getFasciaPriorita(nomePriorita: string): Promise<{
+        punteggioInizio: number;
+        punteggioFine: number;
+    }> {
+        const fascia = await db.query.priorita.findFirst({
+            where: eq(priorita.nome, nomePriorita as any),
+        });
+
+        if (!fascia) {
+            throw new Error(`Priorità ${nomePriorita} non trovata`);
+        }
+
+        return {
+            punteggioInizio: fascia.punteggioInizio,
+            punteggioFine: fascia.punteggioFine,
+        };
+    }
+
+    /**
      * Aggiorna la priorità del paziente se necessario
      * Logica:
      * - Se priorità aumenta → Aggiorna paziente e imposta cambiamento nel questionario
