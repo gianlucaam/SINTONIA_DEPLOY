@@ -148,4 +148,36 @@ export class Visualizzazione_lista_questionariService {
         const year = d.getFullYear();
         return `${day}/${month}/${year}`;
     }
+
+    /**
+     * Verifica se il paziente ha compilato almeno una volta tutti e 4 i questionari iniziali
+     * I questionari iniziali sono: PHQ-9, GAD-7, WHO-5, PC-PTSD-5
+     * @param userId - ID del paziente
+     * @returns true se ha compilato tutti e 4, false altrimenti
+     */
+    async hasCompletedInitialQuestionnaires(userId: string): Promise<boolean> {
+        const INITIAL_QUESTIONNAIRES = ['PHQ-9', 'GAD-7', 'WHO-5', 'PC-PTSD-5'];
+
+        // Per ogni questionario iniziale, verifica se esiste almeno una compilazione
+        for (const questionnaireName of INITIAL_QUESTIONNAIRES) {
+            const compilations = await db
+                .select({ id: questionario.idQuestionario })
+                .from(questionario)
+                .where(
+                    and(
+                        eq(questionario.idPaziente, userId),
+                        eq(questionario.nomeTipologia, questionnaireName)
+                    )
+                )
+                .limit(1);
+
+            // Se anche solo uno dei questionari non è mai stato compilato, ritorna false
+            if (compilations.length === 0) {
+                return false;
+            }
+        }
+
+        // Tutti e 4 i questionari sono stati compilati almeno una volta
+        return true;
+    }
 }
