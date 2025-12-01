@@ -127,7 +127,7 @@ export class Visualizzazione_lista_questionariService {
         const completati: QuestionarioItemDto[] = compiled.map((q) => ({
             id: q.idQuestionario,
             titolo: q.nomeTipologia,
-            descrizione: `Compilato il ${this.formatDate(q.dataCompilazione)}. Score: ${q.score?.toFixed(1) ?? 'N/A'}`,
+            descrizione: `Compilato il ${this.formatDate(q.dataCompilazione)}`,
             dataCompletamento: this.formatDate(q.dataCompilazione),
         }));
 
