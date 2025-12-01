@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import type { PatientData } from '../types/patient';
 import type { QuestionnaireData } from '../types/psychologist';
-import { getPatientDetailsByPsychologist } from '../services/patient.service';
+import { getPatientDetailsByPsychologist, terminatePatientCare } from '../services/patient.service';
 import { fetchQuestionnairesByPatient } from '../services/questionnaire.service';
 import QuestionnaireDetailModal from './QuestionnaireDetailModal';
+import Toast from './Toast';
 import '../css/QuestionnaireDetailModal.css'; // Reuse existing styles
 
 interface PsychologistPatientDetailModalProps {
@@ -20,6 +21,9 @@ const PsychologistPatientDetailModal: React.FC<PsychologistPatientDetailModalPro
     const [viewingQuestionnaire, setViewingQuestionnaire] = useState<QuestionnaireData | null>(null);
     const [loading, setLoading] = useState(true);
     const [loadingQuestionnaires, setLoadingQuestionnaires] = useState(true);
+    const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+    const [showConfirmModal, setShowConfirmModal] = useState(false);
+    const [isTerminating, setIsTerminating] = useState(false);
 
     useEffect(() => {
         if (patient) {
@@ -250,7 +254,25 @@ const PsychologistPatientDetailModal: React.FC<PsychologistPatientDetailModalPro
                     </div>
 
                     <div className="modal-footer">
-                        {/* Footer vuoto - solo chiusura tramite X */}
+                        <button
+                            className="terminate-cure-btn"
+                            onClick={() => setShowConfirmModal(true)}
+                            style={{
+                                backgroundColor: '#dc3545',
+                                color: 'white',
+                                border: 'none',
+                                padding: '10px 20px',
+                                borderRadius: '4px',
+                                cursor: 'pointer',
+                                fontSize: '14px',
+                                fontWeight: 'bold',
+                                transition: 'background-color 0.2s'
+                            }}
+                            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#c82333'}
+                            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#dc3545'}
+                        >
+                            Termina cura
+                        </button>
                     </div>
                 </div>
             </div>
@@ -262,6 +284,99 @@ const PsychologistPatientDetailModal: React.FC<PsychologistPatientDetailModalPro
                     onClose={handleCloseQuestionnaireModal}
                     role="psychologist"
                 />
+            )}
+
+            {toast && (
+                <Toast
+                    message={toast.message}
+                    type={toast.type}
+                    onClose={() => setToast(null)}
+                />
+            )}
+
+            {/* Custom Confirmation Modal */}
+            {showConfirmModal && (
+                <div style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    zIndex: 10000
+                }} onClick={() => setShowConfirmModal(false)}>
+                    <div style={{
+                        backgroundColor: 'white',
+                        padding: '24px',
+                        borderRadius: '12px',
+                        maxWidth: '400px',
+                        width: '90%',
+                        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)',
+                        textAlign: 'center'
+                    }} onClick={e => e.stopPropagation()}>
+                        <h3 style={{ marginTop: 0, marginBottom: '12px', color: '#333' }}>Conferma Terminazione</h3>
+                        <p style={{ color: '#666', marginBottom: '24px' }}>
+                            Sei sicuro di voler terminare la cura di questo paziente?
+                        </p>
+                        <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+                            <button
+                                onClick={() => setShowConfirmModal(false)}
+                                style={{
+                                    padding: '8px 16px',
+                                    borderRadius: '6px',
+                                    border: '1px solid #ddd',
+                                    background: 'white',
+                                    cursor: 'pointer',
+                                    color: '#666'
+                                }}
+                            >
+                                Annulla
+                            </button>
+                            <button
+                                onClick={async () => {
+                                    setIsTerminating(true);
+                                    try {
+                                        await terminatePatientCare(patient.idPaziente);
+                                        setToast({
+                                            message: 'Terminazione cura avvenuta con successo',
+                                            type: 'success'
+                                        });
+                                        setShowConfirmModal(false);
+                                        // Delay closing to show the toast
+                                        setTimeout(() => {
+                                            onClose();
+                                            // Reload page to refresh patient list
+                                            window.location.reload();
+                                        }, 1500);
+                                    } catch (error: any) {
+                                        setToast({
+                                            message: error.response?.data?.message || 'Errore durante la terminazione della cura',
+                                            type: 'error'
+                                        });
+                                        setShowConfirmModal(false);
+                                    } finally {
+                                        setIsTerminating(false);
+                                    }
+                                }}
+                                disabled={isTerminating}
+                                style={{
+                                    padding: '8px 16px',
+                                    borderRadius: '6px',
+                                    border: 'none',
+                                    background: isTerminating ? '#999' : '#dc3545',
+                                    color: 'white',
+                                    cursor: isTerminating ? 'not-allowed' : 'pointer',
+                                    fontWeight: 'bold'
+                                }}
+                            >
+                                {isTerminating ? 'Terminazione...' : 'Termina'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
             )}
         </>
     );

@@ -157,3 +157,29 @@ export const getPatientDetailsByPsychologist = async (id: string): Promise<any> 
         throw error;
     }
 };
+
+/**
+ * Terminate patient care (psychologist only)
+ * @param idPaziente - UUID del paziente
+ * @returns Response from the backend
+ */
+export const terminatePatientCare = async (idPaziente: string): Promise<any> => {
+    try {
+        const token = getCurrentUser()?.access_token as string | undefined;
+        const cf = getCurrentUser()?.fiscalCode || getCurrentUser()?.email;
+
+        const response = await axios.delete(
+            `${API_URL}/psi/patients/${idPaziente}/termina-cura?cf=${cf}`,
+            {
+                headers: {
+                    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                    'Content-Type': 'application/json',
+                },
+            }
+        );
+        return response.data;
+    } catch (error) {
+        console.error('Error terminating patient care:', error);
+        throw error;
+    }
+};

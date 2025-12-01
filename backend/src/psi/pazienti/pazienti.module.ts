@@ -3,9 +3,11 @@ import { Visualizzazione_pazientiController } from './visualizzazione_pazienti.c
 import { Visualizzazione_pazientiService } from './visualizzazione_pazienti.service.js';
 import { Ricerca_pazientiController } from './ricerca_pazienti.controller.js';
 import { Ricerca_pazientiService } from './ricerca_pazienti.service.js';
+import { TerminaCuraController } from './termina-cura.controller.js';
+import { TerminaCuraService } from './termina-cura.service.js';
 
 @Module({
-    controllers: [Visualizzazione_pazientiController, Ricerca_pazientiController],
-    providers: [Visualizzazione_pazientiService, Ricerca_pazientiService],
+    controllers: [Visualizzazione_pazientiController, Ricerca_pazientiController, TerminaCuraController],
+    providers: [Visualizzazione_pazientiService, Ricerca_pazientiService, TerminaCuraService],
 })
 export class PazientiModule { }
