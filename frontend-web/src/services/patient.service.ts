@@ -183,3 +183,29 @@ export const terminatePatientCare = async (idPaziente: string): Promise<any> => 
         throw error;
     }
 };
+
+/**
+ * Remove patient from waiting list (admin only)
+ * @param idPaziente - UUID del paziente
+ * @returns Response from the backend
+ */
+export const removePatientFromWaitingList = async (idPaziente: string): Promise<any> => {
+    try {
+        const token = getCurrentUser()?.access_token as string | undefined;
+
+        const response = await axios.delete(
+            `${API_URL}/admin/patients/${idPaziente}`,
+            {
+                headers: {
+                    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                    'Content-Type': 'application/json',
+                },
+            }
+        );
+        return response.data;
+    } catch (error) {
+        console.error('Error removing patient from waiting list:', error);
+        throw error;
+    }
+};
+
