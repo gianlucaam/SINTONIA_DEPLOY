@@ -3,7 +3,7 @@
     padding: 48px 20px 30px;
     border-bottom-left-radius: 50px;
     border-bottom-right-radius: 50px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
 .forum-header-content {

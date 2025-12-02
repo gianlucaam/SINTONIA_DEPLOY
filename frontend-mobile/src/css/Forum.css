@@ -1,46 +1,6 @@
 .forum-page {
     background-color: var(--secondary-bg);
-}
-
-.forum-content {
-    padding: 16px 20px;
-}
-
-.forum-section {
-    margin-bottom: 32px;
-}
-
-.section-title {
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--text-dark);
-    margin: 0 0 16px 0;
-    padding: 0 4px;
-}
-
-.posts-list {
-    display: flex;
-    flex-direction: column;
-}
-
-.loading-screen {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    font-size: 18px;
-    font-weight: 600;
-    color: var(--text-gray);
-}
-
-.no-posts {
-    text-align: center;
-    padding: 60px 20px;
-    color: var(--text-gray);
-}
-
-.forum-page {
-    background-color: var(--secondary-bg);
+    padding-bottom: 100px;
 }
 
 .forum-content {
@@ -96,8 +56,8 @@
     position: fixed;
     bottom: 90px;
     right: 20px;
-    width: 56px;
-    height: 56px;
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
     background: rgba(127, 185, 156, 0.15);
     border: 2px solid #7FB99C;
@@ -105,15 +65,15 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    z-index: 100;
+    z-index: 150;
     box-shadow: 0 4px 12px rgba(127, 185, 156, 0.2);
     transition: all 0.2s ease;
     padding: 0;
 }
 
 .forum-fab img {
-    width: 28px;
-    height: 28px;
+    width: 30px;
+    height: 30px;
 }
 
 .forum-fab:hover {

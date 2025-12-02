@@ -3,7 +3,7 @@
     padding: 20px;
     border-radius: 20px;
     margin: 20px 20px 0;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 10px 10px -5px rgba(0, 0, 0, 0.35);
 }
 
 .category-filters-header {
