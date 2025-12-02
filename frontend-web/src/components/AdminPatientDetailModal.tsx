@@ -12,6 +12,12 @@ interface AdminPatientDetailModalProps {
     onUpdate?: () => void; // Callback to refresh list after update
 }
 
+const PRIORITY_OPTIONS = [
+    { value: 'Alta', label: 'Alta' },
+    { value: 'Media', label: 'Media' },
+    { value: 'Bassa', label: 'Bassa' }
+];
+
 const AdminPatientDetailModal: React.FC<AdminPatientDetailModalProps> = ({
     patient,
     onClose,
@@ -31,6 +37,7 @@ const AdminPatientDetailModal: React.FC<AdminPatientDetailModalProps> = ({
     const [editedEmail, setEditedEmail] = useState('');
     const [editedResidenza, setEditedResidenza] = useState('');
     const [editedPsicologo, setEditedPsicologo] = useState('');
+    const [editedPriorita, setEditedPriorita] = useState('');
     const [psychologistSearch, setPsychologistSearch] = useState('');
     const [showPsychologistDropdown, setShowPsychologistDropdown] = useState(false);
 
@@ -64,6 +71,7 @@ const AdminPatientDetailModal: React.FC<AdminPatientDetailModalProps> = ({
             setEditedEmail(details.email || '');
             setEditedResidenza(details.residenza || '');
             setEditedPsicologo(details.idPsicologo || '');
+            setEditedPriorita(details.idPriorita || '');
         } catch (error) {
             console.error('Error loading patient details:', error);
             setToast({ message: 'Errore nel caricamento dei dettagli del paziente', type: 'error' });
@@ -81,6 +89,7 @@ const AdminPatientDetailModal: React.FC<AdminPatientDetailModalProps> = ({
                 email: editedEmail,
                 residenza: editedResidenza,
                 idPsicologo: editedPsicologo,
+                idPriorita: editedPriorita,
             });
             setToast({ message: 'Paziente aggiornato con successo!', type: 'success' });
             setIsEditing(false);
@@ -104,6 +113,7 @@ const AdminPatientDetailModal: React.FC<AdminPatientDetailModalProps> = ({
             setEditedEmail(patientDetails.email || '');
             setEditedResidenza(patientDetails.residenza || '');
             setEditedPsicologo(patientDetails.idPsicologo || '');
+            setEditedPriorita(patientDetails.idPriorita || '');
         }
         setPsychologistSearch('');
         setShowPsychologistDropdown(false);
@@ -295,12 +305,71 @@ const AdminPatientDetailModal: React.FC<AdminPatientDetailModalProps> = ({
                             />
 
                             {/* Priorità Card */}
-                            <InfoCard
-                                icon={<Flag size={16} />}
-                                label="Priorità"
-                                value={patientDetails.idPriorita || 'N/A'}
-                                iconColor="#E57373"
-                            />
+                            {isEditing ? (
+                                <div style={{
+                                    background: 'white',
+                                    borderRadius: '12px',
+                                    padding: '14px',
+                                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
+                                    border: '1px solid #e8e8e8',
+                                    transition: 'all 0.3s ease'
+                                }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                                        <div style={{
+                                            width: '32px',
+                                            height: '32px',
+                                            borderRadius: '10px',
+                                            background: 'linear-gradient(135deg, #E57373 0%, #E57373dd 100%)',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            color: 'white'
+                                        }}>
+                                            <Flag size={16} />
+                                        </div>
+                                        <span style={{
+                                            fontSize: '10px',
+                                            fontWeight: '600',
+                                            color: '#666',
+                                            textTransform: 'uppercase',
+                                            letterSpacing: '0.5px'
+                                        }}>
+                                            Priorità
+                                        </span>
+                                    </div>
+                                    <select
+                                        value={editedPriorita}
+                                        onChange={(e) => setEditedPriorita(e.target.value)}
+                                        style={{
+                                            width: '100%',
+                                            padding: '10px 12px',
+                                            border: '2px solid #e0e0e0',
+                                            borderRadius: '8px',
+                                            fontSize: '13px',
+                                            fontWeight: '500',
+                                            outline: 'none',
+                                            backgroundColor: 'white',
+                                            cursor: 'pointer'
+                                        }}
+                                        onFocus={(e) => e.target.style.borderColor = '#E57373'}
+                                        onBlur={(e) => e.target.style.borderColor = '#e0e0e0'}
+                                    >
+                                        <option value="">Seleziona...</option>
+                                        {PRIORITY_OPTIONS.map(option => (
+                                            <option key={option.value} value={option.value}>
+                                                {option.label}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                            ) : (
+                                <InfoCard
+                                    icon={<Flag size={16} />}
+                                    label="Priorità"
+                                    value={patientDetails.idPriorita || 'N/A'}
+                                    iconColor="#E57373"
+                                />
+                            )}
 
                             {/* Residenza Card - Editable */}
                             <EditableCard
