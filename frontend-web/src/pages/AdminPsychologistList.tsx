@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import AdminPsychologistTable from '../components/AdminPsychologistTable';
 import AdminPsychologistDetailModal from '../components/AdminPsychologistDetailModal';
 import AddPsychologistModal from '../components/AddPsychologistModal';
-import { User, Eye, LayoutGrid, List, UserPlus } from 'lucide-react';
+import { User, Eye, LayoutGrid, List, UserPlus, Search, RotateCcw } from 'lucide-react';
 import '../css/QuestionnaireManagement.css'; // Reuse existing layout styles
 import '../css/AdminPsychologistList.css';
 import { fetchAllPsychologists, createPsychologist, type PsychologistOption } from '../services/psychologist.service';
@@ -155,14 +155,12 @@ const AdminPsychologistList: React.FC = () => {
             const normalized = data.map(normalizePsychologist);
             setPsychologists(normalized);
 
-            setShowAddModal(false);
+            // Modal closing is now handled by the modal itself after toast
+            // setShowAddModal(false); 
         } catch (err: any) {
             console.error('Error adding psychologist:', err);
-            const errorMessage = err.message?.includes('localhost') || err.message?.includes('fetch')
-                ? 'Errore di connessione al server.'
-                : (err.message || 'Errore durante la creazione dello psicologo. Riprova.');
-            setError(errorMessage);
-            // Keep modal open on error so user can retry
+            // Re-throw error so the modal can handle it with a toast
+            throw err;
         } finally {
             setLoading(false);
         }
@@ -338,7 +336,7 @@ const AdminPsychologistList: React.FC = () => {
                             type="text"
                             value={searchQuery}
                             onChange={handleSearchInputChange}
-                            placeholder="🔍 Cerca per CF, nome o cognome..."
+                            placeholder="Cerca per CF, nome o cognome..."
                             style={{
                                 padding: '10px 16px',
                                 borderRadius: '8px',
@@ -352,8 +350,9 @@ const AdminPsychologistList: React.FC = () => {
                             onBlur={(e) => e.target.style.borderColor = '#ddd'}
                         />
                         {searchQuery && (
-                            <button onClick={handleReset} className="clear-filter-btn">
-                                ↺ Reset
+                            <button onClick={handleReset} className="clear-filter-btn" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                <RotateCcw size={14} />
+                                Reset
                             </button>
                         )}
                     </div>
@@ -469,9 +468,14 @@ const AdminPsychologistList: React.FC = () => {
                             <p style={{
                                 fontSize: '16px',
                                 color: '#666',
-                                margin: 0
+                                margin: 0,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '8px'
                             }}>
-                                🔍 Nessuno psicologo trovato con "<strong>{searchQuery}</strong>"
+                                <Search size={18} style={{ flexShrink: 0 }} />
+                                <span>Nessuno psicologo trovato con "<strong>{searchQuery}</strong>"</span>
                             </p>
                             <p style={{
                                 fontSize: '14px',

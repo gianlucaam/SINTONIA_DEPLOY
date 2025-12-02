@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { X } from 'lucide-react';
 import AdminQuestionnaireTable from '../components/AdminQuestionnaireTable';
 import AdminQuestionnaireDetailModal from '../components/AdminQuestionnaireDetailModal';
 import { fetchQuestionnaires, fetchQuestionnairesByPatient, cancelRevision, viewQuestionnaire } from '../services/questionnaire.service';
 import type { QuestionnaireData, LoadingState } from '../types/psychologist';
 import '../css/QuestionnaireManagement.css'; // Reuse existing layout styles
+
+import Toast from '../components/Toast';
 
 const AdminQuestionnaireList: React.FC = () => {
     const [questionnairesState, setQuestionnairesState] = useState<LoadingState<QuestionnaireData[]>>({
@@ -14,6 +17,7 @@ const AdminQuestionnaireList: React.FC = () => {
     const [selectedQuestionnaireId, setSelectedQuestionnaireId] = useState<string | null>(null);
     const [viewingQuestionnaire, setViewingQuestionnaire] = useState<QuestionnaireData | null>(null);
     const [patientFilter, setPatientFilter] = useState<string | null>(null);
+    const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
     useEffect(() => {
         loadQuestionnaires();
@@ -64,7 +68,7 @@ const AdminQuestionnaireList: React.FC = () => {
             setViewingQuestionnaire(questionnaireDetails);
         } catch (error) {
             console.error('Error loading questionnaire details:', error);
-            alert('Errore nel caricamento dei dettagli del questionario');
+            setToast({ message: 'Errore nel caricamento dei dettagli del questionario', type: 'error' });
         }
     };
 
@@ -75,12 +79,12 @@ const AdminQuestionnaireList: React.FC = () => {
     const handleCancelRevision = async (id: string) => {
         try {
             await cancelRevision(id);
-            alert('Revisione annullata con successo');
+            setToast({ message: 'Revisione annullata con successo', type: 'success' });
             // Reload with current filter if active
             loadQuestionnaires(patientFilter || undefined);
         } catch (error) {
             console.error('Error cancelling revision:', error);
-            alert('Errore durante l\'annullamento della revisione');
+            setToast({ message: 'Errore durante l\'annullamento della revisione', type: 'error' });
         }
     };
 
@@ -121,8 +125,9 @@ const AdminQuestionnaireList: React.FC = () => {
                         {patientFilter && (
                             <div className="active-filter">
                                 <span>Filtro attivo: Paziente {patientFilter.substring(0, 8)}...</span>
-                                <button className="reset-filter-btn" onClick={handleResetFilter}>
-                                    ✕ Rimuovi Filtro
+                                <button className="reset-filter-btn" onClick={handleResetFilter} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                    <X size={14} />
+                                    Rimuovi Filtro
                                 </button>
                             </div>
                         )}
@@ -143,6 +148,13 @@ const AdminQuestionnaireList: React.FC = () => {
                     questionnaire={viewingQuestionnaire}
                     onClose={handleCloseModal}
                     onCancelRevision={handleCancelRevision}
+                />
+            )}
+            {toast && (
+                <Toast
+                    message={toast.message}
+                    type={toast.type}
+                    onClose={() => setToast(null)}
                 />
             )}
         </div>

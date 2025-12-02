@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Search, User, Mail, Building2, IdCard, Edit2, Save, X } from 'lucide-react';
+import ReactDOM from 'react-dom';
+import { Search, User, Mail, Building2, IdCard, Edit2, Save, X, Check } from 'lucide-react';
 import '../css/QuestionnaireDetailModal.css';
 import { updatePsychologist } from '../services/psychologist.service';
 import Toast from './Toast';
@@ -108,7 +109,7 @@ const AdminPsychologistDetailModal: React.FC<AdminPsychologistDetailModalProps> 
 
     if (!psychologist) return null;
 
-    return (
+    return ReactDOM.createPortal(
         <div className="modal-overlay" onClick={onClose} style={{ backdropFilter: 'blur(4px)' }}>
             <div
                 className="modal-content"
@@ -368,11 +369,14 @@ const AdminPsychologistDetailModal: React.FC<AdminPsychologistDetailModalProps> 
                                         <span style={{
                                             fontSize: '11px',
                                             color: '#7FB77E',
-                                            display: 'block',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '4px',
                                             marginTop: '6px',
                                             fontWeight: '500'
                                         }}>
-                                            ✓ Selezionato: {editedAsl}
+                                            <Check size={12} />
+                                            Selezionato: {editedAsl}
                                         </span>
                                     )}
                                 </div>
@@ -579,7 +583,8 @@ const AdminPsychologistDetailModal: React.FC<AdminPsychologistDetailModalProps> 
                     onClose={() => setToast(null)}
                 />
             )}
-        </div >
+        </div >,
+        document.body
     );
 };
 

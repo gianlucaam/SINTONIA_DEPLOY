@@ -1,16 +1,19 @@
 import React, { useState } from 'react';
+import ReactDOM from 'react-dom';
 import { Eye, EyeOff, X } from 'lucide-react';
-import '../css/ChangePasswordModal.css';
+import '../css/QuestionnaireDetailModal.css';
 
 interface ChangePasswordModalProps {
     onClose: () => void;
-    onConfirm: (newPassword: string) => void;
+    onConfirm: (oldPassword: string, newPassword: string) => void;
 }
 
 const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ onClose, onConfirm }) => {
-    const [password, setPassword] = useState('');
+    const [oldPassword, setOldPassword] = useState('');
+    const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
-    const [showPassword, setShowPassword] = useState(false);
+    const [showOldPassword, setShowOldPassword] = useState(false);
+    const [showNewPassword, setShowNewPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [error, setError] = useState('');
 
@@ -18,66 +21,179 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ onClose, onCo
         e.preventDefault();
 
         // Validazione
-        if (!password || !confirmPassword) {
+        if (!oldPassword || !newPassword || !confirmPassword) {
             setError('Tutti i campi sono obbligatori');
             return;
         }
 
-        if (password.length < 8) {
+        if (newPassword.length < 8) {
             setError('La password deve essere di almeno 8 caratteri');
             return;
         }
 
-        if (password !== confirmPassword) {
-            setError('Le password non corrispondono');
+        if (newPassword !== confirmPassword) {
+            setError('Le nuove password non corrispondono');
             return;
         }
 
-        // Se tutto ok, chiama onConfirm
-        onConfirm(password);
+        // Se tutto ok, chiama onConfirm con password vecchia e nuova
+        onConfirm(oldPassword, newPassword);
         onClose();
     };
 
-    return (
+    return ReactDOM.createPortal(
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                <div className="modal-header">
-                    <h2 className="modal-title">Modifica Password</h2>
-                    <button className="modal-close-btn" onClick={onClose} aria-label="Chiudi">
-                        <X size={24} />
-                    </button>
+                {/* Modern Header with Gradient - Same as AdminPsychologistDetailModal */}
+                <div style={{
+                    background: 'linear-gradient(135deg, #0D475D 0%, #1a5f7a 50%, #83B9C1 100%)',
+                    padding: '32px',
+                    position: 'relative',
+                    overflow: 'hidden'
+                }}>
+                    <div style={{
+                        position: 'absolute',
+                        top: '-50%',
+                        right: '-10%',
+                        width: '300px',
+                        height: '300px',
+                        background: 'rgba(255, 255, 255, 0.05)',
+                        borderRadius: '50%',
+                        filter: 'blur(40px)'
+                    }}></div>
+
+                    <div style={{ position: 'relative', zIndex: 1 }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                            <div>
+                                <h2 style={{
+                                    margin: '0',
+                                    fontSize: '28px',
+                                    fontWeight: '700',
+                                    color: 'white',
+                                    letterSpacing: '-0.5px'
+                                }}>
+                                    Modifica Password
+                                </h2>
+                            </div>
+                            <button
+                                onClick={onClose}
+                                style={{
+                                    background: 'rgba(255, 255, 255, 0.15)',
+                                    backdropFilter: 'blur(10px)',
+                                    border: 'none',
+                                    color: 'white',
+                                    width: '40px',
+                                    height: '40px',
+                                    borderRadius: '50%',
+                                    cursor: 'pointer',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    transition: 'all 0.3s ease',
+                                    fontSize: '20px'
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.25)';
+                                    e.currentTarget.style.transform = 'rotate(90deg) scale(1.1)';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.15)';
+                                    e.currentTarget.style.transform = 'rotate(0deg) scale(1)';
+                                }}
+                            >
+                                <X size={20} />
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
-                <form onSubmit={handleSubmit} className="modal-form">
-                    {/* Nuova Password */}
-                    <div className="form-group">
-                        <label className="form-label">Nuova Password</label>
-                        <div className="password-input-wrapper">
+                <form onSubmit={handleSubmit} className="modal-body">
+                    {/* Password Vecchia */}
+                    <div className="info-item" style={{ marginBottom: '20px' }}>
+                        <label className="info-label" style={{ fontSize: '14px', fontWeight: '600', color: '#1A5F5F', marginBottom: '8px', display: 'block' }}>
+                            Password Attuale
+                        </label>
+                        <div style={{ position: 'relative' }}>
                             <input
-                                type={showPassword ? 'text' : 'password'}
-                                value={password}
+                                type={showOldPassword ? 'text' : 'password'}
+                                value={oldPassword}
                                 onChange={(e) => {
-                                    setPassword(e.target.value);
+                                    setOldPassword(e.target.value);
                                     setError('');
                                 }}
-                                className="form-control"
-                                placeholder="Inserisci la nuova password"
+                                className="modal-input"
+                                placeholder="Inserisci la password attuale"
+                                style={{ paddingRight: '40px' }}
                             />
                             <button
                                 type="button"
-                                className="toggle-password-btn"
-                                onClick={() => setShowPassword(!showPassword)}
-                                aria-label={showPassword ? 'Nascondi password' : 'Mostra password'}
+                                onClick={() => setShowOldPassword(!showOldPassword)}
+                                style={{
+                                    position: 'absolute',
+                                    right: '10px',
+                                    top: '50%',
+                                    transform: 'translateY(-50%)',
+                                    background: 'none',
+                                    border: 'none',
+                                    cursor: 'pointer',
+                                    color: '#83B9C1',
+                                    padding: '4px',
+                                    display: 'flex',
+                                    alignItems: 'center'
+                                }}
+                                aria-label={showOldPassword ? 'Nascondi password' : 'Mostra password'}
                             >
-                                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                                {showOldPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Nuova Password */}
+                    <div className="info-item" style={{ marginBottom: '20px' }}>
+                        <label className="info-label" style={{ fontSize: '14px', fontWeight: '600', color: '#1A5F5F', marginBottom: '8px', display: 'block' }}>
+                            Nuova Password
+                        </label>
+                        <div style={{ position: 'relative' }}>
+                            <input
+                                type={showNewPassword ? 'text' : 'password'}
+                                value={newPassword}
+                                onChange={(e) => {
+                                    setNewPassword(e.target.value);
+                                    setError('');
+                                }}
+                                className="modal-input"
+                                placeholder="Inserisci la nuova password"
+                                style={{ paddingRight: '40px' }}
+                            />
+                            <button
+                                type="button"
+                                onClick={() => setShowNewPassword(!showNewPassword)}
+                                style={{
+                                    position: 'absolute',
+                                    right: '10px',
+                                    top: '50%',
+                                    transform: 'translateY(-50%)',
+                                    background: 'none',
+                                    border: 'none',
+                                    cursor: 'pointer',
+                                    color: '#83B9C1',
+                                    padding: '4px',
+                                    display: 'flex',
+                                    alignItems: 'center'
+                                }}
+                                aria-label={showNewPassword ? 'Nascondi password' : 'Mostra password'}
+                            >
+                                {showNewPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                             </button>
                         </div>
                     </div>
 
                     {/* Conferma Password */}
-                    <div className="form-group">
-                        <label className="form-label">Conferma Password</label>
-                        <div className="password-input-wrapper">
+                    <div className="info-item" style={{ marginBottom: '20px' }}>
+                        <label className="info-label" style={{ fontSize: '14px', fontWeight: '600', color: '#1A5F5F', marginBottom: '8px', display: 'block' }}>
+                            Conferma Nuova Password
+                        </label>
+                        <div style={{ position: 'relative' }}>
                             <input
                                 type={showConfirmPassword ? 'text' : 'password'}
                                 value={confirmPassword}
@@ -85,39 +201,89 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ onClose, onCo
                                     setConfirmPassword(e.target.value);
                                     setError('');
                                 }}
-                                className="form-control"
+                                className="modal-input"
                                 placeholder="Reinserisci la nuova password"
+                                style={{ paddingRight: '40px' }}
                             />
                             <button
                                 type="button"
-                                className="toggle-password-btn"
                                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                style={{
+                                    position: 'absolute',
+                                    right: '10px',
+                                    top: '50%',
+                                    transform: 'translateY(-50%)',
+                                    background: 'none',
+                                    border: 'none',
+                                    cursor: 'pointer',
+                                    color: '#83B9C1',
+                                    padding: '4px',
+                                    display: 'flex',
+                                    alignItems: 'center'
+                                }}
                                 aria-label={showConfirmPassword ? 'Nascondi password' : 'Mostra password'}
                             >
-                                {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                                {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                             </button>
                         </div>
                     </div>
 
                     {/* Error Message */}
                     {error && (
-                        <div className="error-message">
+                        <div style={{
+                            padding: '12px',
+                            background: '#fee',
+                            border: '1px solid #fcc',
+                            borderRadius: '6px',
+                            color: '#c00',
+                            fontSize: '14px',
+                            marginBottom: '20px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px'
+                        }}>
                             ⚠️ {error}
                         </div>
                     )}
 
                     {/* Buttons */}
-                    <div className="modal-actions">
-                        <button type="button" className="btn-secondary" onClick={onClose}>
+                    <div className="modal-footer" style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '24px' }}>
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            style={{
+                                padding: '10px 20px',
+                                borderRadius: '6px',
+                                border: '1px solid #ddd',
+                                background: '#fff',
+                                cursor: 'pointer',
+                                fontSize: '14px',
+                                fontWeight: '500',
+                                color: '#666'
+                            }}
+                        >
                             Annulla
                         </button>
-                        <button type="submit" className="btn-primary">
+                        <button
+                            type="submit"
+                            style={{
+                                padding: '10px 20px',
+                                borderRadius: '6px',
+                                border: 'none',
+                                background: '#83B9C1',
+                                color: '#fff',
+                                cursor: 'pointer',
+                                fontSize: '14px',
+                                fontWeight: '600'
+                            }}
+                        >
                             Conferma
                         </button>
                     </div>
                 </form>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 };
 
