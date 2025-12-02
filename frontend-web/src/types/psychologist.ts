@@ -2,6 +2,8 @@
  * Type definitions for the Psychologist Dashboard
  */
 
+import { Lamp } from 'lucide-react';
+
 export interface Psychologist {
     name: string;
     title: string;
@@ -50,13 +52,6 @@ export type {
 } from './questionnaire';
 export { getQuestionnaireStatus } from './questionnaire';
 
-export interface Questionnaire {
-    id: string;
-    name: string;
-    author: string;
-    status: QuestionnaireStatus;
-    revisionDate: string; // Format: YYYY-MM-DD
-}
 
 export interface PaginationInfo {
     currentPage: number;

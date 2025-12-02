@@ -25,6 +25,7 @@ export class Ricerca_pazientiService {
             .leftJoin(psicologo, eq(paziente.idPsicologo, psicologo.codFiscale))
             .where(and(
                 eq(paziente.idPsicologo, idPsicologo),
+                eq(paziente.stato, true),
                 or(
                     ilike(paziente.nome, searchQuery),
                     ilike(paziente.cognome, searchQuery),
