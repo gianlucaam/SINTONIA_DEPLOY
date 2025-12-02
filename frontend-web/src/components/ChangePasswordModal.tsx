@@ -5,7 +5,7 @@ import '../css/QuestionnaireDetailModal.css';
 
 interface ChangePasswordModalProps {
     onClose: () => void;
-    onConfirm: (oldPassword: string, newPassword: string) => void;
+    onConfirm: (oldPassword: string, newPassword: string) => Promise<void>;
 }
 
 const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ onClose, onConfirm }) => {
@@ -17,10 +17,10 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ onClose, onCo
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [error, setError] = useState('');
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        // Validazione
+        // Validazione client-side
         if (!oldPassword || !newPassword || !confirmPassword) {
             setError('Tutti i campi sono obbligatori');
             return;
@@ -36,9 +36,15 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ onClose, onCo
             return;
         }
 
-        // Se tutto ok, chiama onConfirm con password vecchia e nuova
-        onConfirm(oldPassword, newPassword);
-        onClose();
+        // Chiamata async al backend
+        try {
+            await onConfirm(oldPassword, newPassword);
+            onClose(); // Chiude solo se successo
+        } catch (error: any) {
+            // Mostra errore dal backend sotto il campo password attuale
+            const errorMessage = error.response?.data?.message || 'Errore durante la modifica della password';
+            setError(errorMessage);
+        }
     };
 
     return ReactDOM.createPortal(

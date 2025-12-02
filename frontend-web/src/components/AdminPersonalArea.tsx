@@ -19,20 +19,11 @@ const AdminPersonalArea: React.FC = () => {
     const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
     const handlePasswordChange = async (oldPassword: string, newPassword: string) => {
-        try {
-            // Note: The backend currently doesn't verify the old password, but we receive it from the modal
-            await changePassword(newPassword);
-            setToast({
-                message: 'Password modificata con successo!',
-                type: 'success'
-            });
-        } catch (error) {
-            console.error('Error changing password:', error);
-            setToast({
-                message: 'Errore durante la modifica della password. Riprova.',
-                type: 'error'
-            });
-        }
+        await changePassword(oldPassword, newPassword);
+        setToast({
+            message: 'Password modificata con successo!',
+            type: 'success'
+        });
     };
 
     return (
