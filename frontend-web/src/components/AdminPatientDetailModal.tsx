@@ -13,9 +13,10 @@ interface AdminPatientDetailModalProps {
 }
 
 const PRIORITY_OPTIONS = [
-    { value: 'Alta', label: 'Alta' },
-    { value: 'Media', label: 'Media' },
-    { value: 'Bassa', label: 'Bassa' }
+    { value: 'Urgente', label: 'Urgente' },
+    { value: 'Breve', label: 'Breve' },
+    { value: 'Differibile', label: 'Differibile' },
+    { value: 'Programmabile', label: 'Programmabile' }
 ];
 
 const AdminPatientDetailModal: React.FC<AdminPatientDetailModalProps> = ({
@@ -309,12 +310,12 @@ const AdminPatientDetailModal: React.FC<AdminPatientDetailModalProps> = ({
                                 <div style={{
                                     background: 'white',
                                     borderRadius: '12px',
-                                    padding: '14px',
+                                    padding: '16px',
                                     boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
                                     border: '1px solid #e8e8e8',
-                                    transition: 'all 0.3s ease'
+                                    gridColumn: '1 / -1'
                                 }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
                                         <div style={{
                                             width: '32px',
                                             height: '32px',
@@ -337,30 +338,103 @@ const AdminPatientDetailModal: React.FC<AdminPatientDetailModalProps> = ({
                                             Priorità
                                         </span>
                                     </div>
-                                    <select
-                                        value={editedPriorita}
-                                        onChange={(e) => setEditedPriorita(e.target.value)}
-                                        style={{
-                                            width: '100%',
-                                            padding: '10px 12px',
-                                            border: '2px solid #e0e0e0',
-                                            borderRadius: '8px',
-                                            fontSize: '13px',
-                                            fontWeight: '500',
-                                            outline: 'none',
-                                            backgroundColor: 'white',
-                                            cursor: 'pointer'
-                                        }}
-                                        onFocus={(e) => e.target.style.borderColor = '#E57373'}
-                                        onBlur={(e) => e.target.style.borderColor = '#e0e0e0'}
-                                    >
-                                        <option value="">Seleziona...</option>
-                                        {PRIORITY_OPTIONS.map(option => (
-                                            <option key={option.value} value={option.value}>
-                                                {option.label}
-                                            </option>
-                                        ))}
-                                    </select>
+                                    {/* Grid di card selezionabili */}
+                                    <div style={{
+                                        display: 'grid',
+                                        gridTemplateColumns: 'repeat(2, 1fr)',
+                                        gap: '12px'
+                                    }}>
+                                        {PRIORITY_OPTIONS.map(option => {
+                                            const isSelected = editedPriorita === option.value;
+                                            const colors = {
+                                                'Urgente': { bg: '#ef4444', bgLight: '#fee2e2', border: '#dc2626' },
+                                                'Breve': { bg: '#f97316', bgLight: '#ffedd5', border: '#ea580c' },
+                                                'Differibile': { bg: '#eab308', bgLight: '#fef9c3', border: '#ca8a04' },
+                                                'Programmabile': { bg: '#22c55e', bgLight: '#dcfce7', border: '#16a34a' }
+                                            };
+                                            const color = colors[option.value as keyof typeof colors];
+
+                                            return (
+                                                <div
+                                                    key={option.value}
+                                                    onClick={() => setEditedPriorita(option.value)}
+                                                    style={{
+                                                        padding: '14px',
+                                                        borderRadius: '10px',
+                                                        border: `2px solid ${isSelected ? color.border : '#e5e7eb'}`,
+                                                        background: isSelected ? color.bgLight : 'white',
+                                                        cursor: 'pointer',
+                                                        transition: 'all 0.2s ease',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        gap: '10px',
+                                                        position: 'relative',
+                                                        overflow: 'hidden'
+                                                    }}
+                                                    onMouseEnter={(e) => {
+                                                        if (!isSelected) {
+                                                            e.currentTarget.style.borderColor = color.border;
+                                                            e.currentTarget.style.background = color.bgLight;
+                                                            e.currentTarget.style.transform = 'translateY(-2px)';
+                                                            e.currentTarget.style.boxShadow = `0 4px 12px ${color.bg}33`;
+                                                        }
+                                                    }}
+                                                    onMouseLeave={(e) => {
+                                                        if (!isSelected) {
+                                                            e.currentTarget.style.borderColor = '#e5e7eb';
+                                                            e.currentTarget.style.background = 'white';
+                                                            e.currentTarget.style.transform = 'translateY(0)';
+                                                            e.currentTarget.style.boxShadow = 'none';
+                                                        }
+                                                    }}
+                                                >
+                                                    {/* Icona priorità */}
+                                                    <div style={{
+                                                        width: '36px',
+                                                        height: '36px',
+                                                        borderRadius: '8px',
+                                                        background: isSelected
+                                                            ? `linear-gradient(135deg, ${color.bg} 0%, ${color.border} 100%)`
+                                                            : '#f3f4f6',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        color: isSelected ? 'white' : '#9ca3af',
+                                                        transition: 'all 0.2s ease'
+                                                    }}>
+                                                        <Flag size={18} />
+                                                    </div>
+                                                    {/* Label */}
+                                                    <div style={{ flex: 1 }}>
+                                                        <div style={{
+                                                            fontSize: '14px',
+                                                            fontWeight: '600',
+                                                            color: isSelected ? color.border : '#374151'
+                                                        }}>
+                                                            {option.label}
+                                                        </div>
+                                                    </div>
+                                                    {/* Check icon quando selezionato */}
+                                                    {isSelected && (
+                                                        <div style={{
+                                                            width: '20px',
+                                                            height: '20px',
+                                                            borderRadius: '50%',
+                                                            background: color.bg,
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                            color: 'white',
+                                                            fontSize: '12px',
+                                                            fontWeight: 'bold'
+                                                        }}>
+                                                            ✓
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
                                 </div>
                             ) : (
                                 <InfoCard
