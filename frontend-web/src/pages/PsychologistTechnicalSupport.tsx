@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Send } from 'lucide-react';
 import Toast from '../components/Toast';
 import '../css/PsychologistTechnicalSupport.css';
+import { submitSupportRequest } from '../services/psychologist.service';
 
 const PsychologistTechnicalSupport: React.FC = () => {
     const [subject, setSubject] = useState('');
@@ -15,16 +16,27 @@ const PsychologistTechnicalSupport: React.FC = () => {
 
         setIsSubmitting(true);
 
-        // Simulate API call
-        setTimeout(() => {
+        try {
+            await submitSupportRequest({
+                oggetto: subject,
+                descrizione: description,
+            });
+
             setSubject('');
             setDescription('');
-            setIsSubmitting(false);
             setToast({
                 message: 'Richiesta di supporto inviata con successo!',
                 type: 'success'
             });
-        }, 1500);
+        } catch (error) {
+            console.error(error);
+            setToast({
+                message: 'Errore durante l\'invio della richiesta. Riprova.',
+                type: 'error'
+            });
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
 
