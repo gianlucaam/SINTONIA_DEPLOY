@@ -260,3 +260,27 @@ export const generateReport = async (idPaziente: string): Promise<any> => {
         throw error;
     }
 };
+
+/**
+ * Recupera l'ultimo report generato per il paziente
+ * @param idPaziente - UUID del paziente
+ * @returns Dati del report
+ */
+export const getReport = async (idPaziente: string): Promise<any> => {
+    try {
+        const token = getCurrentUser()?.access_token as string | undefined;
+        const response = await axios.get(
+            `${API_URL}/psi/report/view/${idPaziente}`,
+            {
+                headers: {
+                    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                    'Content-Type': 'application/json',
+                },
+            }
+        );
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching report:', error);
+        throw error;
+    }
+};

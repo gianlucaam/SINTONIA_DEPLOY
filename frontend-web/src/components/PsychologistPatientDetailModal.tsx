@@ -6,6 +6,8 @@ import type { QuestionnaireData } from '../types/psychologist';
 import { getPatientDetailsByPsychologist, terminatePatientCare, generateReport } from '../services/patient.service';
 import { fetchQuestionnairesByPatient, reviewQuestionnaire, requestInvalidation, viewQuestionnaire } from '../services/questionnaire.service';
 import QuestionnaireDetailModal from './QuestionnaireDetailModal';
+
+import { getReport } from '../services/patient.service';
 import Toast from './Toast';
 import '../css/QuestionnaireDetailModal.css'; // Reuse existing styles
 
@@ -90,6 +92,8 @@ const PsychologistPatientDetailModal: React.FC<PsychologistPatientDetailModalPro
     const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [isTerminating, setIsTerminating] = useState(false);
     const [isGeneratingReport, setIsGeneratingReport] = useState(false);
+    const [viewingReport, setViewingReport] = useState<{ content: string; date: string } | null>(null);
+    const [isLoadingReport, setIsLoadingReport] = useState(false);
 
     useEffect(() => {
         if (patient) {
@@ -170,11 +174,29 @@ const PsychologistPatientDetailModal: React.FC<PsychologistPatientDetailModalPro
         try {
             await generateReport(patient.idPaziente);
             setToast({ message: 'Report generato con successo!', type: 'success' });
+            loadPatientDetails(); // Reload to update hasReport status
         } catch (error) {
             console.error('Error generating report:', error);
             setToast({ message: 'Errore durante la generazione del report', type: 'error' });
         } finally {
             setIsGeneratingReport(false);
+        }
+    };
+
+    const handleViewReport = async () => {
+        if (!patient) return;
+        setIsLoadingReport(true);
+        try {
+            const report = await getReport(patient.idPaziente);
+            setViewingReport({
+                content: report.contenuto,
+                date: report.dataReport
+            });
+        } catch (error) {
+            console.error('Error fetching report:', error);
+            setToast({ message: 'Nessun report trovato o errore nel caricamento', type: 'error' });
+        } finally {
+            setIsLoadingReport(false);
         }
     };
 
@@ -231,7 +253,7 @@ const PsychologistPatientDetailModal: React.FC<PsychologistPatientDetailModalPro
                                         color: 'white',
                                         letterSpacing: '-0.5px'
                                     }}>
-                                        Dettagli Paziente
+                                        {viewingReport ? 'Report Clinico' : 'Dettagli Paziente'}
                                     </h2>
                                     <p style={{
                                         margin: 0,
@@ -239,41 +261,101 @@ const PsychologistPatientDetailModal: React.FC<PsychologistPatientDetailModalPro
                                         color: 'rgba(255, 255, 255, 0.8)',
                                         fontWeight: '500'
                                     }}>
-                                        {patient.nome} {patient.cognome}
+                                        {viewingReport
+                                            ? `Generato il ${new Date(viewingReport.date).toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}`
+                                            : `${patient.nome} ${patient.cognome}`
+                                        }
                                     </p>
                                 </div>
                                 <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                                    <button
-                                        onClick={handleGenerateReport}
-                                        disabled={isGeneratingReport}
-                                        style={{
-                                            background: 'rgba(255, 255, 255, 0.2)',
-                                            border: '1px solid rgba(255, 255, 255, 0.3)',
-                                            color: 'white',
-                                            padding: '8px 16px',
-                                            borderRadius: '8px',
-                                            cursor: isGeneratingReport ? 'not-allowed' : 'pointer',
-                                            fontSize: '13px',
-                                            fontWeight: '600',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: '8px',
-                                            transition: 'all 0.2s ease'
-                                        }}
-                                        onMouseEnter={(e) => {
-                                            if (!isGeneratingReport) {
-                                                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.3)';
-                                            }
-                                        }}
-                                        onMouseLeave={(e) => {
-                                            if (!isGeneratingReport) {
-                                                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)';
-                                            }
-                                        }}
-                                    >
-                                        <FileText size={16} />
-                                        {isGeneratingReport ? 'Generazione...' : 'Genera Report'}
-                                    </button>
+                                    {!viewingReport ? (
+                                        <>
+                                            <button
+                                                onClick={handleGenerateReport}
+                                                disabled={isGeneratingReport}
+                                                style={{
+                                                    background: 'rgba(255, 255, 255, 0.2)',
+                                                    border: '1px solid rgba(255, 255, 255, 0.3)',
+                                                    color: 'white',
+                                                    padding: '8px 16px',
+                                                    borderRadius: '8px',
+                                                    cursor: isGeneratingReport ? 'not-allowed' : 'pointer',
+                                                    fontSize: '13px',
+                                                    fontWeight: '600',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: '8px',
+                                                    transition: 'all 0.2s ease'
+                                                }}
+                                                onMouseEnter={(e) => {
+                                                    if (!isGeneratingReport) {
+                                                        e.currentTarget.style.background = 'rgba(255, 255, 255, 0.3)';
+                                                    }
+                                                }}
+                                                onMouseLeave={(e) => {
+                                                    if (!isGeneratingReport) {
+                                                        e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)';
+                                                    }
+                                                }}
+                                            >
+                                                <FileText size={16} />
+                                                {isGeneratingReport ? 'Generazione...' : 'Genera Report'}
+                                            </button>
+                                            {patientDetails?.hasReport && (
+                                                <button
+                                                    onClick={handleViewReport}
+                                                    disabled={isLoadingReport}
+                                                    style={{
+                                                        background: 'rgba(255, 255, 255, 0.2)',
+                                                        border: '1px solid rgba(255, 255, 255, 0.3)',
+                                                        color: 'white',
+                                                        padding: '8px 16px',
+                                                        borderRadius: '8px',
+                                                        cursor: isLoadingReport ? 'not-allowed' : 'pointer',
+                                                        fontSize: '13px',
+                                                        fontWeight: '600',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        gap: '8px',
+                                                        transition: 'all 0.2s ease'
+                                                    }}
+                                                    onMouseEnter={(e) => {
+                                                        if (!isLoadingReport) {
+                                                            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.3)';
+                                                        }
+                                                    }}
+                                                    onMouseLeave={(e) => {
+                                                        if (!isLoadingReport) {
+                                                            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)';
+                                                        }
+                                                    }}
+                                                >
+                                                    <FileText size={16} />
+                                                    {isLoadingReport ? 'Caricamento...' : 'Visualizza Report'}
+                                                </button>
+                                            )}
+                                        </>
+                                    ) : (
+                                        <button
+                                            onClick={() => setViewingReport(null)}
+                                            style={{
+                                                background: 'rgba(255, 255, 255, 0.2)',
+                                                border: '1px solid rgba(255, 255, 255, 0.3)',
+                                                color: 'white',
+                                                padding: '8px 16px',
+                                                borderRadius: '8px',
+                                                cursor: 'pointer',
+                                                fontSize: '13px',
+                                                fontWeight: '600',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '8px',
+                                                transition: 'all 0.2s ease'
+                                            }}
+                                        >
+                                            Indietro
+                                        </button>
+                                    )}
                                     <button
                                         onClick={onClose}
                                         style={{
@@ -314,7 +396,24 @@ const PsychologistPatientDetailModal: React.FC<PsychologistPatientDetailModalPro
                         maxHeight: 'calc(90vh - 200px)',
                         overflowY: 'auto'
                     }}>
-                        {loading ? (
+                        {viewingReport ? (
+                            <div style={{
+                                backgroundColor: 'white',
+                                padding: '48px',
+                                borderRadius: '12px',
+                                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
+                                fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+                                fontSize: '16px',
+                                lineHeight: '1.8',
+                                color: '#2c3e50',
+                                whiteSpace: 'pre-wrap',
+                                border: '1px solid #eef2f5',
+                                maxWidth: '800px',
+                                margin: '0 auto'
+                            }}>
+                                {viewingReport.content}
+                            </div>
+                        ) : loading ? (
                             <div style={{ textAlign: 'center', padding: '40px', color: '#666' }}>
                                 Caricamento dettagli...
                             </div>
@@ -584,25 +683,27 @@ const PsychologistPatientDetailModal: React.FC<PsychologistPatientDetailModalPro
 
                     {/* Footer vuoto - solo chiusura tramite X */}
                     <div className="modal-footer">
-                        <button
-                            className="terminate-cure-btn"
-                            onClick={() => setShowConfirmModal(true)}
-                            style={{
-                                backgroundColor: '#dc3545',
-                                color: 'white',
-                                border: 'none',
-                                padding: '10px 20px',
-                                borderRadius: '4px',
-                                cursor: 'pointer',
-                                fontSize: '14px',
-                                fontWeight: 'bold',
-                                transition: 'background-color 0.2s'
-                            }}
-                            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#c82333'}
-                            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#dc3545'}
-                        >
-                            Termina cura
-                        </button>
+                        {!viewingReport && (
+                            <button
+                                className="terminate-cure-btn"
+                                onClick={() => setShowConfirmModal(true)}
+                                style={{
+                                    backgroundColor: '#dc3545',
+                                    color: 'white',
+                                    border: 'none',
+                                    padding: '10px 20px',
+                                    borderRadius: '4px',
+                                    cursor: 'pointer',
+                                    fontSize: '14px',
+                                    fontWeight: 'bold',
+                                    transition: 'background-color 0.2s'
+                                }}
+                                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#c82333'}
+                                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#dc3545'}
+                            >
+                                Termina cura
+                            </button>
+                        )}
                     </div>
                 </div>
                 {toast && (
