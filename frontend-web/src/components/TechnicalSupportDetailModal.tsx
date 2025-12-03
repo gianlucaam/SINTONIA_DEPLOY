@@ -398,6 +398,8 @@ const TechnicalSupportDetailModal: React.FC<TechnicalSupportDetailModalProps> = 
                                 fontSize: '14px',
                                 fontFamily: 'inherit',
                                 resize: 'vertical',
+                                minHeight: '100px',
+                                maxHeight: '250px',
                                 outline: 'none',
                                 transition: 'border-color 0.2s ease',
                                 marginBottom: '12px'
