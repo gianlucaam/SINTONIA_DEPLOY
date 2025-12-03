@@ -43,7 +43,7 @@ const PsychologistTechnicalSupport: React.FC = () => {
                             <p className="support-subtitle">
                                 Hai riscontrato un problema?
                                 <br /><br />
-                                Compila il modulo a destra per inviare una richiesta al team di supporto. Ti risponderemo il prima possibile.
+                                Ti invitiamo a compilare il modulo per inoltrare una richiesta al supporto tecnico. Riceverai una risposta nel più breve tempo possibile.
                             </p>
                         </div>
 

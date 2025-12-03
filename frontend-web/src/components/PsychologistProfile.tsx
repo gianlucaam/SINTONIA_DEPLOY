@@ -181,7 +181,6 @@ const PsychologistProfile: React.FC<PsychologistProfileProps> = ({ onSelectSecti
                             className="side-btn"
                             aria-label="Supporto Tecnico"
                             onClick={(e) => handleNavigation('supporto-tecnico', e)}
-                            style={{ backgroundColor: '#FFB74D' }} // Orange color to distinguish
                         >
                             <HelpCircle className="side-btn-icon" size={24} />
                         </button>
