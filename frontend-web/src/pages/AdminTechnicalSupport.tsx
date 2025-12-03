@@ -118,7 +118,7 @@ const MOCK_TICKETS: TechnicalSupportTicket[] = [
 const AdminTechnicalSupport: React.FC = () => {
     const [selectedTicket, setSelectedTicket] = useState<TechnicalSupportTicket | null>(null);
     const [currentPage, setCurrentPage] = useState(1);
-    const TICKETS_PER_PAGE = 10;
+    const TICKETS_PER_PAGE = 5;
 
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
