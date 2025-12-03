@@ -233,3 +233,30 @@ export const removePatientFromWaitingList = async (idPaziente: string): Promise<
     }
 };
 
+
+/**
+ * Genera un report completo per il paziente (psicologo)
+ * @param idPaziente - UUID del paziente
+ * @returns Response from the backend
+ */
+export const generateReport = async (idPaziente: string): Promise<any> => {
+    try {
+        const token = getCurrentUser()?.access_token as string | undefined;
+        const cf = getCurrentUser()?.fiscalCode || getCurrentUser()?.email;
+
+        const response = await axios.post(
+            `${API_URL}/psi/report/generate/${idPaziente}?cf=${cf}`,
+            {},
+            {
+                headers: {
+                    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                    'Content-Type': 'application/json',
+                },
+            }
+        );
+        return response.data;
+    } catch (error) {
+        console.error('Error generating report:', error);
+        throw error;
+    }
+};

@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import { Hash, User, CreditCard, Mail, Calendar, Home, Users2, Award, AlertTriangle, FileText, Check, X, ClipboardList } from 'lucide-react';
 import type { PatientData } from '../types/patient';
 import type { QuestionnaireData } from '../types/psychologist';
-import { getPatientDetailsByPsychologist, terminatePatientCare } from '../services/patient.service';
+import { getPatientDetailsByPsychologist, terminatePatientCare, generateReport } from '../services/patient.service';
 import { fetchQuestionnairesByPatient, reviewQuestionnaire, requestInvalidation, viewQuestionnaire } from '../services/questionnaire.service';
 import QuestionnaireDetailModal from './QuestionnaireDetailModal';
 import Toast from './Toast';
@@ -89,6 +89,7 @@ const PsychologistPatientDetailModal: React.FC<PsychologistPatientDetailModalPro
     const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
     const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [isTerminating, setIsTerminating] = useState(false);
+    const [isGeneratingReport, setIsGeneratingReport] = useState(false);
 
     useEffect(() => {
         if (patient) {
@@ -163,6 +164,20 @@ const PsychologistPatientDetailModal: React.FC<PsychologistPatientDetailModalPro
         }
     };
 
+    const handleGenerateReport = async () => {
+        if (!patient) return;
+        setIsGeneratingReport(true);
+        try {
+            await generateReport(patient.idPaziente);
+            setToast({ message: 'Report generato con successo!', type: 'success' });
+        } catch (error) {
+            console.error('Error generating report:', error);
+            setToast({ message: 'Errore durante la generazione del report', type: 'error' });
+        } finally {
+            setIsGeneratingReport(false);
+        }
+    };
+
     if (!patient) return null;
 
     const formatDate = (dateString: string | null) => {
@@ -227,34 +242,67 @@ const PsychologistPatientDetailModal: React.FC<PsychologistPatientDetailModalPro
                                         {patient.nome} {patient.cognome}
                                     </p>
                                 </div>
-                                <button
-                                    onClick={onClose}
-                                    style={{
-                                        background: 'rgba(255, 255, 255, 0.15)',
-                                        backdropFilter: 'blur(10px)',
-                                        border: 'none',
-                                        color: 'white',
-                                        width: '40px',
-                                        height: '40px',
-                                        borderRadius: '50%',
-                                        cursor: 'pointer',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        transition: 'all 0.3s ease',
-                                        fontSize: '20px'
-                                    }}
-                                    onMouseEnter={(e) => {
-                                        e.currentTarget.style.background = 'rgba(255, 255, 255, 0.25)';
-                                        e.currentTarget.style.transform = 'rotate(90deg) scale(1.1)';
-                                    }}
-                                    onMouseLeave={(e) => {
-                                        e.currentTarget.style.background = 'rgba(255, 255, 255, 0.15)';
-                                        e.currentTarget.style.transform = 'rotate(0deg) scale(1)';
-                                    }}
-                                >
-                                    ✕
-                                </button>
+                                <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                                    <button
+                                        onClick={handleGenerateReport}
+                                        disabled={isGeneratingReport}
+                                        style={{
+                                            background: 'rgba(255, 255, 255, 0.2)',
+                                            border: '1px solid rgba(255, 255, 255, 0.3)',
+                                            color: 'white',
+                                            padding: '8px 16px',
+                                            borderRadius: '8px',
+                                            cursor: isGeneratingReport ? 'not-allowed' : 'pointer',
+                                            fontSize: '13px',
+                                            fontWeight: '600',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '8px',
+                                            transition: 'all 0.2s ease'
+                                        }}
+                                        onMouseEnter={(e) => {
+                                            if (!isGeneratingReport) {
+                                                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.3)';
+                                            }
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            if (!isGeneratingReport) {
+                                                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)';
+                                            }
+                                        }}
+                                    >
+                                        <FileText size={16} />
+                                        {isGeneratingReport ? 'Generazione...' : 'Genera Report'}
+                                    </button>
+                                    <button
+                                        onClick={onClose}
+                                        style={{
+                                            background: 'rgba(255, 255, 255, 0.15)',
+                                            backdropFilter: 'blur(10px)',
+                                            border: 'none',
+                                            color: 'white',
+                                            width: '40px',
+                                            height: '40px',
+                                            borderRadius: '50%',
+                                            cursor: 'pointer',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            transition: 'all 0.3s ease',
+                                            fontSize: '20px'
+                                        }}
+                                        onMouseEnter={(e) => {
+                                            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.25)';
+                                            e.currentTarget.style.transform = 'rotate(90deg) scale(1.1)';
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.15)';
+                                            e.currentTarget.style.transform = 'rotate(0deg) scale(1)';
+                                        }}
+                                    >
+                                        ✕
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
