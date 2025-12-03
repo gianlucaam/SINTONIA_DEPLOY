@@ -1,14 +1,86 @@
 /* Psychologist Technical Support Page */
 .psychologist-support-container {
-    max-width: 800px;
+    max-width: 100%;
     margin: 0 auto;
+    height: 100%;
 }
 
+.support-layout {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+    gap: 60px;
+    height: 100%;
+    align-items: start;
+    padding: 20px 0;
+}
+
+/* Left Side */
+.support-header-side {
+    padding-top: 20px;
+}
+
+.support-title {
+    font-size: 36px;
+    font-weight: 800;
+    color: var(--color-teal-dark);
+    margin-bottom: 16px;
+    letter-spacing: -0.5px;
+}
+
+.support-subtitle {
+    color: var(--color-text-secondary);
+    font-size: 16px;
+    line-height: 1.6;
+    margin-bottom: 40px;
+    max-width: 90%;
+}
+
+.support-illustration {
+    display: flex;
+    justify-content: center;
+    margin-top: 40px;
+}
+
+.illustration-circle {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--color-teal-medium) 0%, var(--color-teal-dark) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 20px 40px rgba(43, 122, 122, 0.2);
+    position: relative;
+}
+
+.illustration-circle::after {
+    content: '';
+    position: absolute;
+    top: -20px;
+    left: -20px;
+    right: -20px;
+    bottom: -20px;
+    border-radius: 50%;
+    border: 2px dashed rgba(43, 122, 122, 0.2);
+    animation: spin 20s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Right Side */
 .support-form-card {
     background: white;
-    border-radius: 16px;
-    padding: 32px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border-radius: 24px;
+    padding: 40px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
     border: 1px solid #e8e8e8;
 }
 
@@ -27,24 +99,27 @@
 .form-input,
 .form-textarea {
     width: 100%;
-    padding: 12px 16px;
+    padding: 16px 20px;
     border: 2px solid #e0e0e0;
-    border-radius: 12px;
+    border-radius: 16px;
     font-size: 15px;
     transition: all 0.2s ease;
     font-family: inherit;
     box-sizing: border-box;
+    background-color: #fafafa;
 }
 
 .form-input:focus,
 .form-textarea:focus {
     border-color: var(--color-teal-medium);
+    background-color: white;
     outline: none;
-    box-shadow: 0 0 0 3px rgba(43, 122, 122, 0.1);
+    box-shadow: 0 0 0 4px rgba(43, 122, 122, 0.1);
 }
 
 .form-textarea {
-    min-height: 150px;
+    min-height: 200px;
+    max-height: 280px;
     resize: vertical;
 }
 
@@ -59,21 +134,21 @@
     background: linear-gradient(135deg, var(--color-teal-medium) 0%, var(--color-teal-dark) 100%);
     color: white;
     border: none;
-    padding: 12px 32px;
-    border-radius: 12px;
+    padding: 16px 40px;
+    border-radius: 16px;
     font-weight: 600;
     font-size: 16px;
     cursor: pointer;
     transition: all 0.3s ease;
     display: flex;
     align-items: center;
-    gap: 8px;
-    box-shadow: 0 4px 12px rgba(43, 122, 122, 0.3);
+    gap: 10px;
+    box-shadow: 0 8px 20px rgba(43, 122, 122, 0.25);
 }
 
 .submit-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(43, 122, 122, 0.4);
+    box-shadow: 0 12px 24px rgba(43, 122, 122, 0.35);
 }
 
 .submit-btn:disabled {
@@ -82,79 +157,19 @@
     transform: none;
 }
 
-.support-history {
-    margin-top: 40px;
-}
+/* Responsive */
+@media (max-width: 1024px) {
+    .support-layout {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
 
-.history-title {
-    font-size: 20px;
-    font-weight: 700;
-    color: var(--color-text-primary);
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
+    .support-header-side {
+        text-align: center;
+    }
 
-.history-list {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-}
-
-.ticket-card {
-    background: white;
-    border-radius: 12px;
-    padding: 20px;
-    border: 1px solid #e8e8e8;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    transition: all 0.2s ease;
-}
-
-.ticket-card:hover {
-    border-color: var(--color-teal-light);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-}
-
-.ticket-info h4 {
-    margin: 0 0 4px 0;
-    font-size: 16px;
-    color: var(--color-text-primary);
-}
-
-.ticket-meta {
-    font-size: 13px;
-    color: var(--color-text-secondary);
-    display: flex;
-    gap: 12px;
-}
-
-.ticket-status {
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
-    text-transform: uppercase;
-}
-
-.status-aperto {
-    background-color: #FFF3E0;
-    color: #E65100;
-}
-
-.status-in-lavorazione {
-    background-color: #E3F2FD;
-    color: #1565C0;
-}
-
-.status-risolto {
-    background-color: #E8F5E9;
-    color: #2E7D32;
-}
-
-.status-chiuso {
-    background-color: #F5F5F5;
-    color: #616161;
+    .support-subtitle {
+        margin-left: auto;
+        margin-right: auto;
+    }
 }
