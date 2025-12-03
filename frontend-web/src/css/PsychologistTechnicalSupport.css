@@ -1,0 +1,160 @@
+/* Psychologist Technical Support Page */
+.psychologist-support-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.support-form-card {
+    background: white;
+    border-radius: 16px;
+    padding: 32px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e8e8e8;
+}
+
+.form-group {
+    margin-bottom: 24px;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    font-size: 15px;
+}
+
+.form-input,
+.form-textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    font-size: 15px;
+    transition: all 0.2s ease;
+    font-family: inherit;
+    box-sizing: border-box;
+}
+
+.form-input:focus,
+.form-textarea:focus {
+    border-color: var(--color-teal-medium);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(43, 122, 122, 0.1);
+}
+
+.form-textarea {
+    min-height: 150px;
+    resize: vertical;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 16px;
+    margin-top: 32px;
+}
+
+.submit-btn {
+    background: linear-gradient(135deg, var(--color-teal-medium) 0%, var(--color-teal-dark) 100%);
+    color: white;
+    border: none;
+    padding: 12px 32px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 12px rgba(43, 122, 122, 0.3);
+}
+
+.submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(43, 122, 122, 0.4);
+}
+
+.submit-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.support-history {
+    margin-top: 40px;
+}
+
+.history-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.ticket-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid #e8e8e8;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.2s ease;
+}
+
+.ticket-card:hover {
+    border-color: var(--color-teal-light);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.ticket-info h4 {
+    margin: 0 0 4px 0;
+    font-size: 16px;
+    color: var(--color-text-primary);
+}
+
+.ticket-meta {
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    display: flex;
+    gap: 12px;
+}
+
+.ticket-status {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.status-aperto {
+    background-color: #FFF3E0;
+    color: #E65100;
+}
+
+.status-in-lavorazione {
+    background-color: #E3F2FD;
+    color: #1565C0;
+}
+
+.status-risolto {
+    background-color: #E8F5E9;
+    color: #2E7D32;
+}
+
+.status-chiuso {
+    background-color: #F5F5F5;
+    color: #616161;
+}

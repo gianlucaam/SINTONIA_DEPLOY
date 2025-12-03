@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { HelpCircle } from 'lucide-react';
 import { fetchDashboardData } from '../services/psychologist.service';
 import { getCurrentUser, logout } from '../services/auth.service';
 import type { PsychologistDashboardData, LoadingState } from '../types/psychologist';
@@ -175,9 +176,19 @@ const PsychologistProfile: React.FC<PsychologistProfileProps> = ({ onSelectSecti
                         />
                     </div>
 
-                    <button className="side-btn right-side-btn" aria-label="Notifications">
-                        <img src={notificationIcon} alt="Notifications" className="side-btn-icon notification-icon" />
-                    </button>
+                    <div style={{ marginLeft: 'auto', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                        <button
+                            className="side-btn"
+                            aria-label="Supporto Tecnico"
+                            onClick={(e) => handleNavigation('supporto-tecnico', e)}
+                            style={{ backgroundColor: '#FFB74D' }} // Orange color to distinguish
+                        >
+                            <HelpCircle className="side-btn-icon" size={24} />
+                        </button>
+                        <button className="side-btn" aria-label="Notifications">
+                            <img src={notificationIcon} alt="Notifications" className="side-btn-icon notification-icon" />
+                        </button>
+                    </div>
                 </div>
             </div>
 
