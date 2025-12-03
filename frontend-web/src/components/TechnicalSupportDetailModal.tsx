@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 import { Ticket, User, Calendar, FileText, AlertCircle, Check, Send } from 'lucide-react';
 import type { TechnicalSupportTicket } from '../types/technicalSupport';
+import Toast from './Toast';
 import '../css/QuestionnaireDetailModal.css';
 
 interface TechnicalSupportDetailModalProps {
     ticket: TechnicalSupportTicket | null;
     onClose: () => void;
+    onTicketUpdated?: () => void;
 }
 
 // Info Card Component
@@ -68,25 +70,82 @@ const InfoCard: React.FC<{
     );
 };
 
-const TechnicalSupportDetailModal: React.FC<TechnicalSupportDetailModalProps> = ({ ticket, onClose }) => {
+const TechnicalSupportDetailModal: React.FC<TechnicalSupportDetailModalProps> = ({ ticket, onClose, onTicketUpdated }) => {
     const [showCloseConfirm, setShowCloseConfirm] = useState(false);
+    const [showReplyConfirm, setShowReplyConfirm] = useState(false);
     const [responseText, setResponseText] = useState('');
+    const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
     if (!ticket) return null;
 
-    const handleSendResponse = () => {
-        if (responseText.trim()) {
-            alert(`Risposta inviata: ${responseText}`);
-            setResponseText('');
-            // Optional: close modal or just clear text
+    const handleSendResponse = async () => {
+        if (!responseText.trim()) return;
+
+        try {
+            const userStr = localStorage.getItem('user');
+            const user = userStr ? JSON.parse(userStr) : null;
+            const token = user?.access_token;
+
+            const response = await fetch('http://localhost:3000/admin/support-request/reply', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    ticketId: ticket.idTicket,
+                    response: responseText
+                })
+            });
+
+            if (response.ok) {
+                setToast({ message: 'Risposta inviata con successo!', type: 'success' });
+                setResponseText('');
+                setShowReplyConfirm(false);
+                if (onTicketUpdated) onTicketUpdated();
+                setTimeout(() => {
+                    onClose();
+                }, 2000);
+            } else {
+                setToast({ message: 'Errore durante l\'invio della risposta.', type: 'error' });
+            }
+        } catch (error) {
+            console.error('Error sending reply:', error);
+            setToast({ message: 'Errore di connessione.', type: 'error' });
         }
     };
 
-    const handleCloseTicket = () => {
-        // TODO: Mock action - will integrate with backend later
-        alert('Ticket chiuso con successo! (Mock - nessuna azione backend)');
-        setShowCloseConfirm(false);
-        onClose();
+    const handleCloseTicket = async () => {
+        try {
+            const userStr = localStorage.getItem('user');
+            const user = userStr ? JSON.parse(userStr) : null;
+            const token = user?.access_token;
+
+            const response = await fetch('http://localhost:3000/admin/support-request/close', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    ticketId: ticket.idTicket
+                })
+            });
+
+            if (response.ok) {
+                setToast({ message: 'Ticket chiuso con successo!', type: 'success' });
+                setShowCloseConfirm(false);
+                if (onTicketUpdated) onTicketUpdated();
+                setTimeout(() => {
+                    onClose();
+                }, 2000);
+            } else {
+                setToast({ message: 'Errore durante la chiusura del ticket.', type: 'error' });
+            }
+        } catch (error) {
+            console.error('Error closing ticket:', error);
+            setToast({ message: 'Errore di connessione.', type: 'error' });
+        }
     };
 
     const formatDate = (dateString: string) => {
@@ -408,7 +467,7 @@ const TechnicalSupportDetailModal: React.FC<TechnicalSupportDetailModalProps> = 
                             onBlur={(e) => e.target.style.borderColor = '#e0e0e0'}
                         />
                         <button
-                            onClick={handleSendResponse}
+                            onClick={() => setShowReplyConfirm(true)}
                             disabled={!responseText.trim()}
                             style={{
                                 width: '100%',
@@ -487,7 +546,7 @@ const TechnicalSupportDetailModal: React.FC<TechnicalSupportDetailModalProps> = 
                     </button>
                 </div>
 
-                {/* Confirmation Dialog */}
+                {/* Close Confirmation Dialog */}
                 {showCloseConfirm && (
                     <div
                         style={{
@@ -583,6 +642,113 @@ const TechnicalSupportDetailModal: React.FC<TechnicalSupportDetailModalProps> = 
                             </div>
                         </div>
                     </div>
+                )}
+
+                {/* Reply Confirmation Dialog */}
+                {showReplyConfirm && (
+                    <div
+                        style={{
+                            position: 'fixed',
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            background: 'rgba(0, 0, 0, 0.5)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            zIndex: 1001
+                        }}
+                        onClick={() => setShowReplyConfirm(false)}
+                    >
+                        <div
+                            style={{
+                                background: 'white',
+                                borderRadius: '12px',
+                                padding: '24px',
+                                maxWidth: '400px',
+                                width: '90%',
+                                boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
+                            }}
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <h3 style={{
+                                margin: '0 0 12px 0',
+                                fontSize: '18px',
+                                fontWeight: '600',
+                                color: '#111827'
+                            }}>
+                                Conferma invio risposta
+                            </h3>
+                            <p style={{
+                                margin: '0 0 20px 0',
+                                fontSize: '14px',
+                                lineHeight: '1.5',
+                                color: '#6b7280'
+                            }}>
+                                Sei sicuro di voler inviare questa risposta? Verrà inviata una email al richiedente.
+                            </p>
+                            <div style={{
+                                display: 'flex',
+                                gap: '12px',
+                                justifyContent: 'flex-end'
+                            }}>
+                                <button
+                                    onClick={() => setShowReplyConfirm(false)}
+                                    style={{
+                                        padding: '10px 20px',
+                                        borderRadius: '8px',
+                                        fontSize: '14px',
+                                        fontWeight: '600',
+                                        cursor: 'pointer',
+                                        transition: 'all 0.2s ease',
+                                        background: '#f3f4f6',
+                                        border: '1px solid #e5e7eb',
+                                        color: '#374151'
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        e.currentTarget.style.background = '#e5e7eb';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.currentTarget.style.background = '#f3f4f6';
+                                    }}
+                                >
+                                    Annulla
+                                </button>
+                                <button
+                                    onClick={handleSendResponse}
+                                    style={{
+                                        padding: '10px 20px',
+                                        borderRadius: '8px',
+                                        fontSize: '14px',
+                                        fontWeight: '600',
+                                        cursor: 'pointer',
+                                        transition: 'all 0.2s ease',
+                                        background: '#83B9C1',
+                                        border: 'none',
+                                        color: 'white'
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        e.currentTarget.style.background = '#5a9aa5';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.currentTarget.style.background = '#83B9C1';
+                                    }}
+                                >
+                                    Conferma Invio
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Toast Notification */}
+                {toast && (
+                    <Toast
+                        message={toast.message}
+                        type={toast.type}
+                        onClose={() => setToast(null)}
+                    />
                 )}
             </div>
         </div>,
