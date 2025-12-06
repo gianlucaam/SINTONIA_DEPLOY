@@ -15,6 +15,7 @@ import PsychologistTechnicalSupport from './pages/PsychologistTechnicalSupport';
 import PsychologistPersonalArea from './components/PsychologistPersonalArea';
 import AdminPersonalArea from './components/AdminPersonalArea';
 import SpidCallback from './pages/SpidCallback';
+import SpidError from './pages/SpidError';
 import NotificationCenter from './pages/NotificationCenter';
 import { getCurrentUser } from './services/auth.service';
 
@@ -30,6 +31,7 @@ function App() {
         {/* Login page */}
         <Route path="/login" element={<Login />} />
         <Route path="/spid-callback" element={<SpidCallback />} />
+        <Route path="/spid-error" element={<SpidError />} />
 
         {/* Psychologist Dashboard with nested routes */}
         <Route

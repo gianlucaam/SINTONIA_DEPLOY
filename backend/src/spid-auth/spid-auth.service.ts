@@ -109,6 +109,11 @@ export class SpidAuthService {
             .where(eq(schema.psicologo.codFiscale, spidProfile.fiscalNumber));
 
         if (psychologists.length > 0) {
+            // Verifica se lo psicologo è attivo
+            if (psychologists[0].stato === false) {
+                console.warn(`Access denied for psychologist ${psychologists[0].codFiscale}: account deactivated`);
+                throw new UnauthorizedException('Accesso negato: Il tuo account è stato disattivato. Contatta l\'amministratore.');
+            }
             console.log('Psychologist found:', psychologists[0].codFiscale);
             return psychologists[0];
         }
