@@ -106,12 +106,41 @@
     font-weight: 700;
 }
 
-/* Questionnaire Grid - 2x2 Layout */
+/* Questionnaire Grid - Dynamic Layout based on count */
 .questionnaire-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: 10px;
     margin-bottom: 14px;
+}
+
+/* 1 item - centered */
+.questionnaire-grid.count-1 .grid-item {
+    width: 140px;
+}
+
+/* 2 items - side by side */
+.questionnaire-grid.count-2 .grid-item {
+    width: calc(50% - 5px);
+}
+
+/* 3 items - pyramid: 2 on top, 1 centered below */
+.questionnaire-grid.count-3 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.questionnaire-grid.count-3 .grid-item:last-child {
+    grid-column: 1 / -1;
+    max-width: 50%;
+    margin: 0 auto;
+}
+
+/* 4 items - 2x2 grid */
+.questionnaire-grid.count-4 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
 }
 
 .grid-item {

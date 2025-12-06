@@ -93,7 +93,7 @@ const InitialQuestionnairesModal: React.FC<InitialQuestionnairesModalProps> = ({
                         Completa <strong>{questionnaireCount} {questionnaireWord}</strong> per valutare il tuo benessere
                     </p>
 
-                    <div className="questionnaire-grid">
+                    <div className={`questionnaire-grid count-${questionnaireCount}`}>
                         {pendingQuestionnaires.map((name) => {
                             const config = QUESTIONNAIRE_CONFIG[name];
                             if (!config) return null;
