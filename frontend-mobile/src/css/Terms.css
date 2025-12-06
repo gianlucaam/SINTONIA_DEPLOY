@@ -2,6 +2,7 @@
 .terms-page-background {
     background-color: #8ab6b6;
     /* Teal color from mockup */
+    min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
