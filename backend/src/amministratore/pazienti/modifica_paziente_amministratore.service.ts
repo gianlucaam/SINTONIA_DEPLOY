@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { db } from '../../drizzle/db.js';
 import { paziente, psicologo } from '../../drizzle/schema.js';
 import { eq } from 'drizzle-orm';
@@ -57,6 +57,7 @@ export class Modifica_paziente_amministratoreService {
                 residenza: paziente.residenza,
                 sesso: paziente.sesso,
                 score: paziente.score,
+                stato: paziente.stato,
                 terms: paziente.terms,
                 idPsicologo: paziente.idPsicologo,
                 idPriorita: paziente.idPriorita,
@@ -85,6 +86,7 @@ export class Modifica_paziente_amministratoreService {
             residenza: row.residenza,
             sesso: row.sesso,
             score: row.score,
+            stato: row.stato,
             terms: row.terms,
             idPsicologo: row.idPsicologo,
             idPriorita: row.idPriorita,

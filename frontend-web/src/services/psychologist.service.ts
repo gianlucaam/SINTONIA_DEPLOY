@@ -3,7 +3,7 @@
  * Handles API calls to backend
  */
 
-import type { Psychologist, Questionnaire, PsychologistDashboardData } from '../types/psychologist';
+import type { Psychologist, QuestionnaireData, PsychologistDashboardData } from '../types/psychologist';
 import { getCurrentUser } from './auth.service';
 
 const API_URL = 'http://localhost:3000';
@@ -56,28 +56,61 @@ export const getPsychologistInfo = (): Psychologist => {
  * Get sample questionnaire data
  * Returns mock data matching the mockup (K10 questionnaires by Gianfranco Barba)
  */
-export const getQuestionnaires = (): Questionnaire[] => {
+export const getQuestionnaires = (): QuestionnaireData[] => {
     return [
         {
-            id: '1',
-            name: 'K10',
-            author: 'Gianfranco Barba',
-            status: 'Approvato',
-            revisionDate: '2023-10-26',
+            idQuestionario: '1',
+            idPaziente: 'paziente-1',
+            nomeTipologia: 'K10',
+            score: 25,
+            risposte: {},
+            cambiamento: false,
+            dataCompilazione: '2023-10-26',
+            revisionato: true,
+            invalidato: false,
+            noteInvalidazione: null,
+            dataInvalidazione: null,
+            idPsicologoRevisione: 'psi-1',
+            idPsicologoRichiedente: null,
+            idAmministratoreConferma: null,
+            domande: [],
+            campi: []
         },
         {
-            id: '2',
-            name: 'K10',
-            author: 'Gianfranco Barba',
-            status: 'Approvato',
-            revisionDate: '2023-10-26',
+            idQuestionario: '2',
+            idPaziente: 'paziente-2',
+            nomeTipologia: 'K10',
+            score: 18,
+            risposte: {},
+            cambiamento: false,
+            dataCompilazione: '2023-10-26',
+            revisionato: true,
+            invalidato: false,
+            noteInvalidazione: null,
+            dataInvalidazione: null,
+            idPsicologoRevisione: 'psi-1',
+            idPsicologoRichiedente: null,
+            idAmministratoreConferma: null,
+            domande: [],
+            campi: []
         },
         {
-            id: '3',
-            name: 'K10',
-            author: 'Gianfranco Barba',
-            status: 'Approvato',
-            revisionDate: '2023-10-26',
+            idQuestionario: '3',
+            idPaziente: 'paziente-3',
+            nomeTipologia: 'K10',
+            score: 32,
+            risposte: {},
+            cambiamento: true,
+            dataCompilazione: '2023-10-26',
+            revisionato: true,
+            invalidato: false,
+            noteInvalidazione: null,
+            dataInvalidazione: null,
+            idPsicologoRevisione: 'psi-1',
+            idPsicologoRichiedente: null,
+            idAmministratoreConferma: null,
+            domande: [],
+            campi: []
         },
     ];
 };
@@ -85,7 +118,7 @@ export const getQuestionnaires = (): Questionnaire[] => {
 /**
  * Get paginated questionnaires
  */
-export const getQuestionnairesPage = (page: number, itemsPerPage: number = 3): Questionnaire[] => {
+export const getQuestionnairesPage = (page: number, itemsPerPage: number = 3): QuestionnaireData[] => {
     const allQuestionnaires = getQuestionnaires();
     const startIndex = (page - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;

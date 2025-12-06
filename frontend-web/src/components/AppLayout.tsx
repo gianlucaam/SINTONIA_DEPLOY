@@ -21,14 +21,18 @@ const AppLayout: React.FC<AppLayoutProps> = ({ role }) => {
             if (path.includes('/questionnaires')) return 'questionari';
             if (path.includes('/forum')) return 'forum';
             if (path.includes('/clinical-alerts')) return 'alert';
+            if (path.includes('/technical-support')) return 'supporto-tecnico';
             if (path.includes('/personal-area')) return 'area-personale';
+            if (path.includes('/notifications')) return 'notifiche';
         } else {
             if (path.includes('/patients')) return 'pazienti';
             if (path.includes('/psychologists')) return 'psicologi';
             if (path.includes('/questionnaires')) return 'questionari';
             if (path.includes('/invalidation')) return 'invalidazione';
+            if (path.includes('/technical-support')) return 'supporto';
             if (path.includes('/forum')) return 'forum';
             if (path.includes('/personal-area')) return 'area-personale';
+            if (path.includes('/notifications')) return 'notifiche';
         }
 
         return '';
@@ -51,6 +55,9 @@ const AppLayout: React.FC<AppLayoutProps> = ({ role }) => {
             case 'alert':
                 navigate(`${basePath}/clinical-alerts`);
                 break;
+            case 'supporto-tecnico':
+                navigate(`${basePath}/technical-support`);
+                break;
             case 'area-personale':
                 navigate(`${basePath}/personal-area`);
                 break;
@@ -59,6 +66,12 @@ const AppLayout: React.FC<AppLayoutProps> = ({ role }) => {
                 break;
             case 'invalidazione':
                 navigate(`${basePath}/invalidation`);
+                break;
+            case 'supporto':
+                navigate(`${basePath}/technical-support`);
+                break;
+            case 'notifiche':
+                navigate(`${basePath}/notifications`);
                 break;
             default:
                 navigate(basePath);

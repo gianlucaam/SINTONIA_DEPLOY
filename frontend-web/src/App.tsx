@@ -7,13 +7,16 @@ import AdminPatientList from './pages/AdminPatientList';
 import AdminPsychologistList from './pages/AdminPsychologistList';
 import AdminInvalidationList from './pages/AdminInvalidationList';
 import AdminQuestionnaireList from './pages/AdminQuestionnaireList';
+import AdminTechnicalSupport from './pages/AdminTechnicalSupport';
 import QuestionnaireManagement from './pages/QuestionnaireManagement';
 import ForumPage from './pages/ForumPage';
 import ClinicalAlerts from './pages/ClinicalAlerts';
+import PsychologistTechnicalSupport from './pages/PsychologistTechnicalSupport';
 import PsychologistPersonalArea from './components/PsychologistPersonalArea';
 import AdminPersonalArea from './components/AdminPersonalArea';
 import SpidCallback from './pages/SpidCallback';
 import SpidError from './pages/SpidError';
+import NotificationCenter from './pages/NotificationCenter';
 import { getCurrentUser } from './services/auth.service';
 
 const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
@@ -44,7 +47,9 @@ function App() {
           <Route path="questionnaires" element={<QuestionnaireManagement />} />
           <Route path="forum" element={<ForumPage />} />
           <Route path="clinical-alerts" element={<ClinicalAlerts />} />
+          <Route path="technical-support" element={<PsychologistTechnicalSupport />} />
           <Route path="personal-area" element={<PsychologistPersonalArea onProfileUpdate={() => { }} />} />
+          <Route path="notifications" element={<NotificationCenter />} />
         </Route>
 
         {/* Admin Dashboard with nested routes */}
@@ -61,8 +66,10 @@ function App() {
           <Route path="psychologists" element={<AdminPsychologistList />} />
           <Route path="questionnaires" element={<AdminQuestionnaireList />} />
           <Route path="invalidation" element={<AdminInvalidationList />} />
+          <Route path="technical-support" element={<AdminTechnicalSupport />} />
           <Route path="forum" element={<ForumPage />} />
           <Route path="personal-area" element={<AdminPersonalArea />} />
+          <Route path="notifications" element={<NotificationCenter />} />
         </Route>
 
         {/* Legacy routes - redirect to new structure */}

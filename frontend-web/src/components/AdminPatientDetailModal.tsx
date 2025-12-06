@@ -1,16 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
-import { User, Mail, MapPin, IdCard, Calendar, Award, Flag, UserCog, X, Save, Edit2, Loader2, Hash, Users } from 'lucide-react';
+import { User, Mail, MapPin, IdCard, Calendar, Award, Flag, UserCog, X, Save, Edit2, Loader2, Hash, Users, Trash2 } from 'lucide-react';
 import type { PatientData } from '../types/patient';
-import { getPatientDetails, updatePatient } from '../services/patient.service';
+import { getPatientDetails, updatePatient, removePatientFromWaitingList, updatePatientPriority} from '../services/patient.service';
 import { fetchAllPsychologists, type PsychologistOption } from '../services/psychologist.service';
 import Toast from './Toast';
+import '../css/AdminPatientDetailModal.css';
 
 interface AdminPatientDetailModalProps {
     patient: PatientData | null;
     onClose: () => void;
     onUpdate?: () => void; // Callback to refresh list after update
 }
+
+const PRIORITY_OPTIONS = [
+    { value: 'Urgente', label: 'Urgente' },
+    { value: 'Breve', label: 'Breve' },
+    { value: 'Differibile', label: 'Differibile' },
+    { value: 'Programmabile', label: 'Programmabile' }
+];
 
 const AdminPatientDetailModal: React.FC<AdminPatientDetailModalProps> = ({
     patient,
@@ -21,6 +29,8 @@ const AdminPatientDetailModal: React.FC<AdminPatientDetailModalProps> = ({
     const [loading, setLoading] = useState(true);
     const [isEditing, setIsEditing] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
+    const [isRemoving, setIsRemoving] = useState(false);
+    const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
     // Psychologists list
@@ -31,6 +41,7 @@ const AdminPatientDetailModal: React.FC<AdminPatientDetailModalProps> = ({
     const [editedEmail, setEditedEmail] = useState('');
     const [editedResidenza, setEditedResidenza] = useState('');
     const [editedPsicologo, setEditedPsicologo] = useState('');
+    const [editedPriorita, setEditedPriorita] = useState('');
     const [psychologistSearch, setPsychologistSearch] = useState('');
     const [showPsychologistDropdown, setShowPsychologistDropdown] = useState(false);
 
@@ -64,6 +75,7 @@ const AdminPatientDetailModal: React.FC<AdminPatientDetailModalProps> = ({
             setEditedEmail(details.email || '');
             setEditedResidenza(details.residenza || '');
             setEditedPsicologo(details.idPsicologo || '');
+            setEditedPriorita(details.idPriorita || '');
         } catch (error) {
             console.error('Error loading patient details:', error);
             setToast({ message: 'Errore nel caricamento dei dettagli del paziente', type: 'error' });
@@ -77,11 +89,18 @@ const AdminPatientDetailModal: React.FC<AdminPatientDetailModalProps> = ({
 
         setIsSaving(true);
         try {
+            // Update basic fields (email, residenza, psicologo)
             await updatePatient(patient.idPaziente, {
                 email: editedEmail,
                 residenza: editedResidenza,
                 idPsicologo: editedPsicologo,
             });
+
+            // Update priority separately if changed
+            if (editedPriorita !== patientDetails.idPriorita) {
+                await updatePatientPriority(patient.idPaziente, editedPriorita);
+            }
+
             setToast({ message: 'Paziente aggiornato con successo!', type: 'success' });
             setIsEditing(false);
             // Reload details
@@ -104,10 +123,46 @@ const AdminPatientDetailModal: React.FC<AdminPatientDetailModalProps> = ({
             setEditedEmail(patientDetails.email || '');
             setEditedResidenza(patientDetails.residenza || '');
             setEditedPsicologo(patientDetails.idPsicologo || '');
+            setEditedPriorita(patientDetails.idPriorita || '');
         }
         setPsychologistSearch('');
         setShowPsychologistDropdown(false);
         setIsEditing(false);
+    };
+
+    const handleRemoveFromWaitingList = () => {
+        if (!patient || !patientDetails) return;
+        setShowConfirmModal(true);
+    };
+
+    const confirmRemove = async () => {
+        if (!patient || !patientDetails) return;
+
+        setIsRemoving(true);
+        try {
+            await removePatientFromWaitingList(patient.idPaziente);
+            setToast({
+                message: `${patientDetails.nome} ${patientDetails.cognome} è stato rimosso dalla lista d'attesa con successo!`,
+                type: 'success'
+            });
+            setShowConfirmModal(false);
+            setIsEditing(false);
+            // Notify parent to refresh list
+            if (onUpdate) {
+                onUpdate();
+            }
+            // Close modal after short delay
+            setTimeout(() => {
+                onClose();
+            }, 1500);
+        } catch (error: any) {
+            console.error('Error removing patient:', error);
+            const errorMessage = error.response?.data?.message || 'Errore nella rimozione del paziente dalla lista d\'attesa';
+            setToast({ message: errorMessage, type: 'error' });
+            setShowConfirmModal(false);
+        } finally {
+            setIsRemoving(false);
+        }
     };
 
     const handlePsychologistSelect = (codFiscale: string) => {
@@ -295,12 +350,144 @@ const AdminPatientDetailModal: React.FC<AdminPatientDetailModalProps> = ({
                             />
 
                             {/* Priorità Card */}
-                            <InfoCard
-                                icon={<Flag size={16} />}
-                                label="Priorità"
-                                value={patientDetails.idPriorita || 'N/A'}
-                                iconColor="#E57373"
-                            />
+                            {isEditing ? (
+                                <div style={{
+                                    background: 'white',
+                                    borderRadius: '12px',
+                                    padding: '16px',
+                                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
+                                    border: '1px solid #e8e8e8',
+                                    gridColumn: '1 / -1'
+                                }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+                                        <div style={{
+                                            width: '32px',
+                                            height: '32px',
+                                            borderRadius: '10px',
+                                            background: 'linear-gradient(135deg, #E57373 0%, #E57373dd 100%)',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            color: 'white'
+                                        }}>
+                                            <Flag size={16} />
+                                        </div>
+                                        <span style={{
+                                            fontSize: '10px',
+                                            fontWeight: '600',
+                                            color: '#666',
+                                            textTransform: 'uppercase',
+                                            letterSpacing: '0.5px'
+                                        }}>
+                                            Priorità
+                                        </span>
+                                    </div>
+                                    {/* Grid di card selezionabili */}
+                                    <div style={{
+                                        display: 'grid',
+                                        gridTemplateColumns: 'repeat(2, 1fr)',
+                                        gap: '12px'
+                                    }}>
+                                        {PRIORITY_OPTIONS.map(option => {
+                                            const isSelected = editedPriorita === option.value;
+                                            const colors = {
+                                                'Urgente': { bg: '#ef4444', bgLight: '#fee2e2', border: '#dc2626' },
+                                                'Breve': { bg: '#f97316', bgLight: '#ffedd5', border: '#ea580c' },
+                                                'Differibile': { bg: '#eab308', bgLight: '#fef9c3', border: '#ca8a04' },
+                                                'Programmabile': { bg: '#22c55e', bgLight: '#dcfce7', border: '#16a34a' }
+                                            };
+                                            const color = colors[option.value as keyof typeof colors];
+
+                                            return (
+                                                <div
+                                                    key={option.value}
+                                                    onClick={() => setEditedPriorita(option.value)}
+                                                    style={{
+                                                        padding: '14px',
+                                                        borderRadius: '10px',
+                                                        border: `2px solid ${isSelected ? color.border : '#e5e7eb'}`,
+                                                        background: isSelected ? color.bgLight : 'white',
+                                                        cursor: 'pointer',
+                                                        transition: 'all 0.2s ease',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        gap: '10px',
+                                                        position: 'relative',
+                                                        overflow: 'hidden'
+                                                    }}
+                                                    onMouseEnter={(e) => {
+                                                        if (!isSelected) {
+                                                            e.currentTarget.style.borderColor = color.border;
+                                                            e.currentTarget.style.background = color.bgLight;
+                                                            e.currentTarget.style.transform = 'translateY(-2px)';
+                                                            e.currentTarget.style.boxShadow = `0 4px 12px ${color.bg}33`;
+                                                        }
+                                                    }}
+                                                    onMouseLeave={(e) => {
+                                                        if (!isSelected) {
+                                                            e.currentTarget.style.borderColor = '#e5e7eb';
+                                                            e.currentTarget.style.background = 'white';
+                                                            e.currentTarget.style.transform = 'translateY(0)';
+                                                            e.currentTarget.style.boxShadow = 'none';
+                                                        }
+                                                    }}
+                                                >
+                                                    {/* Icona priorità */}
+                                                    <div style={{
+                                                        width: '36px',
+                                                        height: '36px',
+                                                        borderRadius: '8px',
+                                                        background: isSelected
+                                                            ? `linear-gradient(135deg, ${color.bg} 0%, ${color.border} 100%)`
+                                                            : '#f3f4f6',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        color: isSelected ? 'white' : '#9ca3af',
+                                                        transition: 'all 0.2s ease'
+                                                    }}>
+                                                        <Flag size={18} />
+                                                    </div>
+                                                    {/* Label */}
+                                                    <div style={{ flex: 1 }}>
+                                                        <div style={{
+                                                            fontSize: '14px',
+                                                            fontWeight: '600',
+                                                            color: isSelected ? color.border : '#374151'
+                                                        }}>
+                                                            {option.label}
+                                                        </div>
+                                                    </div>
+                                                    {/* Check icon quando selezionato */}
+                                                    {isSelected && (
+                                                        <div style={{
+                                                            width: '20px',
+                                                            height: '20px',
+                                                            borderRadius: '50%',
+                                                            background: color.bg,
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                            color: 'white',
+                                                            fontSize: '12px',
+                                                            fontWeight: 'bold'
+                                                        }}>
+                                                            ✓
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            ) : (
+                                <InfoCard
+                                    icon={<Flag size={16} />}
+                                    label="Priorità"
+                                    value={patientDetails.idPriorita || 'N/A'}
+                                    iconColor="#E57373"
+                                />
+                            )}
 
                             {/* Residenza Card - Editable */}
                             <EditableCard
@@ -542,16 +729,58 @@ const AdminPatientDetailModal: React.FC<AdminPatientDetailModalProps> = ({
                         <>
                             {isEditing ? (
                                 <>
+                                    <div style={{ display: 'flex', gap: '12px', flex: 1 }}>
+                                        <button
+                                            onClick={handleRemoveFromWaitingList}
+                                            disabled={!patientDetails.stato || isSaving || isRemoving}
+                                            style={{
+                                                padding: '12px 24px',
+                                                borderRadius: '12px',
+                                                border: 'none',
+                                                background: !patientDetails.stato
+                                                    ? 'linear-gradient(135deg, #9e9e9e 0%, #757575 100%)'
+                                                    : 'linear-gradient(135deg, #dc3545 0%, #c82333 100%)',
+                                                color: 'white',
+                                                cursor: (!patientDetails.stato || isSaving || isRemoving) ? 'not-allowed' : 'pointer',
+                                                fontSize: '15px',
+                                                fontWeight: '600',
+                                                transition: 'all 0.2s ease',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '8px',
+                                                boxShadow: !patientDetails.stato
+                                                    ? '0 4px 12px rgba(158, 158, 158, 0.3)'
+                                                    : '0 4px 12px rgba(220, 53, 69, 0.3)',
+                                                opacity: (!patientDetails.stato || isSaving || isRemoving) ? 0.6 : 1
+                                            }}
+                                            onMouseEnter={(e) => {
+                                                if (patientDetails.stato && !isSaving && !isRemoving) {
+                                                    e.currentTarget.style.transform = 'translateY(-2px)';
+                                                    e.currentTarget.style.boxShadow = '0 6px 20px rgba(220, 53, 69, 0.4)';
+                                                }
+                                            }}
+                                            onMouseLeave={(e) => {
+                                                if (patientDetails.stato) {
+                                                    e.currentTarget.style.transform = 'translateY(0)';
+                                                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(220, 53, 69, 0.3)';
+                                                }
+                                            }}
+                                            title={!patientDetails.stato ? 'Il paziente è già stato rimosso dalla lista d\'attesa' : ''}
+                                        >
+                                            <Trash2 size={18} />
+                                            {isRemoving ? 'Rimozione...' : 'Rimuovi dalla Lista d\'Attesa'}
+                                        </button>
+                                    </div>
                                     <button
                                         onClick={handleCancel}
-                                        disabled={isSaving}
+                                        disabled={isSaving || isRemoving}
                                         style={{
                                             padding: '12px 24px',
                                             borderRadius: '12px',
                                             border: '2px solid #e0e0e0',
                                             background: 'white',
                                             color: '#666',
-                                            cursor: isSaving ? 'not-allowed' : 'pointer',
+                                            cursor: (isSaving || isRemoving) ? 'not-allowed' : 'pointer',
                                             fontSize: '15px',
                                             fontWeight: '600',
                                             transition: 'all 0.2s ease',
@@ -560,7 +789,7 @@ const AdminPatientDetailModal: React.FC<AdminPatientDetailModalProps> = ({
                                             gap: '8px'
                                         }}
                                         onMouseEnter={(e) => {
-                                            if (!isSaving) {
+                                            if (!isSaving && !isRemoving) {
                                                 e.currentTarget.style.background = '#f8f9fa';
                                                 e.currentTarget.style.borderColor = '#d0d0d0';
                                             }
@@ -575,14 +804,14 @@ const AdminPatientDetailModal: React.FC<AdminPatientDetailModalProps> = ({
                                     </button>
                                     <button
                                         onClick={handleSave}
-                                        disabled={isSaving}
+                                        disabled={isSaving || isRemoving}
                                         style={{
                                             padding: '12px 24px',
                                             borderRadius: '12px',
                                             border: 'none',
                                             background: 'linear-gradient(135deg, #7FB77E 0%, #5fa05d 100%)',
                                             color: 'white',
-                                            cursor: isSaving ? 'not-allowed' : 'pointer',
+                                            cursor: (isSaving || isRemoving) ? 'not-allowed' : 'pointer',
                                             fontSize: '15px',
                                             fontWeight: '600',
                                             transition: 'all 0.2s ease',
@@ -592,7 +821,7 @@ const AdminPatientDetailModal: React.FC<AdminPatientDetailModalProps> = ({
                                             boxShadow: '0 4px 12px rgba(127, 183, 126, 0.3)'
                                         }}
                                         onMouseEnter={(e) => {
-                                            if (!isSaving) {
+                                            if (!isSaving && !isRemoving) {
                                                 e.currentTarget.style.transform = 'translateY(-2px)';
                                                 e.currentTarget.style.boxShadow = '0 6px 20px rgba(127, 183, 126, 0.4)';
                                             }
@@ -647,6 +876,42 @@ const AdminPatientDetailModal: React.FC<AdminPatientDetailModalProps> = ({
                     type={toast.type}
                     onClose={() => setToast(null)}
                 />
+            )}
+
+            {showConfirmModal && ReactDOM.createPortal(
+                <div className="alerts-overlay" role="dialog" aria-modal="true" aria-labelledby="alerts-overlay-title">
+                    <div className="alerts-overlay-backdrop" onClick={() => setShowConfirmModal(false)} />
+                    <div className="alerts-overlay-card" role="document">
+                        <h3 id="alerts-overlay-title" className="overlay-title">Conferma rimozione</h3>
+                        <p className="overlay-text">
+                            Sei sicuro di voler rimuovere {patientDetails?.nome} {patientDetails?.cognome} dalla lista d'attesa?
+                        </p>
+                        <p className="overlay-id">
+                            <strong>ID Paziente:</strong> {patient?.idPaziente}
+                        </p>
+                        <p style={{ fontSize: '13px', color: '#666', fontStyle: 'italic', marginTop: '8px' }}>
+                            Questa azione imposterà lo stato del paziente come non attivo.
+                        </p>
+                        <div className="overlay-actions">
+                            <button
+                                className="cancel-btn"
+                                onClick={() => setShowConfirmModal(false)}
+                                disabled={isRemoving}
+                            >
+                                Annulla
+                            </button>
+                            <button
+                                className="confirm-btn"
+                                onClick={confirmRemove}
+                                disabled={isRemoving}
+                                style={{ background: 'linear-gradient(135deg, #dc3545 0%, #c82333 100%)' }}
+                            >
+                                {isRemoving ? 'Rimozione...' : 'Conferma Rimozione'}
+                            </button>
+                        </div>
+                    </div>
+                </div>,
+                document.body
             )}
         </div>,
         document.body
