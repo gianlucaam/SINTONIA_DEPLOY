@@ -4,6 +4,7 @@ import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import * as schema from '../drizzle/schema.js';
 import { eq } from 'drizzle-orm';
 import { SpidProfileDto } from './dto/spid-profile.dto.js';
+import { MOCK_CREDENTIALS } from './mock-credentials.js';
 
 @Injectable()
 export class SpidAuthService {
@@ -63,6 +64,39 @@ export class SpidAuthService {
 
         console.log('New patient created:', newPatients[0].idPaziente);
         return newPatients[0];
+    }
+
+    // Password mock fissa per tutti gli utenti
+    private readonly MOCK_PASSWORD = 'password123';
+
+    async authenticateWithMockCredentials(email: string, password: string) {
+        console.log('Authenticating with mock credentials:', email);
+
+        const codFiscale = MOCK_CREDENTIALS[email.toLowerCase()];
+
+        if (!codFiscale) {
+            console.log('Email not found in mock credentials');
+            return null;
+        }
+
+        if (password !== this.MOCK_PASSWORD) {
+            console.log('Password mismatch');
+            return null;
+        }
+
+        // Find patient by codFiscale
+        const patients = await this.db
+            .select()
+            .from(schema.paziente)
+            .where(eq(schema.paziente.codFiscale, codFiscale));
+
+        if (patients.length > 0) {
+            console.log('Patient authenticated:', patients[0].idPaziente);
+            return patients[0];
+        }
+
+        console.log('Patient with codFiscale not found in DB:', codFiscale);
+        return null;
     }
 
     async validatePsychologist(spidProfile: SpidProfileDto) {
