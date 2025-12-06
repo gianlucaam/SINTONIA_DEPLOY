@@ -182,18 +182,38 @@ export class Visualizzazione_lista_questionariService {
     }
 
     /**
-     * Ritorna la lista dei questionari iniziali non ancora compilati
+     * Ritorna la lista dei questionari iniziali da compilare
      * I questionari iniziali sono: PHQ-9, GAD-7, WHO-5, PC-PTSD-5
+     * Un questionario è "pending" se:
+     * 1) Non è mai stato compilato, OPPURE
+     * 2) L'ultima compilazione è avvenuta >= tempoSomministrazione giorni fa
      * @param userId - ID del paziente
-     * @returns Array con i nomi dei questionari non compilati
+     * @returns Array con i nomi dei questionari da compilare
      */
     async getPendingInitialQuestionnaires(userId: string): Promise<string[]> {
         const INITIAL_QUESTIONNAIRES = ['PHQ-9', 'GAD-7', 'WHO-5', 'PC-PTSD-5'];
         const pending: string[] = [];
+        const today = new Date();
+        const msPerDay = 1000 * 60 * 60 * 24;
+
+        // Ottieni i tempi di somministrazione per ogni tipologia
+        const allTypes = await db
+            .select({
+                nome: tipologiaQuestionario.nome,
+                tempoSomministrazione: tipologiaQuestionario.tempoSomministrazione,
+            })
+            .from(tipologiaQuestionario)
+            .where(sql`${tipologiaQuestionario.nome} IN (${sql.join(INITIAL_QUESTIONNAIRES.map(q => sql`${q}`), sql`, `)})`);
+
+        const tempoMap = new Map<string, number>();
+        for (const t of allTypes) {
+            tempoMap.set(t.nome, t.tempoSomministrazione);
+        }
 
         for (const questionnaireName of INITIAL_QUESTIONNAIRES) {
-            const compilations = await db
-                .select({ id: questionario.idQuestionario })
+            // Trova l'ultima compilazione per questo questionario
+            const lastCompilation = await db
+                .select({ dataCompilazione: questionario.dataCompilazione })
                 .from(questionario)
                 .where(
                     and(
@@ -201,10 +221,24 @@ export class Visualizzazione_lista_questionariService {
                         eq(questionario.nomeTipologia, questionnaireName)
                     )
                 )
+                .orderBy(desc(questionario.dataCompilazione))
                 .limit(1);
 
-            if (compilations.length === 0) {
+            if (lastCompilation.length === 0) {
+                // Mai compilato -> pending
                 pending.push(questionnaireName);
+            } else {
+                // Già compilato -> verifica se è passato abbastanza tempo
+                const tempoSomministrazione = tempoMap.get(questionnaireName) || 30; // default 30 giorni
+                const lastDate = new Date(lastCompilation[0].dataCompilazione);
+                const daysSinceLastCompilation = Math.floor(
+                    (today.getTime() - lastDate.getTime()) / msPerDay
+                );
+
+                if (daysSinceLastCompilation >= tempoSomministrazione) {
+                    // È passato abbastanza tempo -> pending di nuovo
+                    pending.push(questionnaireName);
+                }
             }
         }
 
