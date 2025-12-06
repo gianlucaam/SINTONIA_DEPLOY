@@ -13,6 +13,7 @@ import ClinicalAlerts from './pages/ClinicalAlerts';
 import PsychologistPersonalArea from './components/PsychologistPersonalArea';
 import AdminPersonalArea from './components/AdminPersonalArea';
 import SpidCallback from './pages/SpidCallback';
+import SpidError from './pages/SpidError';
 import { getCurrentUser } from './services/auth.service';
 
 const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
@@ -27,6 +28,7 @@ function App() {
         {/* Login page */}
         <Route path="/login" element={<Login />} />
         <Route path="/spid-callback" element={<SpidCallback />} />
+        <Route path="/spid-error" element={<SpidError />} />
 
         {/* Psychologist Dashboard with nested routes */}
         <Route
