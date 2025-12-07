@@ -48,9 +48,9 @@ Il campo `cambiamento=true` indica che il questionario ha causato un cambio di f
 
 | Paziente | Data Base | Fascia | Finestra | Data Scadenza | Posizione |
 |----------|-----------|--------|----------|---------------|-----------|
-| Mario | 01/11/2024 | Urgente | 3 gg | 04/11/2024 | **1° (priorità)** |
-| Anna | 15/10/2024 | Breve | 10 gg | 25/10/2024 | **2°** |
-| Luca | 01/10/2024 | Differibile | 30 gg | 31/10/2024 | **3°** |
+| Anna | 15/10/2024 | Breve | 10 gg | 25/10/2024 | **1° (priorità)** |
+| Luca | 01/10/2024 | Differibile | 30 gg | 31/10/2024 | **2°** |
+| Mario | 01/11/2024 | Urgente | 3 gg | 04/11/2024 | **3°** |
 
 ---
 
