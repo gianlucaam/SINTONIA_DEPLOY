@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import { Hash, FileText, User, Clock, AlertCircle, CheckCircle, XCircle, MessageSquare, Check, X } from 'lucide-react';
 import type { InvalidationRequestData } from '../types/invalidation';
 import Toast from './Toast';
+import '../css/Modal.css';
 
 interface AdminInvalidationDetailModalProps {
     request: InvalidationRequestData | null;
@@ -70,101 +71,35 @@ const AdminInvalidationDetailModal: React.FC<AdminInvalidationDetailModalProps> 
     const statusInfo = getStatusInfo(request.stato);
 
     return ReactDOM.createPortal(
-        <div className="modal-overlay" onClick={onClose} style={{ backdropFilter: 'blur(4px)' }}>
+        <div className="modal-overlay-blur" onClick={onClose}>
             <div
-                className="modal-content"
+                className="modal-card"
                 onClick={(e) => e.stopPropagation()}
-                style={{
-                    maxWidth: '1100px',
-                    borderRadius: '20px',
-                    overflow: 'hidden',
-                    boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)'
-                }}
+                style={{ maxWidth: '1100px' }}
             >
                 {/* Modern Header with Gradient */}
-                <div style={{
-                    background: 'linear-gradient(135deg, #0D475D 0%, #1a5f7a 50%, #83B9C1 100%)',
-                    padding: '32px',
-                    position: 'relative',
-                    overflow: 'hidden'
-                }}>
-                    <div style={{
-                        position: 'absolute',
-                        top: '-50%',
-                        right: '-10%',
-                        width: '300px',
-                        height: '300px',
-                        background: 'rgba(255, 255, 255, 0.05)',
-                        borderRadius: '50%',
-                        filter: 'blur(40px)'
-                    }}></div>
-
-                    <div style={{ position: 'relative', zIndex: 1 }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                            <div>
-                                <h2 style={{
-                                    margin: '0 0 8px 0',
-                                    fontSize: '28px',
-                                    fontWeight: '700',
-                                    color: 'white',
-                                    letterSpacing: '-0.5px'
-                                }}>
-                                    Dettagli Richiesta Invalidazione
-                                </h2>
-                                <p style={{
-                                    margin: 0,
-                                    fontSize: '14px',
-                                    color: 'rgba(255, 255, 255, 0.8)',
-                                    fontWeight: '500'
-                                }}>
-                                    {request.nomeQuestionario}
-                                </p>
-                            </div>
-                            <button
-                                onClick={onClose}
-                                style={{
-                                    background: 'rgba(255, 255, 255, 0.15)',
-                                    backdropFilter: 'blur(10px)',
-                                    border: 'none',
-                                    color: 'white',
-                                    width: '40px',
-                                    height: '40px',
-                                    borderRadius: '50%',
-                                    cursor: 'pointer',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    transition: 'all 0.3s ease',
-                                    fontSize: '20px'
-                                }}
-                                onMouseEnter={(e) => {
-                                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.25)';
-                                    e.currentTarget.style.transform = 'rotate(90deg) scale(1.1)';
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.15)';
-                                    e.currentTarget.style.transform = 'rotate(0deg) scale(1)';
-                                }}
-                            >
-                                ✕
-                            </button>
+                <div className="modal-header-gradient">
+                    <div className="modal-header-content">
+                        <div className="modal-header-text">
+                            <h2 className="modal-header-title">
+                                Dettagli Richiesta Invalidazione
+                            </h2>
+                            <p className="modal-header-subtitle">
+                                {request.nomeQuestionario}
+                            </p>
                         </div>
+                        <button
+                            onClick={onClose}
+                            className="modal-close-btn-rounded"
+                        >
+                            ✕
+                        </button>
                     </div>
                 </div>
 
                 {/* Body with Modern Cards */}
-                <div style={{
-                    padding: '32px',
-                    background: '#f8f9fa',
-                    maxHeight: 'calc(90vh - 200px)',
-                    overflowY: 'auto'
-                }}>
-                    <div style={{
-                        display: 'grid',
-                        gridTemplateColumns: 'repeat(3, 1fr)',
-                        gap: '16px',
-                        marginBottom: '24px'
-                    }}>
+                <div className="modal-body-gray modal-body-scrollable">
+                    <div className="modal-info-grid">
                         {/* ID Questionario Card */}
                         <InfoCard
                             icon={<Hash size={16} />}
@@ -209,13 +144,7 @@ const AdminInvalidationDetailModal: React.FC<AdminInvalidationDetailModalProps> 
 
                     {/* Note section */}
                     {request.note && (
-                        <div style={{
-                            background: 'white',
-                            borderRadius: '16px',
-                            padding: '24px',
-                            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
-                            marginBottom: '24px'
-                        }}>
+                        <div className="modal-info-card" style={{ marginTop: '24px', marginBottom: '24px' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
                                 <div style={{
                                     width: '40px',
@@ -252,12 +181,7 @@ const AdminInvalidationDetailModal: React.FC<AdminInvalidationDetailModalProps> 
 
                     {/* Action section for pending requests */}
                     {isPending && (
-                        <div style={{
-                            background: 'white',
-                            borderRadius: '16px',
-                            padding: '24px',
-                            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)'
-                        }}>
+                        <div className="modal-info-card">
                             <h3 style={{
                                 margin: '0 0 16px 0',
                                 fontSize: '18px',
@@ -267,37 +191,15 @@ const AdminInvalidationDetailModal: React.FC<AdminInvalidationDetailModalProps> 
                             <p style={{ marginBottom: '20px', color: '#666', fontSize: '14px' }}>
                                 Questa richiesta è in attesa di approvazione. Puoi accettare o rifiutare la richiesta.
                             </p>
-                            <div style={{ display: 'flex', gap: '12px' }}>
+                            <div className="modal-footer-actions">
                                 <button
                                     onClick={handleAccept}
                                     disabled={isAccepting || isRejecting}
+                                    className="btn-modal-success"
                                     style={{
                                         flex: 1,
-                                        padding: '12px 24px',
-                                        borderRadius: '12px',
-                                        border: 'none',
-                                        background: 'linear-gradient(135deg, #7FB77E 0%, #5fa05d 100%)',
-                                        color: 'white',
-                                        cursor: (isAccepting || isRejecting) ? 'not-allowed' : 'pointer',
-                                        fontSize: '15px',
-                                        fontWeight: '600',
-                                        transition: 'all 0.2s ease',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        gap: '8px',
-                                        boxShadow: '0 4px 12px rgba(127, 183, 126, 0.3)',
-                                        opacity: (isAccepting || isRejecting) ? 0.6 : 1
-                                    }}
-                                    onMouseEnter={(e) => {
-                                        if (!isAccepting && !isRejecting) {
-                                            e.currentTarget.style.transform = 'translateY(-2px)';
-                                            e.currentTarget.style.boxShadow = '0 6px 20px rgba(127, 183, 126, 0.4)';
-                                        }
-                                    }}
-                                    onMouseLeave={(e) => {
-                                        e.currentTarget.style.transform = 'translateY(0)';
-                                        e.currentTarget.style.boxShadow = '0 4px 12px rgba(127, 183, 126, 0.3)';
+                                        opacity: (isAccepting || isRejecting) ? 0.6 : 1,
+                                        cursor: (isAccepting || isRejecting) ? 'not-allowed' : 'pointer'
                                     }}
                                 >
                                     <Check size={18} />
@@ -306,33 +208,11 @@ const AdminInvalidationDetailModal: React.FC<AdminInvalidationDetailModalProps> 
                                 <button
                                     onClick={handleReject}
                                     disabled={isAccepting || isRejecting}
+                                    className="btn-modal-danger"
                                     style={{
                                         flex: 1,
-                                        padding: '12px 24px',
-                                        borderRadius: '12px',
-                                        border: 'none',
-                                        background: 'linear-gradient(135deg, #E57373 0%, #d55353 100%)',
-                                        color: 'white',
-                                        cursor: (isAccepting || isRejecting) ? 'not-allowed' : 'pointer',
-                                        fontSize: '15px',
-                                        fontWeight: '600',
-                                        transition: 'all 0.2s ease',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        gap: '8px',
-                                        boxShadow: '0 4px 12px rgba(229, 115, 115, 0.3)',
-                                        opacity: (isAccepting || isRejecting) ? 0.6 : 1
-                                    }}
-                                    onMouseEnter={(e) => {
-                                        if (!isAccepting && !isRejecting) {
-                                            e.currentTarget.style.transform = 'translateY(-2px)';
-                                            e.currentTarget.style.boxShadow = '0 6px 20px rgba(229, 115, 115, 0.4)';
-                                        }
-                                    }}
-                                    onMouseLeave={(e) => {
-                                        e.currentTarget.style.transform = 'translateY(0)';
-                                        e.currentTarget.style.boxShadow = '0 4px 12px rgba(229, 115, 115, 0.3)';
+                                        opacity: (isAccepting || isRejecting) ? 0.6 : 1,
+                                        cursor: (isAccepting || isRejecting) ? 'not-allowed' : 'pointer'
                                     }}
                                 >
                                     <X size={18} />
@@ -344,12 +224,7 @@ const AdminInvalidationDetailModal: React.FC<AdminInvalidationDetailModalProps> 
 
                     {/* Message for already processed requests */}
                     {!isPending && (
-                        <div style={{
-                            background: 'white',
-                            borderRadius: '16px',
-                            padding: '24px',
-                            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)'
-                        }}>
+                        <div className="modal-info-card">
                             <h3 style={{
                                 margin: '0 0 16px 0',
                                 fontSize: '18px',

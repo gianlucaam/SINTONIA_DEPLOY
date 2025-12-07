@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import { User, Mail, MapPin, IdCard, Calendar, Award, Flag, UserCog, X, Save, Edit2, Loader2, Hash, Users, Trash2 } from 'lucide-react';
 import type { PatientData } from '../types/patient';
-import { getPatientDetails, updatePatient, removePatientFromWaitingList, updatePatientPriority} from '../services/patient.service';
+import { getPatientDetails, updatePatient, removePatientFromWaitingList, updatePatientPriority } from '../services/patient.service';
 import { fetchAllPsychologists, type PsychologistOption } from '../services/psychologist.service';
 import Toast from './Toast';
-import '../css/AdminPatientDetailModal.css';
+import '../css/Modal.css';
 
 interface AdminPatientDetailModalProps {
     patient: PatientData | null;
@@ -184,106 +184,40 @@ const AdminPatientDetailModal: React.FC<AdminPatientDetailModalProps> = ({
     };
 
     return ReactDOM.createPortal(
-        <div className="modal-overlay" onClick={onClose} style={{ backdropFilter: 'blur(4px)' }}>
+        <div className="modal-overlay-blur" onClick={onClose}>
             <div
-                className="modal-content"
+                className="modal-card modal-card-lg"
                 onClick={(e) => e.stopPropagation()}
-                style={{
-                    maxWidth: '1100px',
-                    borderRadius: '20px',
-                    overflow: 'hidden',
-                    boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)'
-                }}
             >
-                {/* Modern Header with Gradient */}
-                <div style={{
-                    background: 'linear-gradient(135deg, #0D475D 0%, #1a5f7a 50%, #83B9C1 100%)',
-                    padding: '32px',
-                    position: 'relative',
-                    overflow: 'hidden'
-                }}>
-                    <div style={{
-                        position: 'absolute',
-                        top: '-50%',
-                        right: '-10%',
-                        width: '300px',
-                        height: '300px',
-                        background: 'rgba(255, 255, 255, 0.05)',
-                        borderRadius: '50%',
-                        filter: 'blur(40px)'
-                    }}></div>
-
-                    <div style={{ position: 'relative', zIndex: 1 }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                            <div>
-                                <h2 style={{
-                                    margin: '0 0 8px 0',
-                                    fontSize: '28px',
-                                    fontWeight: '700',
-                                    color: 'white',
-                                    letterSpacing: '-0.5px'
-                                }}>
-                                    Dettagli Paziente
-                                </h2>
-                                <p style={{
-                                    margin: 0,
-                                    fontSize: '14px',
-                                    color: 'rgba(255, 255, 255, 0.8)',
-                                    fontWeight: '500'
-                                }}>
-                                    {patientDetails ? `${patientDetails.nome} ${patientDetails.cognome}` : ''}
-                                </p>
-                            </div>
-                            <button
-                                onClick={onClose}
-                                style={{
-                                    background: 'rgba(255, 255, 255, 0.15)',
-                                    backdropFilter: 'blur(10px)',
-                                    border: 'none',
-                                    color: 'white',
-                                    width: '40px',
-                                    height: '40px',
-                                    borderRadius: '50%',
-                                    cursor: 'pointer',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    transition: 'all 0.3s ease',
-                                    fontSize: '20px'
-                                }}
-                                onMouseEnter={(e) => {
-                                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.25)';
-                                    e.currentTarget.style.transform = 'rotate(90deg) scale(1.1)';
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.15)';
-                                    e.currentTarget.style.transform = 'rotate(0deg) scale(1)';
-                                }}
-                            >
-                                ✕
-                            </button>
+                {/* Header with Gradient */}
+                <div className="modal-header-gradient">
+                    <div className="modal-header-content">
+                        <div className="modal-header-text">
+                            <h2 className="modal-header-title">
+                                Dettagli Paziente
+                            </h2>
+                            <p className="modal-header-subtitle">
+                                {patientDetails ? `${patientDetails.nome} ${patientDetails.cognome}` : ''}
+                            </p>
                         </div>
+                        <button
+                            onClick={onClose}
+                            className="modal-close-btn-rounded"
+                        >
+                            <X size={20} />
+                        </button>
                     </div>
                 </div>
 
-                {/* Body with Modern Cards */}
-                <div style={{
-                    padding: '32px',
-                    background: '#f8f9fa',
-                    maxHeight: 'calc(90vh - 200px)',
-                    overflowY: 'auto'
-                }}>
+                {/* Body */}
+                <div className="modal-body-gray modal-body-scrollable">
                     {loading ? (
-                        <div style={{ textAlign: 'center', padding: '40px', color: '#666' }}>
-                            <Loader2 size={32} style={{ animation: 'spin 1s linear infinite' }} />
+                        <div className="modal-loading">
+                            <Loader2 size={32} className="modal-loading-spinner" />
                             <p style={{ marginTop: '16px' }}>Caricamento dettagli...</p>
                         </div>
                     ) : patientDetails ? (
-                        <div style={{
-                            display: 'grid',
-                            gridTemplateColumns: 'repeat(3, 1fr)',
-                            gap: '16px'
-                        }}>
+                        <div className="modal-info-grid">
                             {/* ID Paziente Card */}
                             <InfoCard
                                 icon={<Hash size={20} />}

@@ -8,7 +8,7 @@ import { fetchQuestionnairesByPatient, reviewQuestionnaire, requestInvalidation,
 import QuestionnaireDetailModal from './QuestionnaireDetailModal';
 import Toast from './Toast';
 import { jsPDF } from 'jspdf';
-import '../css/QuestionnaireDetailModal.css'; // Reuse existing styles
+import '../css/Modal.css'; // Unified modal styles
 
 interface PsychologistPatientDetailModalProps {
     patient: PatientData | null;
@@ -392,221 +392,126 @@ const PsychologistPatientDetailModal: React.FC<PsychologistPatientDetailModalPro
 
     return ReactDOM.createPortal(
         <>
-            <div className="modal-overlay" onClick={onClose} style={{ backdropFilter: 'blur(4px)' }}>
+            <div className="modal-overlay-blur" onClick={onClose}>
                 <div
-                    className="modal-content"
+                    className="modal-card modal-card-lg"
                     onClick={(e) => e.stopPropagation()}
-                    style={{
-                        maxWidth: '1100px',
-                        borderRadius: '20px',
-                        overflow: 'hidden',
-                        boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)'
-                    }}
                 >
-                    {/* Modern Header with Gradient */}
-                    <div style={{
-                        background: 'linear-gradient(135deg, #0D475D 0%, #1a5f7a 50%, #83B9C1 100%)',
-                        padding: '32px',
-                        position: 'relative',
-                        overflow: 'hidden'
-                    }}>
-                        <div style={{
-                            position: 'absolute',
-                            top: '-50%',
-                            right: '-10%',
-                            width: '300px',
-                            height: '300px',
-                            background: 'rgba(255, 255, 255, 0.05)',
-                            borderRadius: '50%',
-                            filter: 'blur(40px)'
-                        }}></div>
-
-                        <div style={{ position: 'relative', zIndex: 1 }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                                <div>
-                                    <h2 style={{
-                                        margin: '0 0 8px 0',
-                                        fontSize: '28px',
-                                        fontWeight: '700',
-                                        color: 'white',
-                                        letterSpacing: '-0.5px'
-                                    }}>
-                                        {viewingReport ? 'Report Clinico' : 'Dettagli Paziente'}
-                                    </h2>
-                                    <p style={{
-                                        margin: 0,
-                                        fontSize: '14px',
-                                        color: 'rgba(255, 255, 255, 0.8)',
-                                        fontWeight: '500'
-                                    }}>
-                                        {viewingReport
-                                            ? `Generato il ${new Date(viewingReport.date).toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}`
-                                            : `${patient.nome} ${patient.cognome}`
-                                        }
-                                    </p>
-                                </div>
-                                <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                                    {!viewingReport ? (
-                                        <>
+                    {/* Header with Gradient */}
+                    <div className="modal-header-gradient">
+                        <div className="modal-header-content">
+                            <div className="modal-header-text">
+                                <h2 className="modal-header-title">
+                                    {viewingReport ? 'Report Clinico' : 'Dettagli Paziente'}
+                                </h2>
+                                <p className="modal-header-subtitle">
+                                    {viewingReport
+                                        ? `Generato il ${new Date(viewingReport.date).toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}`
+                                        : `${patient.nome} ${patient.cognome}`
+                                    }
+                                </p>
+                            </div>
+                            <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                                {!viewingReport ? (
+                                    <>
+                                        <button
+                                            onClick={handleGenerateReport}
+                                            disabled={isGeneratingReport}
+                                            className="btn-modal-header"
+                                            style={{
+                                                background: 'rgba(255, 255, 255, 0.2)',
+                                                border: '1px solid rgba(255, 255, 255, 0.3)',
+                                                color: 'white',
+                                                padding: '8px 16px',
+                                                borderRadius: '8px',
+                                                cursor: isGeneratingReport ? 'not-allowed' : 'pointer',
+                                                fontSize: '13px',
+                                                fontWeight: '600',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '8px'
+                                            }}
+                                        >
+                                            <FileText size={16} />
+                                            {isGeneratingReport ? 'Generazione...' : 'Genera Report'}
+                                        </button>
+                                        {patientDetails?.hasReport && (
                                             <button
-                                                onClick={handleGenerateReport}
-                                                disabled={isGeneratingReport}
+                                                onClick={handleViewReport}
+                                                disabled={isLoadingReport}
                                                 style={{
                                                     background: 'rgba(255, 255, 255, 0.2)',
                                                     border: '1px solid rgba(255, 255, 255, 0.3)',
                                                     color: 'white',
                                                     padding: '8px 16px',
                                                     borderRadius: '8px',
-                                                    cursor: isGeneratingReport ? 'not-allowed' : 'pointer',
+                                                    cursor: isLoadingReport ? 'not-allowed' : 'pointer',
                                                     fontSize: '13px',
                                                     fontWeight: '600',
                                                     display: 'flex',
                                                     alignItems: 'center',
-                                                    gap: '8px',
-                                                    transition: 'all 0.2s ease'
-                                                }}
-                                                onMouseEnter={(e) => {
-                                                    if (!isGeneratingReport) {
-                                                        e.currentTarget.style.background = 'rgba(255, 255, 255, 0.3)';
-                                                    }
-                                                }}
-                                                onMouseLeave={(e) => {
-                                                    if (!isGeneratingReport) {
-                                                        e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)';
-                                                    }
+                                                    gap: '8px'
                                                 }}
                                             >
                                                 <FileText size={16} />
-                                                {isGeneratingReport ? 'Generazione...' : 'Genera Report'}
+                                                {isLoadingReport ? 'Caricamento...' : 'Visualizza Report'}
                                             </button>
-                                            {patientDetails?.hasReport && (
-                                                <button
-                                                    onClick={handleViewReport}
-                                                    disabled={isLoadingReport}
-                                                    style={{
-                                                        background: 'rgba(255, 255, 255, 0.2)',
-                                                        border: '1px solid rgba(255, 255, 255, 0.3)',
-                                                        color: 'white',
-                                                        padding: '8px 16px',
-                                                        borderRadius: '8px',
-                                                        cursor: isLoadingReport ? 'not-allowed' : 'pointer',
-                                                        fontSize: '13px',
-                                                        fontWeight: '600',
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        gap: '8px',
-                                                        transition: 'all 0.2s ease'
-                                                    }}
-                                                    onMouseEnter={(e) => {
-                                                        if (!isLoadingReport) {
-                                                            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.3)';
-                                                        }
-                                                    }}
-                                                    onMouseLeave={(e) => {
-                                                        if (!isLoadingReport) {
-                                                            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)';
-                                                        }
-                                                    }}
-                                                >
-                                                    <FileText size={16} />
-                                                    {isLoadingReport ? 'Caricamento...' : 'Visualizza Report'}
-                                                </button>
-                                            )}
-                                        </>
-                                    ) : (
-                                        <>
-                                            <button
-                                                onClick={() => setViewingReport(null)}
-                                                style={{
-                                                    background: 'rgba(255, 255, 255, 0.2)',
-                                                    border: '1px solid rgba(255, 255, 255, 0.3)',
-                                                    color: 'white',
-                                                    padding: '8px 16px',
-                                                    borderRadius: '8px',
-                                                    cursor: 'pointer',
-                                                    fontSize: '13px',
-                                                    fontWeight: '600',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    gap: '8px',
-                                                    transition: 'all 0.2s ease'
-                                                }}
-                                            >
-                                                Indietro
-                                            </button>
-                                            <button
-                                                onClick={handleDownloadPdf}
-                                                disabled={isDownloadingPdf}
-                                                style={{
-                                                    background: 'rgba(255, 255, 255, 0.2)',
-                                                    border: '1px solid rgba(255, 255, 255, 0.3)',
-                                                    color: 'white',
-                                                    padding: '8px 16px',
-                                                    borderRadius: '8px',
-                                                    cursor: isDownloadingPdf ? 'not-allowed' : 'pointer',
-                                                    fontSize: '13px',
-                                                    fontWeight: '600',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    gap: '8px',
-                                                    transition: 'all 0.2s ease'
-                                                }}
-                                                onMouseEnter={(e) => {
-                                                    if (!isDownloadingPdf) {
-                                                        e.currentTarget.style.background = 'rgba(255, 255, 255, 0.3)';
-                                                    }
-                                                }}
-                                                onMouseLeave={(e) => {
-                                                    if (!isDownloadingPdf) {
-                                                        e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)';
-                                                    }
-                                                }}
-                                            >
-                                                <Download size={16} />
-                                                {isDownloadingPdf ? 'Download...' : 'Scarica PDF'}
-                                            </button>
-                                        </>
-                                    )}
-                                    <button
-                                        onClick={onClose}
-                                        style={{
-                                            background: 'rgba(255, 255, 255, 0.15)',
-                                            backdropFilter: 'blur(10px)',
-                                            border: 'none',
-                                            color: 'white',
-                                            width: '40px',
-                                            height: '40px',
-                                            borderRadius: '50%',
-                                            cursor: 'pointer',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            transition: 'all 0.3s ease',
-                                            fontSize: '20px'
-                                        }}
-                                        onMouseEnter={(e) => {
-                                            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.25)';
-                                            e.currentTarget.style.transform = 'rotate(90deg) scale(1.1)';
-                                        }}
-                                        onMouseLeave={(e) => {
-                                            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.15)';
-                                            e.currentTarget.style.transform = 'rotate(0deg) scale(1)';
-                                        }}
-                                    >
-                                        ✕
-                                    </button>
-                                </div>
+                                        )}
+                                    </>
+                                ) : (
+                                    <>
+                                        <button
+                                            onClick={() => setViewingReport(null)}
+                                            style={{
+                                                background: 'rgba(255, 255, 255, 0.2)',
+                                                border: '1px solid rgba(255, 255, 255, 0.3)',
+                                                color: 'white',
+                                                padding: '8px 16px',
+                                                borderRadius: '8px',
+                                                cursor: 'pointer',
+                                                fontSize: '13px',
+                                                fontWeight: '600',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '8px'
+                                            }}
+                                        >
+                                            Indietro
+                                        </button>
+                                        <button
+                                            onClick={handleDownloadPdf}
+                                            disabled={isDownloadingPdf}
+                                            style={{
+                                                background: 'rgba(255, 255, 255, 0.2)',
+                                                border: '1px solid rgba(255, 255, 255, 0.3)',
+                                                color: 'white',
+                                                padding: '8px 16px',
+                                                borderRadius: '8px',
+                                                cursor: isDownloadingPdf ? 'not-allowed' : 'pointer',
+                                                fontSize: '13px',
+                                                fontWeight: '600',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '8px'
+                                            }}
+                                        >
+                                            <Download size={16} />
+                                            {isDownloadingPdf ? 'Download...' : 'Scarica PDF'}
+                                        </button>
+                                    </>
+                                )}
+                                <button
+                                    onClick={onClose}
+                                    className="modal-close-btn-rounded"
+                                >
+                                    ✕
+                                </button>
                             </div>
                         </div>
                     </div>
 
-                    {/* Body with Modern Cards */}
-                    <div style={{
-                        padding: '32px',
-                        background: '#f8f9fa',
-                        maxHeight: 'calc(90vh - 200px)',
-                        overflowY: 'auto'
-                    }}>
+                    {/* Body */}
+                    <div className="modal-body-gray modal-body-scrollable">
                         {viewingReport ? (
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                                 {/* Report Header Card */}
@@ -1019,7 +924,13 @@ const PsychologistPatientDetailModal: React.FC<PsychologistPatientDetailModalPro
                     </div>
 
                     {/* Footer vuoto - solo chiusura tramite X */}
-                    <div className="modal-footer">
+                    <div style={{
+                        display: 'flex',
+                        justifyContent: 'flex-end',
+                        padding: '16px 24px',
+                        borderTop: '1px solid #eef2f5',
+                        background: '#f8fafc'
+                    }}>
                         {!viewingReport && (
                             <button
                                 className="terminate-cure-btn"
