@@ -39,6 +39,8 @@ const AdminPatientDetailModal: React.FC<AdminPatientDetailModalProps> = ({
 
     // Editable fields
     const [editedEmail, setEditedEmail] = useState('');
+    const [tempEmail, setTempEmail] = useState('');
+    const [emailError, setEmailError] = useState('');
     const [editedResidenza, setEditedResidenza] = useState('');
     const [editedPsicologo, setEditedPsicologo] = useState('');
     const [editedPriorita, setEditedPriorita] = useState('');
@@ -459,7 +461,13 @@ const AdminPatientDetailModal: React.FC<AdminPatientDetailModalProps> = ({
                                     <span className="modal-data-row-label">Email</span>
                                     <div style={{ position: 'relative' }} ref={emailInputRef}>
                                         <button
-                                            onClick={() => isEditing && setShowEmailInput(!showEmailInput)}
+                                            onClick={() => {
+                                                if (isEditing) {
+                                                    setTempEmail(editedEmail);
+                                                    setEmailError('');
+                                                    setShowEmailInput(!showEmailInput);
+                                                }
+                                            }}
                                             className="modal-editable-chip"
                                             style={{ cursor: isEditing ? 'pointer' : 'default', opacity: isEditing ? 1 : 0.8 }}
                                         >
@@ -471,12 +479,21 @@ const AdminPatientDetailModal: React.FC<AdminPatientDetailModalProps> = ({
                                             <div className="modal-chip-input-popover">
                                                 <input
                                                     type="email"
-                                                    value={editedEmail}
-                                                    onChange={(e) => setEditedEmail(e.target.value)}
+                                                    value={tempEmail}
+                                                    onChange={(e) => {
+                                                        setTempEmail(e.target.value);
+                                                        setEmailError('');
+                                                    }}
                                                     placeholder="Inserisci email..."
                                                     className="modal-chip-input"
                                                     autoFocus
+                                                    style={{ borderColor: emailError ? '#ef4444' : undefined }}
                                                 />
+                                                {emailError && (
+                                                    <div style={{ color: '#ef4444', fontSize: '11px', marginTop: '6px', fontWeight: 500 }}>
+                                                        {emailError}
+                                                    </div>
+                                                )}
                                                 <div className="modal-chip-input-actions">
                                                     <button
                                                         onClick={() => setShowEmailInput(false)}
@@ -485,7 +502,16 @@ const AdminPatientDetailModal: React.FC<AdminPatientDetailModalProps> = ({
                                                         Annulla
                                                     </button>
                                                     <button
-                                                        onClick={() => setShowEmailInput(false)}
+                                                        onClick={() => {
+                                                            // Robust email regex: Standard chars @ Standard domain . TLD (min 2 chars)
+                                                            const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+                                                            if (!tempEmail || emailRegex.test(tempEmail)) {
+                                                                setEditedEmail(tempEmail);
+                                                                setShowEmailInput(false);
+                                                            } else {
+                                                                setEmailError('Email non valida');
+                                                            }
+                                                        }}
                                                         className="modal-chip-btn modal-chip-btn-save"
                                                     >
                                                         <Check size={14} /> OK
