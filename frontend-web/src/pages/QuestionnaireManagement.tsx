@@ -7,8 +7,11 @@ import { getCurrentUser, getUserRole } from '../services/auth.service';
 import { fetchQuestionnaires, fetchQuestionnairesByPatient, requestInvalidation, reviewQuestionnaire, viewQuestionnaire } from '../services/questionnaire.service';
 import type { QuestionnaireData, LoadingState } from '../types/psychologist';
 import '../css/QuestionnaireManagement.css';
+import '../css/ForumPage.css';
 
 import Toast from '../components/Toast';
+
+const ITEMS_PER_PAGE = 4;
 
 const QuestionnaireManagement: React.FC = () => {
     const [questionnairesState, setQuestionnairesState] = useState<LoadingState<QuestionnaireData[]>>({
@@ -20,6 +23,7 @@ const QuestionnaireManagement: React.FC = () => {
     const [viewingQuestionnaire, setViewingQuestionnaire] = useState<QuestionnaireData | null>(null);
     const [patientFilter, setPatientFilter] = useState<string | null>(null);
     const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+    const [currentPage, setCurrentPage] = useState(1);
 
     const user = getCurrentUser();
     const role = getUserRole();
@@ -131,6 +135,28 @@ const QuestionnaireManagement: React.FC = () => {
         setToast({ message: 'Carica nuova tipologia di questionario', type: 'success' });
     };
 
+    // Pagination helpers
+    const getPaginatedQuestionnaires = (): QuestionnaireData[] => {
+        if (!questionnairesState.data) return [];
+        const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+        const endIndex = startIndex + ITEMS_PER_PAGE;
+        return questionnairesState.data.slice(startIndex, endIndex);
+    };
+
+    const getTotalPages = (): number => {
+        if (!questionnairesState.data) return 0;
+        return Math.ceil(questionnairesState.data.length / ITEMS_PER_PAGE);
+    };
+
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page);
+    };
+
+    // Reset page when filter changes
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [patientFilter]);
+
     if (!role) {
         return <div className="error-message">Errore: ruolo utente non trovato</div>;
     }
@@ -142,18 +168,18 @@ const QuestionnaireManagement: React.FC = () => {
                 subtitle="Revisiona e gestisci i questionari compilati"
                 icon={<ClipboardList size={24} />}
             />
-            <div className="management-header">
-                <div className="header-actions">
-                    {role === 'admin' && (
+            {role === 'admin' && (
+                <div className="management-header">
+                    <div className="header-actions">
                         <button
                             className="upload-btn"
                             onClick={handleUploadNewType}
                         >
                             ⬆ Carica Nuova Tipologia
                         </button>
-                    )}
+                    </div>
                 </div>
-            </div>
+            )}
 
             {questionnairesState.error && (
                 <div className="error-state">
@@ -166,6 +192,9 @@ const QuestionnaireManagement: React.FC = () => {
 
             {questionnairesState.data && !questionnairesState.loading && (
                 <>
+                    <div className="questionnaire-count">
+                        Totale questionari: <strong>{questionnairesState.data.length}</strong>
+                    </div>
                     <div className="filter-controls">
                         <button
                             className="filter-btn"
@@ -186,13 +215,33 @@ const QuestionnaireManagement: React.FC = () => {
                         )}
                     </div>
                     <QuestionnaireTable
-                        questionnaires={questionnairesState.data}
+                        questionnaires={getPaginatedQuestionnaires()}
                         role={role === 'admin' ? 'admin' : 'psychologist'}
                         selectedId={selectedQuestionnaireId}
                         onSelect={handleSelectQuestionnaire}
                         onView={handleView}
                         onReview={handleReview}
                     />
+
+                    {getTotalPages() > 1 && (
+                        <div className="pagination">
+                            <button
+                                className="pagination-btn"
+                                onClick={() => handlePageChange(currentPage - 1)}
+                                disabled={currentPage === 1}
+                            >
+                                ‹
+                            </button>
+                            <span className="pagination-current">{currentPage} / {getTotalPages()}</span>
+                            <button
+                                className="pagination-btn"
+                                onClick={() => handlePageChange(currentPage + 1)}
+                                disabled={currentPage === getTotalPages()}
+                            >
+                                ›
+                            </button>
+                        </div>
+                    )}
                 </>
             )}
 

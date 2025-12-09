@@ -101,13 +101,25 @@
     box-shadow: 0 6px 16px rgba(26, 95, 95, 0.4);
 }
 
+/* Questionnaire Count */
+.questionnaire-count {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 8px;
+}
+
+.questionnaire-count strong {
+    color: #0D475D;
+    font-weight: 700;
+}
+
 /* Filter Controls */
 .filter-controls {
     display: flex;
     align-items: center;
     gap: 16px;
-    padding: 16px 0;
-    margin-bottom: 16px;
+    padding: 8px 0;
+    margin-bottom: 12px;
     flex-wrap: wrap;
 }
 
@@ -218,6 +230,12 @@
     font-size: 18px;
     font-weight: 600;
     color: var(--color-rejected);
+}
+
+/* Fixed Pagination - Override ForumPage styles for Questionnaire context */
+.content-panel .pagination {
+    margin: auto -32px -32px -32px;
+    margin-top: auto;
 }
 
 /* Responsive */

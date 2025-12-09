@@ -1,5 +1,5 @@
 .personal-area-container {
-    background-color: #ffffff;
+    background: linear-gradient(180deg, #F4FAFB 0%, #FFFFFF 100%);
     border-radius: 16px;
     display: flex;
     flex-direction: column;

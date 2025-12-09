@@ -145,8 +145,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    padding: 10px;
+    gap: 10px;
+    padding: 12px;
     border-top: 1px solid #e5e7eb;
     margin: 0 -32px -32px -32px;
     background: white;
@@ -154,13 +154,13 @@
 }
 
 .pagination-btn {
-    width: 24px;
-    height: 24px;
+    width: 32px;
+    height: 32px;
     border: 1px solid #e5e7eb;
-    border-radius: 4px;
+    border-radius: 5px;
     background: white;
     color: #6B7280;
-    font-size: 14px;
+    font-size: 16px;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -179,8 +179,9 @@
 }
 
 .pagination-current {
-    font-size: 12px;
-    color: #9ca3af;
+    font-size: 14px;
+    font-weight: 500;
+    color: #6B7280;
 }
 
 /* Delete Dialog */

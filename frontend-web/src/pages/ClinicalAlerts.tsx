@@ -6,6 +6,7 @@ import PageHeader from '../components/PageHeader';
 import { fetchClinicalAlerts, acceptClinicalAlert } from '../services/alert-clinici.service';
 import type { ClinicalAlert, LoadingState } from '../types/alert';
 import '../css/ClinicalAlerts.css';
+import '../css/ForumPage.css';
 import '../css/EmptyState.css';
 
 import Toast from '../components/Toast';
@@ -156,21 +157,19 @@ const ClinicalAlerts: React.FC = () => {
                     {getTotalPages() > 1 && (
                         <div className="pagination">
                             <button
-                                className="pagination-button"
+                                className="pagination-btn"
                                 onClick={() => handlePageChange(currentPage - 1)}
                                 disabled={currentPage === 1}
                             >
-                                ← Precedente
+                                ‹
                             </button>
-                            <div className="pagination-info">
-                                Pagina {currentPage} di {getTotalPages()}
-                            </div>
+                            <span className="pagination-current">{currentPage} / {getTotalPages()}</span>
                             <button
-                                className="pagination-button"
+                                className="pagination-btn"
                                 onClick={() => handlePageChange(currentPage + 1)}
                                 disabled={currentPage === getTotalPages()}
                             >
-                                Successiva →
+                                ›
                             </button>
                         </div>
                     )}

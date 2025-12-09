@@ -26,19 +26,8 @@ const PsychologistPatientList: React.FC = () => {
             if (viewMode === 'grid') {
                 setItemsPerPage(8);
             } else {
-                // List view calculation
-                const headerHeight = 80; // Navbar
-                const titleSearchHeight = 140; // Title + Search bar
-                const paginationHeight = 80; // Pagination controls
-                const padding = 40; // Container padding
-
-                const availableHeight = window.innerHeight - (headerHeight + titleSearchHeight + paginationHeight + padding);
-                const rowHeight = 60; // Approximate height of a table row
-                const tableHeaderHeight = 50;
-                const listAvailableHeight = availableHeight - tableHeaderHeight;
-
-                const rows = Math.max(5, Math.floor(listAvailableHeight / rowHeight));
-                setItemsPerPage(rows);
+                // List view: fixed 4 rows
+                setItemsPerPage(4);
             }
         };
 
