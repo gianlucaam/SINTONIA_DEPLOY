@@ -16,7 +16,7 @@ jest.mock('../../../../src/patient/badge/badge.service.js');
 
 describe('InserimentoDomandaService - Validazione (Unit)', () => {
     let service: InserimentoDomandaService;
-    const oracle = loadOracle('inserimento-domanda-unit1');
+    const oracle = loadOracle('patient/forum/inserimento-domanda-unit1');
 
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({

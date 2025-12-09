@@ -9,7 +9,11 @@ jest.mock('../../../../src/patient/forum/inserimento_domanda.service.js');
 describe('InserimentoDomandaController (Unit)', () => {
     let controller: InserimentoDomandaController;
     let service: InserimentoDomandaService;
-    const oracle = loadOracle('inserimento-domanda-unit3');
+    let oracle;
+
+    beforeAll(() => {
+        oracle = loadOracle('patient/forum/inserimento-domanda-unit3');
+    });
 
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
