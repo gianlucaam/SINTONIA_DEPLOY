@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
-import { User } from 'lucide-react';
 import profilePhoto from '../images/psychologist-photo.png';
 import ChangePasswordModal from './ChangePasswordModal';
-import PageHeader from './PageHeader';
 import Toast from './Toast';
 import '../css/AdminPersonalArea.css';
 
@@ -30,77 +28,56 @@ const AdminPersonalArea: React.FC = () => {
 
     return (
         <div className="personal-area-container">
-            <PageHeader
-                title="Area Personale"
-                subtitle="Gestisci il tuo profilo"
-                icon={<User size={24} />}
-            />
+            {/* Hero Banner */}
+            <div className="profile-hero-banner" />
 
+            {/* Profile Photo overlapping banner */}
+            <div className="profile-photo-container">
+                <div className="profile-image-wrapper">
+                    <img
+                        src={MOCK_ADMIN_DATA.profileImageUrl}
+                        alt="Foto profilo"
+                        className="profile-image-preview"
+                        onError={(e) => {
+                            e.currentTarget.src = profilePhoto;
+                        }}
+                    />
+                </div>
+                <div className="profile-name-display">
+                    <h2>{MOCK_ADMIN_DATA.nome} {MOCK_ADMIN_DATA.cognome}</h2>
+                    <p>Amministratore</p>
+                </div>
+            </div>
+
+            {/* Content with Info Cards */}
             <div className="personal-area-content">
-                {/* Profile Image Section */}
-                <div className="profile-image-section">
-                    <div className="profile-image-wrapper">
-                        <img
-                            src={MOCK_ADMIN_DATA.profileImageUrl}
-                            alt="Foto profilo admin"
-                            className="profile-image-preview"
-                            onError={(e) => {
-                                e.currentTarget.src = profilePhoto;
-                            }}
-                        />
+                <div className="info-cards-grid">
+                    <div className="info-card">
+                        <div className="info-card-label">Nome</div>
+                        <div className="info-card-value">{MOCK_ADMIN_DATA.nome}</div>
+                    </div>
+                    <div className="info-card">
+                        <div className="info-card-label">Cognome</div>
+                        <div className="info-card-value">{MOCK_ADMIN_DATA.cognome}</div>
+                    </div>
+                    <div className="info-card full-width">
+                        <div className="info-card-label">Email</div>
+                        <div className="info-card-value">{MOCK_ADMIN_DATA.email}</div>
                     </div>
                 </div>
 
-                {/* Form Fields */}
-                <div className="form-section">
-
-                    {/* Nome e Cognome */}
-                    <div className="form-row form-row-double">
-                        <div className="form-field">
-                            <label className="field-label">Nome</label>
-                            <input
-                                type="text"
-                                value={MOCK_ADMIN_DATA.nome}
-                                disabled
-                                className="field-input field-disabled"
-                            />
-                        </div>
-                        <div className="form-field">
-                            <label className="field-label">Cognome</label>
-                            <input
-                                type="text"
-                                value={MOCK_ADMIN_DATA.cognome}
-                                disabled
-                                className="field-input field-disabled"
-                            />
-                        </div>
-                    </div>
-
-                    {/* Email and Password */}
-                    <div className="form-row form-row-double">
-                        <div className="form-field">
-                            <label className="field-label">Email</label>
-                            <input
-                                type="email"
-                                value={MOCK_ADMIN_DATA.email}
-                                disabled
-                                className="field-input field-disabled"
-                            />
-                        </div>
-                        <div className="form-field">
-                            <label className="field-label">Password</label>
-                            <button
-                                className="change-password-button"
-                                onClick={() => setShowPasswordModal(true)}
-                            >
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                    <path d="M11 4H4C3.46957 4 2.96086 4.21071 2.58579 4.58579C2.21071 4.96086 2 5.46957 2 6V20C2 20.5304 2.21071 21.0391 2.58579 21.4142C2.96086 21.7893 3.46957 22 4 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V13" />
-                                    <path d="M18.5 2.50001C18.8978 2.10219 19.4374 1.87869 20 1.87869C20.5626 1.87869 21.1022 2.10219 21.5 2.50001C21.8978 2.89784 22.1213 3.43741 22.1213 4.00001C22.1213 4.56262 21.8978 5.10219 21.5 5.50001L12 15L8 16L9 12L18.5 2.50001Z" />
-                                </svg>
-                                Modifica Password
-                            </button>
-                        </div>
-                    </div>
+                {/* Actions */}
+                <div className="profile-actions">
+                    <button
+                        className="change-password-button"
+                        onClick={() => setShowPasswordModal(true)}
+                    >
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                        </svg>
+                        Modifica Password
+                    </button>
                 </div>
             </div>
 
