@@ -18,6 +18,11 @@
     margin: 0;
 }
 
+.alerts-count strong {
+    color: #0D475D;
+    font-weight: 700;
+}
+
 /* Overlay Wrapper */
 .table-overlay-wrapper {
     position: relative;

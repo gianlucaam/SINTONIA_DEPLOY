@@ -202,9 +202,9 @@ const PsychologistPatientList: React.FC = () => {
                         <div className="filter-controls" style={{ margin: 0 }}>
                             <p style={{ color: '#666', fontSize: '14px', margin: 0 }}>
                                 {searchQuery ? (
-                                    <>Trovati: {totalPatients} pazienti</>
+                                    <>Trovati: <strong style={{ color: '#0D475D' }}>{totalPatients}</strong> pazienti</>
                                 ) : (
-                                    <>Totale pazienti: {totalPatients}</>
+                                    <>Totale pazienti: <strong style={{ color: '#0D475D' }}>{totalPatients}</strong></>
                                 )}
                                 {totalPages > 1 && <> | Pagina {currentPage} di {totalPages}</>}
                             </p>

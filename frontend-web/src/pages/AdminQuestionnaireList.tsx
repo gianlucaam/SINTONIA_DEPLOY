@@ -7,6 +7,7 @@ import { fetchQuestionnaires, fetchQuestionnairesByPatient, cancelRevision, view
 import type { QuestionnaireData, LoadingState } from '../types/psychologist';
 import '../css/QuestionnaireManagement.css';
 import '../css/EmptyState.css';
+import '../css/ForumPage.css';
 
 import Toast from '../components/Toast';
 
@@ -24,6 +25,10 @@ const AdminQuestionnaireList: React.FC = () => {
     // Stati per la ricerca live
     const [searchQuery, setSearchQuery] = useState<string>('');
     const [filteredQuestionnaires, setFilteredQuestionnaires] = useState<QuestionnaireData[]>([]);
+
+    // Pagination state
+    const [currentPage, setCurrentPage] = useState(1);
+    const ITEMS_PER_PAGE = 4;
 
     useEffect(() => {
         loadQuestionnaires();
@@ -45,6 +50,8 @@ const AdminQuestionnaireList: React.FC = () => {
             );
             setFilteredQuestionnaires(filtered);
         }
+        // Reset page when filter changes
+        setCurrentPage(1);
     }, [searchQuery, questionnairesState.data]);
 
     const loadQuestionnaires = async (patientIdFilter?: string) => {
@@ -97,6 +104,21 @@ const AdminQuestionnaireList: React.FC = () => {
         setSearchQuery('');
     };
 
+    // Pagination helpers
+    const getTotalPages = (): number => {
+        return Math.ceil(filteredQuestionnaires.length / ITEMS_PER_PAGE);
+    };
+
+    const getPaginatedQuestionnaires = (): QuestionnaireData[] => {
+        const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+        const endIndex = startIndex + ITEMS_PER_PAGE;
+        return filteredQuestionnaires.slice(startIndex, endIndex);
+    };
+
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page);
+    };
+
     const handleView = async (id: string) => {
         try {
             const questionnaireDetails = await viewQuestionnaire(id, 'admin');
@@ -131,12 +153,6 @@ const AdminQuestionnaireList: React.FC = () => {
                 icon={<FileCheck size={24} />}
             />
 
-            <div className="management-header">
-                <div className="header-actions">
-                    {/* Filter Controls */}
-                </div>
-            </div>
-
             {questionnairesState.loading && (
                 <div className="loading-state">Caricamento questionari...</div>
             )}
@@ -163,9 +179,9 @@ const AdminQuestionnaireList: React.FC = () => {
                         <div className="filter-controls" style={{ margin: 0 }}>
                             <p style={{ color: '#666', fontSize: '14px', margin: 0 }}>
                                 {searchQuery ? (
-                                    <>Trovati: {filteredQuestionnaires.length} questionari</>
+                                    <>Trovati: <strong style={{ color: '#0D475D' }}>{filteredQuestionnaires.length}</strong> questionari</>
                                 ) : (
-                                    <>Totale questionari: {questionnairesState.data.length}</>
+                                    <>Totale questionari: <strong style={{ color: '#0D475D' }}>{questionnairesState.data.length}</strong></>
                                 )}
                             </p>
                         </div>
@@ -221,11 +237,31 @@ const AdminQuestionnaireList: React.FC = () => {
                             </div>
 
                             <AdminQuestionnaireTable
-                                questionnaires={filteredQuestionnaires}
+                                questionnaires={getPaginatedQuestionnaires()}
                                 selectedId={selectedQuestionnaireId}
                                 onSelect={handleSelectQuestionnaire}
                                 onView={handleView}
                             />
+
+                            {getTotalPages() > 1 && (
+                                <div className="pagination">
+                                    <button
+                                        className="pagination-btn"
+                                        onClick={() => handlePageChange(currentPage - 1)}
+                                        disabled={currentPage === 1}
+                                    >
+                                        ‹
+                                    </button>
+                                    <span className="pagination-current">{currentPage} / {getTotalPages()}</span>
+                                    <button
+                                        className="pagination-btn"
+                                        onClick={() => handlePageChange(currentPage + 1)}
+                                        disabled={currentPage === getTotalPages()}
+                                    >
+                                        ›
+                                    </button>
+                                </div>
+                            )}
                         </>
                     ) : (
                         <div className="unified-empty-state">

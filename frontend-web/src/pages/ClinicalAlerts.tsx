@@ -125,7 +125,7 @@ const ClinicalAlerts: React.FC = () => {
                         <p className="alerts-count">
                             {alertsState.data.length === 0
                                 ? 'Nessun alert da gestire'
-                                : `${alertsState.data.length} alert ${alertsState.data.length === 1 ? 'non accettato' : 'non accettati'}`
+                                : <><strong>{alertsState.data.length}</strong> alert {alertsState.data.length === 1 ? 'non accettato' : 'non accettati'}</>
                             }
                         </p>
                     </div>
