@@ -280,3 +280,111 @@
         width: calc(100% - 40px);
     }
 }
+
+@media (max-width: 375px) {
+    .edit-post-header {
+        padding: 40px 16px 24px;
+        border-bottom-left-radius: 40px;
+        border-bottom-right-radius: 40px;
+    }
+
+    .edit-post-page .header-title {
+        font-size: 20px;
+    }
+
+    .edit-post-page .back-arrow-btn-circle {
+        width: 36px;
+        height: 36px;
+    }
+
+    .edit-post-content {
+        padding: 16px 16px 100px;
+        gap: 16px;
+    }
+
+    .edit-post-page .form-label {
+        font-size: 16px;
+    }
+
+    .edit-post-page .title-input-container {
+        padding: 12px 16px;
+    }
+
+    .edit-post-page .category-selector {
+        padding: 12px 16px;
+    }
+
+    .edit-post-page .textarea-container {
+        padding: 18px 18px 50px;
+        min-height: 240px;
+    }
+
+    .edit-post-page .publish-button-fixed {
+        padding: 16px;
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 320px) {
+    .edit-post-header {
+        padding: 36px 12px 20px;
+        border-bottom-left-radius: 35px;
+        border-bottom-right-radius: 35px;
+    }
+
+    .edit-post-page .header-title {
+        font-size: 18px;
+    }
+
+    .edit-post-page .back-arrow-btn-circle {
+        width: 34px;
+        height: 34px;
+    }
+
+    .edit-post-content {
+        padding: 14px 12px 90px;
+        gap: 14px;
+    }
+
+    .edit-post-page .form-label {
+        font-size: 14px;
+    }
+
+    .edit-post-page .title-input-container {
+        padding: 10px 14px;
+        border-radius: 14px;
+    }
+
+    .edit-post-page .title-input {
+        font-size: 14px;
+    }
+
+    .edit-post-page .category-selector {
+        padding: 10px 14px;
+        border-radius: 14px;
+    }
+
+    .edit-post-page .category-text {
+        font-size: 14px;
+    }
+
+    .edit-post-page .textarea-container {
+        padding: 16px 16px 45px;
+        min-height: 200px;
+        border-radius: 20px;
+    }
+
+    .edit-post-page .content-textarea {
+        font-size: 14px;
+    }
+
+    .edit-post-page .char-counter {
+        font-size: 11px;
+    }
+
+    .edit-post-page .publish-button-fixed {
+        padding: 14px;
+        font-size: 15px;
+        border-radius: 16px;
+    }
+}

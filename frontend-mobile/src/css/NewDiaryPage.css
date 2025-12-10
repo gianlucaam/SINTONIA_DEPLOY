@@ -270,6 +270,62 @@
     }
 }
 
+@media (max-width: 320px) {
+    .new-diary-header {
+        padding: 36px 12px 20px;
+        border-bottom-left-radius: 35px;
+        border-bottom-right-radius: 35px;
+    }
+
+    .new-diary-page .header-title {
+        font-size: 18px;
+    }
+
+    .new-diary-page .back-button {
+        width: 34px;
+        height: 34px;
+    }
+
+    .new-diary-content {
+        padding: 16px 12px;
+        gap: 14px;
+    }
+
+    .form-label {
+        font-size: 14px;
+        margin-bottom: 6px;
+    }
+
+    .title-input-container {
+        padding: 10px 14px;
+        border-radius: 12px;
+    }
+
+    .title-input {
+        font-size: 14px;
+    }
+
+    .new-diary-page .textarea-container {
+        padding: 16px 16px 50px 16px;
+        min-height: 220px !important;
+        border-radius: 18px;
+    }
+
+    .new-diary-page .content-textarea {
+        font-size: 14px;
+    }
+
+    .char-counter {
+        font-size: 11px;
+    }
+
+    .publish-button-fixed {
+        padding: 14px;
+        font-size: 15px;
+        border-radius: 16px;
+    }
+}
+
 @media (min-width: 768px) {
     .new-diary-content {
         max-width: 600px;

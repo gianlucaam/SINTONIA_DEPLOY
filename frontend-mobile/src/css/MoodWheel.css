@@ -192,3 +192,44 @@
         font-size: 6rem;
     }
 }
+
+@media (max-width: 375px) {
+    .wheel-overflow-wrapper {
+        height: 38vh;
+    }
+
+    .wheel-positioner {
+        width: 155vw;
+        height: 155vw;
+    }
+
+    .emoji-large-clickable {
+        font-size: 5.5rem;
+    }
+
+    .wheel-guidance {
+        font-size: 14px;
+        padding: 0 16px;
+    }
+}
+
+@media (max-width: 320px) {
+    .wheel-overflow-wrapper {
+        height: 35vh;
+    }
+
+    .wheel-positioner {
+        width: 150vw;
+        height: 150vw;
+    }
+
+    .emoji-large-clickable {
+        font-size: 5rem;
+    }
+
+    .wheel-guidance {
+        font-size: 13px;
+        padding: 0 12px;
+        margin-bottom: 8px;
+    }
+}

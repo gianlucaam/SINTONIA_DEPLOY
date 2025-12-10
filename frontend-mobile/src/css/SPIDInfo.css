@@ -186,3 +186,120 @@
     max-width: 140px;
     object-fit: contain;
 }
+
+/* ========================================
+   RESPONSIVE BREAKPOINTS
+   ======================================== */
+
+@media (max-width: 375px) {
+    .spid-info-container {
+        padding: 16px;
+    }
+
+    .spid-info-card {
+        padding: 32px 24px;
+        border-radius: 12px;
+    }
+
+    .spid-title {
+        font-size: 1.7rem;
+        margin-bottom: 16px;
+    }
+
+    .spid-description {
+        font-size: 0.85rem;
+        margin-bottom: 24px;
+    }
+
+    .spid-login-btn {
+        padding: 14px 32px;
+        font-size: 0.95rem;
+    }
+
+    .spid-links {
+        gap: 12px;
+        margin-bottom: 24px;
+    }
+
+    .spid-links a {
+        font-size: 0.85rem;
+    }
+
+    .spid-providers-list {
+        max-height: 220px;
+    }
+
+    .provider-item {
+        padding: 10px 14px;
+    }
+
+    .provider-logo-img {
+        height: 28px;
+        max-width: 120px;
+    }
+}
+
+@media (max-width: 320px) {
+    .spid-info-container {
+        padding: 12px;
+    }
+
+    .spid-info-card {
+        padding: 24px 16px;
+        border-radius: 10px;
+    }
+
+    .spid-title {
+        font-size: 1.5rem;
+        margin-bottom: 14px;
+    }
+
+    .spid-description {
+        font-size: 0.8rem;
+        line-height: 1.5;
+        margin-bottom: 20px;
+    }
+
+    .spid-login-btn {
+        padding: 12px 24px;
+        font-size: 0.9rem;
+        border-radius: 22px;
+    }
+
+    .spid-links {
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+    .spid-links a {
+        font-size: 0.8rem;
+    }
+
+    .spid-logos {
+        gap: 16px;
+        padding-top: 16px;
+    }
+
+    .spid-logos img {
+        height: 24px;
+    }
+
+    .spid-dropdown-container {
+        margin-bottom: 40px;
+    }
+
+    .spid-providers-list {
+        max-height: 200px;
+        border-bottom-left-radius: 22px;
+        border-bottom-right-radius: 22px;
+    }
+
+    .provider-item {
+        padding: 10px 12px;
+    }
+
+    .provider-logo-img {
+        height: 26px;
+        max-width: 110px;
+    }
+}

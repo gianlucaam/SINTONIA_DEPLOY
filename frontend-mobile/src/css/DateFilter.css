@@ -42,3 +42,51 @@
     height: 24px;
     display: block;
 }
+
+/* ========================================
+   RESPONSIVE BREAKPOINTS
+   ======================================== */
+
+@media (max-width: 375px) {
+    .month-selector-header {
+        gap: 16px;
+        margin-top: 28px;
+    }
+
+    .month-selector-header .month-label {
+        font-size: 1.75rem;
+        min-width: 160px;
+    }
+
+    .month-nav-arrow {
+        font-size: 1.75rem;
+        padding: 0 8px;
+    }
+
+    .month-nav-arrow img {
+        width: 22px;
+        height: 22px;
+    }
+}
+
+@media (max-width: 320px) {
+    .month-selector-header {
+        gap: 12px;
+        margin-top: 24px;
+    }
+
+    .month-selector-header .month-label {
+        font-size: 1.5rem;
+        min-width: 140px;
+    }
+
+    .month-nav-arrow {
+        font-size: 1.5rem;
+        padding: 0 6px;
+    }
+
+    .month-nav-arrow img {
+        width: 20px;
+        height: 20px;
+    }
+}

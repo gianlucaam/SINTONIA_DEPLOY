@@ -203,3 +203,85 @@
         padding: 1rem 1rem 1.5rem;
     }
 }
+
+@media (max-width: 375px) {
+    .mood-entry-header {
+        padding: 36px 16px 24px;
+    }
+
+    .mood-entry-header .page-title {
+        font-size: 22px;
+    }
+
+    .mood-entry-header .back-button,
+    .mood-entry-header .header-spacer {
+        width: 36px;
+        height: 36px;
+    }
+
+    .step-title {
+        font-size: 1.6rem;
+    }
+
+    .mood-entry-content {
+        padding: 0.75rem 0.75rem 1.25rem;
+    }
+
+    .step-indicator {
+        gap: 6px;
+        margin-bottom: 16px;
+    }
+
+    .save-button,
+    .delete-button {
+        padding: 14px 24px;
+        font-size: 15px;
+    }
+}
+
+@media (max-width: 320px) {
+    .mood-entry-header {
+        padding: 32px 12px 20px;
+    }
+
+    .mood-entry-header .page-title {
+        font-size: 20px;
+    }
+
+    .mood-entry-header .back-button,
+    .mood-entry-header .header-spacer {
+        width: 34px;
+        height: 34px;
+    }
+
+    .step-title {
+        font-size: 1.4rem;
+        margin-bottom: 12px;
+    }
+
+    .mood-entry-content {
+        padding: 0.5rem 0.5rem 1rem;
+    }
+
+    .step-indicator {
+        gap: 5px;
+        margin-bottom: 14px;
+    }
+
+    .step-dot {
+        width: 8px;
+        height: 8px;
+    }
+
+    .save-button,
+    .delete-button {
+        padding: 13px 20px;
+        font-size: 14px;
+        border-radius: 20px;
+    }
+
+    .error-message {
+        padding: 10px 14px;
+        font-size: 13px;
+    }
+}

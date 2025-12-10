@@ -167,6 +167,7 @@
     min-width: 0;
     box-sizing: border-box;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
 }
 
 .card-date {
@@ -181,6 +182,8 @@
     display: flex;
     align-items: center;
     gap: 10px;
+    min-width: 0;
+    overflow: hidden;
 }
 
 .mood-icon-wrapper {
@@ -318,21 +321,38 @@
     }
 
     .mood-entries-grid {
-        gap: 8px;
+        gap: 10px;
     }
 
     .mood-entry-card {
-        padding: 10px;
-        border-radius: 12px;
+        padding: 12px;
+        border-radius: 16px;
+        gap: 8px;
+    }
+
+    .card-mood-row {
+        gap: 8px;
     }
 
     .mood-icon-wrapper {
-        width: 32px;
-        height: 32px;
+        width: 40px;
+        height: 40px;
     }
 
     .mood-name {
+        font-size: 13px;
+    }
+
+    .card-date {
         font-size: 12px;
+    }
+
+    .intensity-row {
+        gap: 5px;
+    }
+
+    .intensity-value {
+        font-size: 11px;
     }
 }
 
@@ -504,4 +524,88 @@
 
 .mood-entry-card:active {
     transform: scale(0.98);
+}
+
+/* 320px breakpoint */
+@media (max-width: 320px) {
+    .mood-history-header {
+        padding: 36px 12px 20px;
+        border-bottom-left-radius: 35px;
+        border-bottom-right-radius: 35px;
+    }
+
+    .mood-history-header .page-title {
+        font-size: 18px;
+    }
+
+    .mood-history-header .back-button {
+        width: 34px;
+        height: 34px;
+    }
+
+    .mood-history-main-card {
+        margin: 12px 10px 85px;
+        padding: 14px 10px;
+        border-radius: 35px;
+    }
+
+    .mood-entries-grid {
+        gap: 6px;
+    }
+
+    .mood-entry-card {
+        padding: 8px;
+        border-radius: 12px;
+        gap: 5px;
+    }
+
+    .card-mood-row {
+        gap: 5px;
+    }
+
+    .card-date {
+        font-size: 10px;
+    }
+
+    .mood-icon-wrapper {
+        width: 32px;
+        height: 32px;
+    }
+
+    .mood-name {
+        font-size: 11px;
+    }
+
+    .intensity-row {
+        gap: 4px;
+        margin-top: 2px;
+    }
+
+    .intensity-bar {
+        height: 4px;
+    }
+
+    .intensity-value {
+        font-size: 9px;
+    }
+
+    .mood-detail-modal {
+        padding: 20px;
+        border-radius: 20px;
+        max-width: 92%;
+    }
+
+    .modal-mood-icon {
+        width: 48px;
+        height: 48px;
+    }
+
+    .modal-mood-name {
+        font-size: 20px;
+    }
+
+    .modal-close-btn {
+        width: 32px;
+        height: 32px;
+    }
 }

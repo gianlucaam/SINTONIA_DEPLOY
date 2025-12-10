@@ -261,3 +261,107 @@
         font-size: 40px;
     }
 }
+
+@media (max-width: 375px) {
+    .badges-header {
+        padding: 40px 16px 24px;
+        border-bottom-left-radius: 40px;
+        border-bottom-right-radius: 40px;
+    }
+
+    .badges-title {
+        font-size: 22px;
+    }
+
+    .back-button {
+        width: 36px;
+        height: 36px;
+    }
+
+    .badges-content {
+        padding: 16px;
+    }
+
+    .filter-buttons {
+        gap: 8px;
+        margin-bottom: 16px;
+    }
+
+    .filter-btn {
+        padding: 8px 16px;
+        font-size: 13px;
+    }
+
+    .badges-grid {
+        gap: 10px;
+    }
+
+    .badge-item {
+        padding: 14px 10px;
+        border-radius: 16px;
+    }
+
+    .badge-icon-wrapper {
+        width: 52px;
+        height: 52px;
+    }
+
+    .badge-name {
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 320px) {
+    .badges-header {
+        padding: 36px 12px 20px;
+        border-bottom-left-radius: 35px;
+        border-bottom-right-radius: 35px;
+    }
+
+    .badges-title {
+        font-size: 20px;
+    }
+
+    .back-button {
+        width: 34px;
+        height: 34px;
+    }
+
+    .badges-content {
+        padding: 12px;
+    }
+
+    .filter-buttons {
+        gap: 6px;
+        margin-bottom: 14px;
+    }
+
+    .filter-btn {
+        padding: 7px 12px;
+        font-size: 12px;
+        border-radius: 14px;
+    }
+
+    .badges-grid {
+        gap: 8px;
+    }
+
+    .badge-item {
+        padding: 12px 8px;
+        border-radius: 14px;
+    }
+
+    .badge-icon-wrapper {
+        width: 48px;
+        height: 48px;
+        margin-bottom: 6px;
+    }
+
+    .badge-name {
+        font-size: 11px;
+    }
+
+    .badges-count {
+        font-size: 32px;
+    }
+}

@@ -117,3 +117,89 @@
     transform: scale(0.95);
     background: #163A4A;
 }
+
+/* ========================================
+   RESPONSIVE BREAKPOINTS
+   ======================================== */
+
+@media (max-width: 375px) {
+    .forum-filter-section {
+        padding: 10px 16px;
+    }
+
+    .forum-filter-toggle {
+        gap: 6px;
+        padding: 3px;
+    }
+
+    .filter-btn {
+        padding: 7px 18px;
+        font-size: 13px;
+    }
+
+    .forum-content {
+        padding: 14px 16px;
+    }
+
+    .section-title {
+        font-size: 16px;
+        margin-bottom: 14px;
+    }
+
+    .forum-fab {
+        width: 54px;
+        height: 54px;
+        bottom: 85px;
+        right: 16px;
+    }
+
+    .forum-fab img {
+        width: 26px;
+        height: 26px;
+    }
+}
+
+@media (max-width: 320px) {
+    .forum-filter-section {
+        padding: 8px 12px;
+    }
+
+    .filter-btn {
+        padding: 6px 14px;
+        font-size: 12px;
+        border-radius: 14px;
+    }
+
+    .forum-content {
+        padding: 12px 12px;
+    }
+
+    .section-title {
+        font-size: 15px;
+        margin-bottom: 12px;
+    }
+
+    .no-posts {
+        padding: 40px 16px;
+    }
+
+    .no-posts p {
+        font-size: 14px;
+    }
+
+    .no-posts-hint {
+        font-size: 12px;
+    }
+
+    .forum-fab {
+        width: 48px;
+        height: 48px;
+        bottom: 80px;
+        right: 12px;
+    }
+
+    .forum-fab img {
+        width: 24px;
+        height: 24px;
+    }
+}

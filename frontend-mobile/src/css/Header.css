@@ -182,3 +182,111 @@
         0 6px 12px rgba(0, 0, 0, 0.2),
         0 3px 6px rgba(0, 0, 0, 0.15);
 }
+
+/* ========================================
+   RESPONSIVE BREAKPOINTS
+   ======================================== */
+
+/* Medium-Small Devices (375px and below) */
+@media (max-width: 375px) {
+    .header {
+        padding: 32px 16px 24px;
+        border-bottom-left-radius: 40px;
+        border-bottom-right-radius: 40px;
+    }
+
+    .header-top {
+        margin-bottom: 16px;
+        font-size: 0.85rem;
+    }
+
+    .avatar {
+        width: 50px;
+        height: 50px;
+    }
+
+    .avatar img {
+        min-width: 50px;
+        min-height: 50px;
+    }
+
+    .greeting-text h1 {
+        font-size: 1.3rem;
+    }
+
+    .user-info {
+        gap: 12px;
+    }
+
+    .icon-box {
+        width: 50px;
+        height: 50px;
+        border-radius: 16px;
+    }
+
+    .icon-box img {
+        width: 26px;
+        height: 26px;
+    }
+
+    .badge {
+        width: 20px;
+        height: 20px;
+        font-size: 0.65rem;
+    }
+}
+
+/* Small Devices (320px and below) */
+@media (max-width: 320px) {
+    .header {
+        padding: 28px 12px 20px;
+        border-bottom-left-radius: 35px;
+        border-bottom-right-radius: 35px;
+    }
+
+    .header-top {
+        margin-bottom: 12px;
+        font-size: 0.8rem;
+    }
+
+    .avatar {
+        width: 44px;
+        height: 44px;
+    }
+
+    .avatar img {
+        min-width: 44px;
+        min-height: 44px;
+    }
+
+    .greeting-text h1 {
+        font-size: 1.15rem;
+    }
+
+    .mood-badge {
+        font-size: 0.8rem;
+    }
+
+    .user-info {
+        gap: 10px;
+    }
+
+    .icon-box {
+        width: 44px;
+        height: 44px;
+        border-radius: 14px;
+    }
+
+    .icon-box img {
+        width: 22px;
+        height: 22px;
+    }
+
+    .badge {
+        width: 18px;
+        height: 18px;
+        font-size: 0.6rem;
+        top: -4px;
+        right: -4px;
+    }
+}
