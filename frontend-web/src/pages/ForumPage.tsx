@@ -212,6 +212,11 @@ const ForumPage: React.FC = () => {
 
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
+        // Scroll to top of the questions list when changing page
+        const scrollContainer = document.querySelector('.forum-scroll-container');
+        if (scrollContainer) {
+            scrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
+        }
     };
 
     return (
