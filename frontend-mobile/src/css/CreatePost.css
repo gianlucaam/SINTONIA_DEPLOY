@@ -271,13 +271,13 @@
 }
 
 @media (max-width: 375px) {
-    .create-post-header {
+    .create-post-header-blue {
         padding: 40px 16px 24px;
         border-bottom-left-radius: 40px;
         border-bottom-right-radius: 40px;
     }
 
-    .create-post-page .header-title {
+    .create-post-title-white {
         font-size: 20px;
     }
 
@@ -315,19 +315,24 @@
 }
 
 @media (max-width: 320px) {
-    .create-post-header {
+    .create-post-header-blue {
         padding: 36px 12px 20px;
         border-bottom-left-radius: 35px;
         border-bottom-right-radius: 35px;
     }
 
-    .create-post-page .header-title {
+    .create-post-title-white {
         font-size: 18px;
     }
 
     .back-arrow-btn-circle {
         width: 34px;
         height: 34px;
+    }
+
+    .back-arrow-btn-circle img {
+        width: 18px;
+        height: 18px;
     }
 
     .create-post-content {

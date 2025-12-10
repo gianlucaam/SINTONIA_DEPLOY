@@ -280,6 +280,7 @@
     .post-title {
         font-size: 14px;
         -webkit-line-clamp: 2;
+        line-clamp: 2;
     }
 
     .post-timestamp {
@@ -290,6 +291,7 @@
         font-size: 12px;
         margin-bottom: 12px;
         -webkit-line-clamp: 3;
+        line-clamp: 3;
     }
 
     .post-action-btn {

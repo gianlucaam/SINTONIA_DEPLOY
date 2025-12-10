@@ -282,13 +282,13 @@
 }
 
 @media (max-width: 375px) {
-    .edit-post-header {
+    .edit-post-header-blue {
         padding: 40px 16px 24px;
         border-bottom-left-radius: 40px;
         border-bottom-right-radius: 40px;
     }
 
-    .edit-post-page .header-title {
+    .edit-post-title-white {
         font-size: 20px;
     }
 
@@ -326,19 +326,24 @@
 }
 
 @media (max-width: 320px) {
-    .edit-post-header {
+    .edit-post-header-blue {
         padding: 36px 12px 20px;
         border-bottom-left-radius: 35px;
         border-bottom-right-radius: 35px;
     }
 
-    .edit-post-page .header-title {
+    .edit-post-title-white {
         font-size: 18px;
     }
 
     .edit-post-page .back-arrow-btn-circle {
         width: 34px;
         height: 34px;
+    }
+
+    .edit-post-page .back-arrow-btn-circle img {
+        width: 18px;
+        height: 18px;
     }
 
     .edit-post-content {

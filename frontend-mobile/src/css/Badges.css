@@ -269,13 +269,18 @@
         border-bottom-right-radius: 40px;
     }
 
-    .badges-title {
+    .badges-header .header-title {
         font-size: 22px;
     }
 
-    .back-button {
+    .badges-header .back-button {
         width: 36px;
         height: 36px;
+    }
+
+    .badges-header .back-button img {
+        width: 18px;
+        height: 18px;
     }
 
     .badges-content {
@@ -318,13 +323,18 @@
         border-bottom-right-radius: 35px;
     }
 
-    .badges-title {
+    .badges-header .header-title {
         font-size: 20px;
     }
 
-    .back-button {
+    .badges-header .back-button {
         width: 34px;
         height: 34px;
+    }
+
+    .badges-header .back-button img {
+        width: 16px;
+        height: 16px;
     }
 
     .badges-content {

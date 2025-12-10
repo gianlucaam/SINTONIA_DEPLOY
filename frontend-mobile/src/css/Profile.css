@@ -345,6 +345,7 @@
     text-overflow: ellipsis;
     display: -webkit-box;
     -webkit-line-clamp: 4;
+    line-clamp: 4;
     -webkit-box-orient: vertical;
     word-break: break-word;
 }
@@ -541,6 +542,7 @@
     .diary-text {
         font-size: 11px;
         -webkit-line-clamp: 3;
+        line-clamp: 3;
     }
 
     .profile-card {

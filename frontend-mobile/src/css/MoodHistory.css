@@ -248,8 +248,8 @@
     line-height: 1.5;
     margin: 0;
     display: -webkit-box;
-    line-clamp: 3;
     -webkit-line-clamp: 3;
+    line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
     word-break: break-word;
@@ -301,17 +301,18 @@
         border-bottom-right-radius: 40px;
     }
 
-    .mood-history-header .page-title {
+    .mood-history-header .header-title {
         font-size: 20px;
     }
 
     .mood-history-header .back-button {
-        width: 40px;
-        height: 40px;
+        width: 36px;
+        height: 36px;
     }
 
-    .mood-history-header .header-spacer {
-        width: 40px;
+    .mood-history-header .back-button img {
+        width: 18px;
+        height: 18px;
     }
 
     .mood-history-main-card {
@@ -534,13 +535,18 @@
         border-bottom-right-radius: 35px;
     }
 
-    .mood-history-header .page-title {
+    .mood-history-header .header-title {
         font-size: 18px;
     }
 
     .mood-history-header .back-button {
         width: 34px;
         height: 34px;
+    }
+
+    .mood-history-header .back-button img {
+        width: 16px;
+        height: 16px;
     }
 
     .mood-history-main-card {
