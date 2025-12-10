@@ -19,6 +19,29 @@
     margin: 0;
 }
 
+/* Custom Filter Pill Colors for Status */
+.filter-pill.filter-open.active {
+    background: #F59E0B;
+    border-color: #F59E0B;
+    color: white;
+}
+
+.filter-pill.filter-open:hover:not(.active) {
+    border-color: #F59E0B;
+    color: #B45309;
+}
+
+.filter-pill.filter-closed.active {
+    background: #7fb77e;
+    border-color: #7fb77e;
+    color: white;
+}
+
+.filter-pill.filter-closed:hover:not(.active) {
+    border-color: #7fb77e;
+    color: #5a9359;
+}
+
 /* Support Table Container - Same as QuestionnaireTable */
 .support-table-container {
     background: #F4FAFB;
@@ -126,9 +149,9 @@
 }
 
 .ticket-status-chiuso {
-    background-color: rgba(107, 114, 128, 0.1);
-    border-color: #6B7280;
-    color: #374151;
+    background-color: rgba(127, 183, 126, 0.15);
+    border-color: #7fb77e;
+    color: #5a9359;
 }
 
 /* Object Cell */

@@ -116,7 +116,7 @@ const TechnicalSupportDetailModal: React.FC<TechnicalSupportDetailModalProps> = 
             'aperto': '#FFB74D',
             'in-lavorazione': '#42A5F5',
             'risolto': '#7FB77E',
-            'chiuso': '#9E9E9E'
+            'chiuso': '#7FB77E'
         };
         return colors[status] || '#9E9E9E';
     };
