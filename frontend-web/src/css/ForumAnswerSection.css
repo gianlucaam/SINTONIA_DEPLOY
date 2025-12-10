@@ -105,6 +105,9 @@
     color: #4b5563;
     line-height: 1.6;
     margin: 0;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
 }
 
 .expand-text-button {

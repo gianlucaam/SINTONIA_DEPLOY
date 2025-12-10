@@ -46,14 +46,11 @@ const ForumQuestionCard: React.FC<ForumQuestionCardProps> = ({
 
     const [isExpanded, setIsExpanded] = React.useState(false);
     const [isTextExpanded, setIsTextExpanded] = React.useState(false);
-    const ANSWERS_THRESHOLD = 2;
     const TEXT_TRUNCATE_LENGTH = 200;
 
     const displayedAnswers = question.risposte && question.risposte.length > 0
-        ? (isExpanded ? question.risposte : question.risposte.slice(0, ANSWERS_THRESHOLD))
+        ? question.risposte // Show all when expanded
         : [];
-
-    const hasMoreAnswers = question.risposte && question.risposte.length > ANSWERS_THRESHOLD;
 
     const isTextLong = question.testo.length > TEXT_TRUNCATE_LENGTH;
     const displayText = isTextLong && !isTextExpanded
@@ -92,33 +89,42 @@ const ForumQuestionCard: React.FC<ForumQuestionCardProps> = ({
             </div>
 
             {question.risposte && question.risposte.length > 0 && (
-                <div className="answers-list">
-                    {displayedAnswers.map(answer => {
-                        const currentUser = getCurrentUser();
-                        // Compare with fiscalCode since idPsicologo is the codice fiscale
-                        const isMyAnswer = !!(currentUser && answer.idPsicologo === currentUser.fiscalCode);
-
-                        return (
-                            <ForumAnswerSection
-                                key={answer.idRisposta}
-                                answer={answer}
-                                isMyAnswer={isMyAnswer}
-                                onEdit={isMyAnswer ? () => onEditAnswer?.(answer.idRisposta, answer.testo) : undefined}
-                                onDelete={isMyAnswer ? () => onDeleteAnswer?.(answer.idRisposta) : undefined}
-                            />
-                        );
-                    })}
-
-                    {hasMoreAnswers && (
+                <div className="answers-section">
+                    {!isExpanded ? (
                         <button
-                            className="toggle-answers-button"
-                            onClick={() => setIsExpanded(!isExpanded)}
+                            className="toggle-answers-button collapsed-toggle"
+                            onClick={() => setIsExpanded(true)}
                         >
-                            {isExpanded
-                                ? 'Mostra meno'
-                                : `Mostra altre ${question.risposte.length - ANSWERS_THRESHOLD} risposte`
-                            }
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                            </svg>
+                            {question.risposte.length} {question.risposte.length === 1 ? 'risposta' : 'risposte'} – Visualizza
                         </button>
+                    ) : (
+                        <div className="answers-list">
+                            {displayedAnswers.map(answer => {
+                                const currentUser = getCurrentUser();
+                                // Compare with fiscalCode since idPsicologo is the codice fiscale
+                                const isMyAnswer = !!(currentUser && answer.idPsicologo === currentUser.fiscalCode);
+
+                                return (
+                                    <ForumAnswerSection
+                                        key={answer.idRisposta}
+                                        answer={answer}
+                                        isMyAnswer={isMyAnswer}
+                                        onEdit={isMyAnswer ? () => onEditAnswer?.(answer.idRisposta, answer.testo) : undefined}
+                                        onDelete={isMyAnswer ? () => onDeleteAnswer?.(answer.idRisposta) : undefined}
+                                    />
+                                );
+                            })}
+
+                            <button
+                                className="toggle-answers-button"
+                                onClick={() => setIsExpanded(false)}
+                            >
+                                Nascondi risposte
+                            </button>
+                        </div>
                     )}
                 </div>
             )}

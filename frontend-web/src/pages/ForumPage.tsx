@@ -81,15 +81,21 @@ const ForumPage: React.FC = () => {
         const user = getCurrentUser();
         const myFiscalCode = user?.fiscalCode;
 
-        const totalQuestions = questionsState.data.length;
+        // Filter by category first if selected
+        let baseQuestions = questionsState.data;
+        if (selectedCategory) {
+            baseQuestions = baseQuestions.filter(q => q.categoria === selectedCategory);
+        }
+
+        const totalQuestions = baseQuestions.length;
 
         // Count questions with no answers
-        const unansweredQuestions = questionsState.data.filter(q =>
+        const unansweredQuestions = baseQuestions.filter(q =>
             !q.risposte || q.risposte.length === 0
         ).length;
 
         // Count questions where *I* have answered
-        const answeredQuestions = questionsState.data.filter(q =>
+        const answeredQuestions = baseQuestions.filter(q =>
             q.risposte && q.risposte.some(r => r.idPsicologo === myFiscalCode)
         ).length;
 
