@@ -71,7 +71,7 @@
     font-size: 10px;
     font-weight: 600;
     cursor: pointer;
-    opacity: 0;
+    opacity: 0.7;
     transition: opacity 0.3s ease;
 }
 
@@ -82,6 +82,12 @@
 .image-upload-overlay svg {
     width: 16px;
     height: 16px;
+}
+
+/* Edit mode indicator on profile image */
+.profile-image-wrapper.editing {
+    box-shadow: 0 0 0 3px #2B8A8A, 0 0 12px rgba(43, 138, 138, 0.4);
+    border-radius: 50%;
 }
 
 /* Content Section - FILLS remaining space */
@@ -99,9 +105,9 @@
     flex: 1;
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: 1fr 1fr 1fr;
     gap: 4px;
     min-height: 0;
+    align-content: start;
 }
 
 .info-card {
@@ -133,14 +139,16 @@
     color: #0D475D;
 }
 
-/* Editable Card */
+/* Editable Card - Teal theme for consistency */
 .info-card.editable {
-    background: linear-gradient(135deg, #FFF9F0 0%, #FFF5E6 100%);
-    border-color: #FFE4C4;
+    background: linear-gradient(135deg, #E0F2F2 0%, #D4ECEC 100%);
+    border: 2px solid #2B8A8A;
+    box-shadow: 0 0 0 3px rgba(43, 138, 138, 0.2), 0 4px 12px rgba(43, 138, 138, 0.15);
 }
 
 .info-card.editable .info-card-label {
-    color: #D4A574;
+    color: #1a6b7a;
+    font-weight: 700;
 }
 
 .info-card-input {
@@ -158,10 +166,6 @@
 .info-card-input:disabled {
     color: #0D475D;
     cursor: default;
-}
-
-.info-card-input:not(:disabled) {
-    border-bottom: 1px solid #FFB74D;
 }
 
 /* Full width card */
@@ -215,7 +219,7 @@
 }
 
 .btn-save {
-    background: linear-gradient(135deg, #2E8B57 0%, #228B22 100%);
+    background: linear-gradient(135deg, #83B9C1 0%, #5a9aa5 100%);
     color: white;
     border: none;
     border-radius: 8px;
@@ -223,7 +227,7 @@
     font-size: 12px;
     font-weight: 600;
     cursor: pointer;
-    box-shadow: 0 3px 10px rgba(34, 139, 34, 0.2);
+    box-shadow: 0 3px 10px rgba(131, 185, 193, 0.3);
 }
 
 /* Email error */

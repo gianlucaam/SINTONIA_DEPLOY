@@ -192,7 +192,7 @@ const PsychologistPersonalArea: React.FC = () => {
 
             {/* Profile Photo overlapping banner */}
             <div className="profile-photo-container">
-                <div className="profile-image-wrapper">
+                <div className={`profile-image-wrapper ${isEditing ? 'editing' : ''}`}>
                     <img
                         src={formData.profileImageUrl}
                         alt="Foto profilo"
