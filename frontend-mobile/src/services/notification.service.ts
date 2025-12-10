@@ -43,7 +43,7 @@ const getAuthHeaders = () => {
 export const getNotifications = async (page: number = 1): Promise<PaginatedNotificationsDto> => {
     try {
         // Request a high limit to fetch "all" notifications (simulating no pagination)
-        const response = await fetch(`${API_URL}?page=${page}&limit=1000`, getAuthHeaders());
+        const response = await fetch(`${API_URL}?page=${page}`, getAuthHeaders());
 
         if (response.status === 401 || response.status === 403) {
             localStorage.removeItem('patient_token');

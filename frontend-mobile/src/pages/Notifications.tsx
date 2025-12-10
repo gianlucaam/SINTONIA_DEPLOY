@@ -4,12 +4,14 @@ import { FileText, MessageSquare, Bell, ChevronRight, ChevronLeft, Smile, Check 
 import { getNotifications, markAsRead, type NotificationDto, type PaginatedNotificationsDto } from '../services/notification.service';
 import LoadingSpinner from '../components/LoadingSpinner';
 import '../css/Notifications.css';
+import { useNotification } from '../contexts/NotificationContext';
 
 const Notifications: React.FC = () => {
     const navigate = useNavigate();
     const [notifications, setNotifications] = useState<NotificationDto[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const { decrementUnreadCount, refreshUnreadCount } = useNotification();
 
     useEffect(() => {
         loadNotifications();
@@ -20,18 +22,50 @@ const Notifications: React.FC = () => {
             setLoading(true);
             setError(null);
 
-            // Fetch all notifications in one request (service uses limit=1000)
-            const data = await getNotifications(1);
-            setNotifications(data.notifications);
+            // Fetch first page to get metadata
+            const firstPageData = await getNotifications(1);
+            let allNotifications = [...firstPageData.notifications];
+
+            // If there are more pages, fetch them all in parallel
+            if (firstPageData.totalPages > 1) {
+                const pagePromises = [];
+                for (let i = 2; i <= firstPageData.totalPages; i++) {
+                    pagePromises.push(getNotifications(i));
+                }
+
+                const otherPagesData = await Promise.all(pagePromises);
+                otherPagesData.forEach(data => {
+                    allNotifications = [...allNotifications, ...data.notifications];
+                });
+            }
+
+            setNotifications(allNotifications);
         } catch (err) {
             console.error('Error loading notifications:', err);
             setError('Errore nel caricamento delle notifiche');
         } finally {
             setLoading(false);
+            // Refresh count deeply to ensure sync
+            refreshUnreadCount();
         }
     };
 
-    const handleNotificationClick = (notification: NotificationDto) => {
+    const handleNotificationClick = async (notification: NotificationDto) => {
+        // Mark as read immediately when clicked
+        if (!notification.letto) {
+            try {
+                // Optimistic update
+                decrementUnreadCount();
+                // We don't await this to ensure navigation speed, but we trigger it
+                markAsRead(notification.idNotifica).catch(err => console.error(err));
+
+                // Also update local state to remove it or mark it read
+                setNotifications(prev => prev.filter(n => n.idNotifica !== notification.idNotifica));
+            } catch (err) {
+                console.error('Error handling notification click:', err);
+            }
+        }
+
         // Navigate based on tipologia
         switch (notification.tipologia) {
             case 'FORUM':
@@ -54,6 +88,8 @@ const Notifications: React.FC = () => {
             await markAsRead(notification.idNotifica);
             // Remove notification from local state
             setNotifications(prev => prev.filter(n => n.idNotifica !== notification.idNotifica));
+            // Update global badge
+            decrementUnreadCount();
         } catch (err) {
             console.error('Error marking notification as read:', err);
         }
