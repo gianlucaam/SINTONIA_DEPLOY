@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import AdminPatientTable from '../components/AdminPatientTable';
 import AdminPatientDetailModal from '../components/AdminPatientDetailModal';
+import PageHeader from '../components/PageHeader';
 import type { PatientData, LoadingState } from '../types/patient';
 import { fetchPatients } from '../services/patient.service';
-import { User, Eye, LayoutGrid, List, Search, RotateCcw } from 'lucide-react';
+import { Users, User, Eye, LayoutGrid, List, Search, RotateCcw } from 'lucide-react';
 import '../css/QuestionnaireManagement.css'; // Reuse existing layout styles
 import '../css/AdminPatientList.css';
+import '../css/EmptyState.css';
 
 const AdminPatientList: React.FC = () => {
     const [patientsState, setPatientsState] = useState<LoadingState<PatientData[]>>({
@@ -25,19 +27,8 @@ const AdminPatientList: React.FC = () => {
             if (viewMode === 'grid') {
                 setItemsPerPage(8);
             } else {
-                // List view calculation
-                const headerHeight = 80; // Navbar
-                const titleSearchHeight = 140; // Title + Search bar
-                const paginationHeight = 80; // Pagination controls
-                const padding = 40; // Container padding
-
-                const availableHeight = window.innerHeight - (headerHeight + titleSearchHeight + paginationHeight + padding);
-                const rowHeight = 60; // Approximate height of a table row
-                const tableHeaderHeight = 50;
-                const listAvailableHeight = availableHeight - tableHeaderHeight;
-
-                const rows = Math.max(5, Math.floor(listAvailableHeight / rowHeight));
-                setItemsPerPage(rows);
+                // List view: fixed 4 rows
+                setItemsPerPage(4);
             }
         };
 
@@ -178,7 +169,11 @@ const AdminPatientList: React.FC = () => {
 
     return (
         <div className="content-panel">
-            <h2 className="panel-title">Gestione Pazienti</h2>
+            <PageHeader
+                title="Gestione Pazienti"
+                subtitle="Visualizza e gestisci tutti i pazienti del sistema"
+                icon={<Users size={24} />}
+            />
 
             {patientsState.loading && (
                 <div className="loading-state">Caricamento pazienti...</div>
@@ -206,11 +201,10 @@ const AdminPatientList: React.FC = () => {
                         <div className="filter-controls" style={{ margin: 0 }}>
                             <p style={{ color: '#666', fontSize: '14px', margin: 0 }}>
                                 {searchQuery ? (
-                                    <>Trovati: {totalPatients} pazienti</>
+                                    <>Trovati: <strong style={{ color: '#0D475D' }}>{totalPatients}</strong> pazienti</>
                                 ) : (
-                                    <>Totale pazienti: {totalPatients}</>
+                                    <>Totale pazienti: <strong style={{ color: '#0D475D' }}>{totalPatients}</strong></>
                                 )}
-                                {totalPages > 1 && <> | Pagina {currentPage} di {totalPages}</>}
                             </p>
                         </div>
 
@@ -358,31 +352,18 @@ const AdminPatientList: React.FC = () => {
                             )}
                         </>
                     ) : (
-                        <div style={{
-                            textAlign: 'center',
-                            padding: '40px 20px',
-                            background: '#f8f9fa',
-                            borderRadius: '8px',
-                            marginTop: '20px'
-                        }}>
-                            <p style={{
-                                fontSize: '16px',
-                                color: '#666',
-                                margin: 0,
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                gap: '8px'
-                            }}>
-                                <Search size={18} style={{ flexShrink: 0 }} />
-                                <span>Nessun paziente trovato con ID "<strong>{searchQuery}</strong>"</span>
-                            </p>
-                            <p style={{
-                                fontSize: '14px',
-                                color: '#999',
-                                marginTop: '8px'
-                            }}>
-                                Prova con un altro ID o clicca Reset
+                        <div className="unified-empty-state">
+                            <div className="unified-empty-icon">
+                                {searchQuery ? <Search size={48} /> : <Users size={48} />}
+                            </div>
+                            <h3 className="unified-empty-title">
+                                {searchQuery ? 'Nessun Risultato' : 'Nessun Paziente'}
+                            </h3>
+                            <p className="unified-empty-message">
+                                {searchQuery
+                                    ? `Nessun paziente trovato con ID "${searchQuery}". Prova con un altro ID.`
+                                    : 'Non sono presenti pazienti da visualizzare.'
+                                }
                             </p>
                         </div>
                     )}

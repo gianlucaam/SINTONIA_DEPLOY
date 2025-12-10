@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import PsychologistPatientTable from '../components/PsychologistPatientTable';
 import PsychologistPatientDetailModal from '../components/PsychologistPatientDetailModal';
+import PageHeader from '../components/PageHeader';
 import type { PatientData, LoadingState } from '../types/patient';
 import { fetchPatientsByPsychologist } from '../services/patient.service';
-import { User, Eye, LayoutGrid, List, Search, RotateCcw } from 'lucide-react';
+import { Users, User, Eye, LayoutGrid, List, Search, RotateCcw } from 'lucide-react';
 import '../css/QuestionnaireManagement.css'; // Reuse existing layout styles
 import '../css/AdminPatientList.css'; // Reuse Admin styles for grid/list view
 
@@ -25,19 +26,8 @@ const PsychologistPatientList: React.FC = () => {
             if (viewMode === 'grid') {
                 setItemsPerPage(8);
             } else {
-                // List view calculation
-                const headerHeight = 80; // Navbar
-                const titleSearchHeight = 140; // Title + Search bar
-                const paginationHeight = 80; // Pagination controls
-                const padding = 40; // Container padding
-
-                const availableHeight = window.innerHeight - (headerHeight + titleSearchHeight + paginationHeight + padding);
-                const rowHeight = 60; // Approximate height of a table row
-                const tableHeaderHeight = 50;
-                const listAvailableHeight = availableHeight - tableHeaderHeight;
-
-                const rows = Math.max(5, Math.floor(listAvailableHeight / rowHeight));
-                setItemsPerPage(rows);
+                // List view: fixed 4 rows
+                setItemsPerPage(4);
             }
         };
 
@@ -180,7 +170,11 @@ const PsychologistPatientList: React.FC = () => {
 
     return (
         <div className="content-panel">
-            <h2 className="panel-title">I Miei Pazienti</h2>
+            <PageHeader
+                title="I Miei Pazienti"
+                subtitle="I pazienti assegnati a te"
+                icon={<Users size={24} />}
+            />
 
             {patientsState.loading && (
                 <div className="loading-state">Caricamento pazienti...</div>
@@ -208,9 +202,9 @@ const PsychologistPatientList: React.FC = () => {
                         <div className="filter-controls" style={{ margin: 0 }}>
                             <p style={{ color: '#666', fontSize: '14px', margin: 0 }}>
                                 {searchQuery ? (
-                                    <>Trovati: {totalPatients} pazienti</>
+                                    <>Trovati: <strong style={{ color: '#0D475D' }}>{totalPatients}</strong> pazienti</>
                                 ) : (
-                                    <>Totale pazienti: {totalPatients}</>
+                                    <>Totale pazienti: <strong style={{ color: '#0D475D' }}>{totalPatients}</strong></>
                                 )}
                                 {totalPages > 1 && <> | Pagina {currentPage} di {totalPages}</>}
                             </p>

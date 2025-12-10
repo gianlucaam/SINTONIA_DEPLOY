@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import AdminPsychologistTable from '../components/AdminPsychologistTable';
 import AdminPsychologistDetailModal from '../components/AdminPsychologistDetailModal';
 import AddPsychologistModal from '../components/AddPsychologistModal';
-import { User, Eye, LayoutGrid, List, UserPlus, Search, RotateCcw } from 'lucide-react';
+import PageHeader from '../components/PageHeader';
+import { User, UserCog, Eye, LayoutGrid, List, UserPlus, Search, RotateCcw } from 'lucide-react';
 import '../css/QuestionnaireManagement.css'; // Reuse existing layout styles
 import '../css/AdminPsychologistList.css';
+import '../css/EmptyState.css';
 import { fetchAllPsychologists, createPsychologist, type PsychologistOption } from '../services/psychologist.service';
 
 interface PsychologistData {
@@ -63,19 +65,8 @@ const AdminPsychologistList: React.FC = () => {
             if (viewMode === 'grid') {
                 setItemsPerPage(8);
             } else {
-                // List view calculation
-                const headerHeight = 80; // Navbar
-                const titleSearchHeight = 140; // Title + Search bar
-                const paginationHeight = 80; // Pagination controls
-                const padding = 40; // Container padding
-
-                const availableHeight = window.innerHeight - (headerHeight + titleSearchHeight + paginationHeight + padding);
-                const rowHeight = 60; // Approximate height of a table row
-                const tableHeaderHeight = 50;
-                const listAvailableHeight = availableHeight - tableHeaderHeight;
-
-                const rows = Math.max(5, Math.floor(listAvailableHeight / rowHeight));
-                setItemsPerPage(rows);
+                // List view: fixed 4 rows
+                setItemsPerPage(4);
             }
         };
 
@@ -240,7 +231,11 @@ const AdminPsychologistList: React.FC = () => {
 
     return (
         <div className="content-panel">
-            <h2 className="panel-title">Gestione Psicologi</h2>
+            <PageHeader
+                title="Gestione Psicologi"
+                subtitle="Gestisci il team di psicologi della piattaforma"
+                icon={<UserCog size={24} />}
+            />
 
             {loading && (
                 <div className="loading-state">Caricamento psicologi...</div>
@@ -272,11 +267,10 @@ const AdminPsychologistList: React.FC = () => {
                         <div className="filter-controls" style={{ margin: 0 }}>
                             <p style={{ color: '#666', fontSize: '14px', margin: 0 }}>
                                 {searchQuery ? (
-                                    <>Trovati: {totalPsychologists} psicologi</>
+                                    <>Trovati: <strong style={{ color: '#0D475D' }}>{totalPsychologists}</strong> psicologi</>
                                 ) : (
-                                    <>Totale psicologi: {totalPsychologists}</>
+                                    <>Totale psicologi: <strong style={{ color: '#0D475D' }}>{totalPsychologists}</strong></>
                                 )}
-                                {totalPages > 1 && <> | Pagina {currentPage} di {totalPages}</>}
                             </p>
                         </div>
 
@@ -322,19 +316,19 @@ const AdminPsychologistList: React.FC = () => {
                         {/* Status Filter Toggle */}
                         <div style={{
                             display: 'flex',
-                            border: '2px solid #ddd',
-                            borderRadius: '8px',
+                            border: '1px solid #ddd',
+                            borderRadius: '6px',
                             overflow: 'hidden'
                         }}>
                             <button
                                 onClick={() => setStatusFilter('Attivo')}
                                 style={{
-                                    padding: '8px 16px',
+                                    padding: '6px 12px',
                                     border: 'none',
                                     background: statusFilter === 'Attivo' ? '#7FB77E' : 'white',
                                     color: statusFilter === 'Attivo' ? 'white' : '#333',
                                     cursor: 'pointer',
-                                    fontSize: '14px',
+                                    fontSize: '13px',
                                     fontWeight: statusFilter === 'Attivo' ? '600' : '500',
                                     transition: 'all 0.2s ease',
                                     borderRight: '1px solid #ddd'
@@ -345,12 +339,12 @@ const AdminPsychologistList: React.FC = () => {
                             <button
                                 onClick={() => setStatusFilter('Inattivo')}
                                 style={{
-                                    padding: '8px 16px',
+                                    padding: '6px 12px',
                                     border: 'none',
                                     background: statusFilter === 'Inattivo' ? '#ef4444' : 'white',
                                     color: statusFilter === 'Inattivo' ? 'white' : '#333',
                                     cursor: 'pointer',
-                                    fontSize: '14px',
+                                    fontSize: '13px',
                                     fontWeight: statusFilter === 'Inattivo' ? '600' : '500',
                                     transition: 'all 0.2s ease'
                                 }}
@@ -365,14 +359,14 @@ const AdminPsychologistList: React.FC = () => {
                                 onClick={() => setViewMode('grid')}
                                 title="Vista Griglia"
                             >
-                                <LayoutGrid size={18} />
+                                <LayoutGrid size={16} />
                             </button>
                             <button
                                 className={`toggle-btn ${viewMode === 'list' ? 'active' : ''}`}
                                 onClick={() => setViewMode('list')}
                                 title="Vista Lista"
                             >
-                                <List size={18} />
+                                <List size={16} />
                             </button>
                         </div>
 
@@ -382,11 +376,11 @@ const AdminPsychologistList: React.FC = () => {
                             onChange={handleSearchInputChange}
                             placeholder="Cerca per CF, nome o cognome..."
                             style={{
-                                padding: '10px 16px',
-                                borderRadius: '8px',
-                                border: '2px solid #ddd',
-                                fontSize: '14px',
-                                width: '300px',
+                                padding: '8px 12px',
+                                borderRadius: '6px',
+                                border: '1px solid #ddd',
+                                fontSize: '13px',
+                                width: '260px',
                                 transition: 'border-color 0.2s ease',
                                 outline: 'none',
                             }}
@@ -502,31 +496,18 @@ const AdminPsychologistList: React.FC = () => {
                             )}
                         </>
                     ) : (
-                        <div style={{
-                            textAlign: 'center',
-                            padding: '40px 20px',
-                            background: '#f8f9fa',
-                            borderRadius: '8px',
-                            marginTop: '20px'
-                        }}>
-                            <p style={{
-                                fontSize: '16px',
-                                color: '#666',
-                                margin: 0,
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                gap: '8px'
-                            }}>
-                                <Search size={18} style={{ flexShrink: 0 }} />
-                                <span>Nessuno psicologo trovato con "<strong>{searchQuery}</strong>"</span>
-                            </p>
-                            <p style={{
-                                fontSize: '14px',
-                                color: '#999',
-                                marginTop: '8px'
-                            }}>
-                                Prova con un altro termine o clicca Reset
+                        <div className="unified-empty-state">
+                            <div className="unified-empty-icon">
+                                {searchQuery ? <Search size={48} /> : <UserCog size={48} />}
+                            </div>
+                            <h3 className="unified-empty-title">
+                                {searchQuery ? 'Nessun Risultato' : 'Nessuno Psicologo'}
+                            </h3>
+                            <p className="unified-empty-message">
+                                {searchQuery
+                                    ? `Nessuno psicologo trovato con "${searchQuery}".`
+                                    : 'Non sono presenti psicologi da visualizzare.'
+                                }
                             </p>
                         </div>
                     )}
@@ -541,9 +522,18 @@ const AdminPsychologistList: React.FC = () => {
                     onUpdate={(updatedData) => {
                         // Update local state immediately if data is provided
                         if (updatedData && viewingPsychologist) {
+                            // Normalize stato field: convert boolean to string if needed
+                            let statoValue: 'Attivo' | 'Inattivo' = viewingPsychologist.stato;
+                            if (typeof updatedData.stato === 'boolean') {
+                                statoValue = updatedData.stato ? 'Attivo' : 'Inattivo';
+                            } else if (updatedData.stato === 'Attivo' || updatedData.stato === 'Inattivo') {
+                                statoValue = updatedData.stato;
+                            }
+
                             setViewingPsychologist({
                                 ...viewingPsychologist,
-                                ...updatedData
+                                ...updatedData,
+                                stato: statoValue
                             });
                         }
 

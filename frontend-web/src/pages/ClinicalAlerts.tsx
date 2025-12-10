@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { AlertTriangle } from 'lucide-react';
 import ClinicalAlertsTable from '../components/ClinicalAlertsTable';
+import PageHeader from '../components/PageHeader';
 import { fetchClinicalAlerts, acceptClinicalAlert } from '../services/alert-clinici.service';
 import type { ClinicalAlert, LoadingState } from '../types/alert';
 import '../css/ClinicalAlerts.css';
+import '../css/ForumPage.css';
 import '../css/EmptyState.css';
 
 import Toast from '../components/Toast';
@@ -96,10 +98,11 @@ const ClinicalAlerts: React.FC = () => {
 
     return (
         <div className="content-panel fade-in">
-            <h2 className="panel-title" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <AlertTriangle size={28} color="#E57373" />
-                Alert Clinici
-            </h2>
+            <PageHeader
+                title="Alert Clinici"
+                subtitle="Gestisci gli alert che richiedono attenzione"
+                icon={<AlertTriangle size={24} />}
+            />
 
             {alertsState.error && (
                 <div className="error-state">
@@ -122,7 +125,7 @@ const ClinicalAlerts: React.FC = () => {
                         <p className="alerts-count">
                             {alertsState.data.length === 0
                                 ? 'Nessun alert da gestire'
-                                : `${alertsState.data.length} alert ${alertsState.data.length === 1 ? 'non accettato' : 'non accettati'}`
+                                : <><strong>{alertsState.data.length}</strong> alert {alertsState.data.length === 1 ? 'non accettato' : 'non accettati'}</>
                             }
                         </p>
                     </div>
@@ -154,21 +157,19 @@ const ClinicalAlerts: React.FC = () => {
                     {getTotalPages() > 1 && (
                         <div className="pagination">
                             <button
-                                className="pagination-button"
+                                className="pagination-btn"
                                 onClick={() => handlePageChange(currentPage - 1)}
                                 disabled={currentPage === 1}
                             >
-                                ← Precedente
+                                ‹
                             </button>
-                            <div className="pagination-info">
-                                Pagina {currentPage} di {getTotalPages()}
-                            </div>
+                            <span className="pagination-current">{currentPage} / {getTotalPages()}</span>
                             <button
-                                className="pagination-button"
+                                className="pagination-btn"
                                 onClick={() => handlePageChange(currentPage + 1)}
                                 disabled={currentPage === getTotalPages()}
                             >
-                                Successiva →
+                                ›
                             </button>
                         </div>
                     )}

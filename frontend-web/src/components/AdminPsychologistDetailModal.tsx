@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
-import { User, Edit2, Save, X, Check, Trash2, PenLine, ChevronDown } from 'lucide-react';
+import { User, Edit2, Save, X, Check, PenLine, ChevronDown, AlertTriangle, UserMinus } from 'lucide-react';
 import '../css/Modal.css';
 import { updatePsychologist, deletePsychologist } from '../services/psychologist.service';
 import Toast from './Toast';
@@ -535,8 +535,8 @@ const AdminPsychologistDetailModal: React.FC<AdminPsychologistDetailModalProps> 
                                         }
                                     }}
                                 >
-                                    <Trash2 size={18} />
-                                    {isInactive ? 'Già Eliminato' : 'Elimina'}
+                                    <UserMinus size={18} />
+                                    {isInactive ? 'Già Disattivato' : 'Disattiva'}
                                 </button>
                             )}
 
@@ -612,10 +612,9 @@ const AdminPsychologistDetailModal: React.FC<AdminPsychologistDetailModalProps> 
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                margin: '0 auto 16px',
-                                fontSize: '32px'
+                                margin: '0 auto 16px'
                             }}>
-                                ⚠️
+                                <AlertTriangle size={32} color="#dc2626" />
                             </div>
                             <h3 style={{
                                 margin: '0 0 12px 0',
@@ -623,7 +622,7 @@ const AdminPsychologistDetailModal: React.FC<AdminPsychologistDetailModalProps> 
                                 fontWeight: '700',
                                 color: '#1a1a1a'
                             }}>
-                                Conferma Eliminazione
+                                Conferma Disattivazione
                             </h3>
                             <p style={{
                                 margin: '0 0 8px 0',
@@ -631,7 +630,7 @@ const AdminPsychologistDetailModal: React.FC<AdminPsychologistDetailModalProps> 
                                 color: '#666',
                                 lineHeight: '1.5'
                             }}>
-                                Sei sicuro di voler eliminare lo psicologo:
+                                Sei sicuro di voler disattivare lo psicologo:
                             </p>
                             <p style={{
                                 margin: '0 0 16px 0',
@@ -643,14 +642,18 @@ const AdminPsychologistDetailModal: React.FC<AdminPsychologistDetailModalProps> 
                             </p>
                             <div style={{
                                 padding: '12px 16px',
-                                background: '#fef3c7',
-                                border: '1px solid #fbbf24',
+                                background: '#e0f2fe',
+                                border: '1px solid #7dd3fc',
                                 borderRadius: '10px',
                                 fontSize: '13px',
-                                color: '#92400e',
-                                fontWeight: '500'
+                                color: '#0369a1',
+                                fontWeight: '500',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                justifyContent: 'center'
                             }}>
-                                ⚠️ Questa operazione non può essere annullata
+                                Lo psicologo verrà impostato come Inattivo e potrà essere riattivato in seguito
                             </div>
                         </div>
 
@@ -714,7 +717,7 @@ const AdminPsychologistDetailModal: React.FC<AdminPsychologistDetailModalProps> 
                                     e.currentTarget.style.boxShadow = '0 4px 12px rgba(239, 68, 68, 0.3)';
                                 }}
                             >
-                                {isDeleting ? 'Eliminazione...' : 'Elimina'}
+                                {isDeleting ? 'Disattivazione...' : 'Disattiva'}
                             </button>
                         </div>
                     </div>

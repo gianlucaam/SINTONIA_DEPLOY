@@ -2,25 +2,29 @@
 
 .psychologist-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
     padding: 10px 0;
     flex: 1;
+    /* Occupy remaining space */
     overflow-y: auto;
+    /* Scroll internally if needed */
     align-content: start;
+    /* Prevent stretching */
 }
 
 .psychologist-card {
     background-color: #0D475D;
-    border-radius: 16px;
+    border-radius: 14px;
     padding: 20px 16px;
     display: flex;
     flex-direction: column;
     align-items: center;
     color: white;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     height: 100%;
+    /* Uniform height */
     box-sizing: border-box;
 }
 
@@ -30,20 +34,20 @@
 }
 
 .psychologist-avatar {
-    width: 64px;
-    height: 64px;
+    width: 60px;
+    height: 60px;
     background-color: white;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 16px;
+    margin-bottom: 14px;
     color: #0D475D;
 }
 
 .psychologist-info {
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
     width: 100%;
 }
 
