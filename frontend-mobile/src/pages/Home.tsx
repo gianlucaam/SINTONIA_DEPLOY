@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Header from '../components/Header';
 import QuickNote from '../components/QuickNote';
 import StreakStatus from '../components/StreakStatus';
@@ -9,12 +10,30 @@ import { getHomeDashboard } from '../services/home.service';
 import { checkInitialQuestionnaires } from '../services/questionari.service';
 import type { HomeDashboardDto } from '../types/home';
 import '../css/Home.css';
+import LoadingSpinner from '../components/LoadingSpinner';
+import Toast from '../components/Toast';
 
 const Home: React.FC = () => {
     const [data, setData] = useState<HomeDashboardDto | null>(null);
     const [loading, setLoading] = useState(true);
     const [showInitialModal, setShowInitialModal] = useState(false);
     const [pendingQuestionnaires, setPendingQuestionnaires] = useState<string[]>([]);
+    const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+
+    const location = useLocation();
+
+    // Handle Toast from navigation state
+    useEffect(() => {
+        const state = location.state as { toastMessage?: string; toastType?: 'success' | 'error' } | null;
+        if (state?.toastMessage) {
+            setToast({
+                message: state.toastMessage,
+                type: state.toastType || 'success'
+            });
+            // Clear state
+            window.history.replaceState({}, document.title);
+        }
+    }, [location]);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -46,7 +65,11 @@ const Home: React.FC = () => {
     }, []);
 
     if (loading) {
-        return <div className="loading-screen">Caricamento...</div>;
+        return (
+            <div className="loading-screen">
+                <LoadingSpinner />
+            </div>
+        );
     }
 
     if (!data) {
@@ -65,6 +88,13 @@ const Home: React.FC = () => {
                 onClose={() => setShowInitialModal(false)}
                 pendingQuestionnaires={pendingQuestionnaires}
             />
+            {toast && (
+                <Toast
+                    message={toast.message}
+                    type={toast.type}
+                    onClose={() => setToast(null)}
+                />
+            )}
         </div>
     );
 };

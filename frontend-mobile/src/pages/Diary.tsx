@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import DiaryCard from '../components/DiaryCard';
 import DateFilter from '../components/DateFilter';
 import ConfirmDeleteModal from '../components/ConfirmDeleteModal';
@@ -8,9 +8,11 @@ import type { DiaryPage } from '../types/diary';
 import Toast from '../components/Toast';
 import '../css/Diary.css';
 import NewForumQuestionIcon from '../assets/icons/NewForumQuestion.svg';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 const Diary: React.FC = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const [pages, setPages] = useState<DiaryPage[]>([]);
     const [filteredPages, setFilteredPages] = useState<DiaryPage[]>([]);
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -25,7 +27,7 @@ const Diary: React.FC = () => {
     // Delete modal
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [pageToDelete, setPageToDelete] = useState<string | null>(null);
-    const [showToast, setShowToast] = useState(false);
+    const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
     // Touch gesture state
     const [touchStart, setTouchStart] = useState<number | null>(null);
@@ -61,6 +63,19 @@ const Diary: React.FC = () => {
         // Filtra le pagine quando cambiano i filtri o le pagine
         filterPagesByDate();
     }, [pages, selectedMonth, selectedYear]);
+
+    // Handle Toast from navigation state
+    useEffect(() => {
+        const state = location.state as { toastMessage?: string; toastType?: 'success' | 'error' } | null;
+        if (state?.toastMessage) {
+            setToast({
+                message: state.toastMessage,
+                type: state.toastType || 'success'
+            });
+            // Clear state
+            window.history.replaceState({}, document.title);
+        }
+    }, [location]);
 
     const loadDiaryPages = async () => {
         try {
@@ -167,7 +182,7 @@ const Diary: React.FC = () => {
 
             setShowDeleteModal(false);
             setPageToDelete(null);
-            setShowToast(true);
+            setToast({ message: 'Pagina eliminata con successo!', type: 'success' });
         } catch (err) {
             console.error('Error deleting page:', err);
         }
@@ -192,8 +207,8 @@ const Diary: React.FC = () => {
 
     if (loading) {
         return (
-            <div className="diary-page">
-                <div className="loading-screen">Caricamento diario...</div>
+            <div className="loading-screen">
+                <LoadingSpinner />
             </div>
         );
     }
@@ -322,10 +337,11 @@ const Diary: React.FC = () => {
                 />
             )}
 
-            {showToast && (
+            {toast && (
                 <Toast
-                    message="Pagina eliminata con successo!"
-                    onClose={() => setShowToast(false)}
+                    message={toast.message}
+                    type={toast.type}
+                    onClose={() => setToast(null)}
                 />
             )}
         </div>

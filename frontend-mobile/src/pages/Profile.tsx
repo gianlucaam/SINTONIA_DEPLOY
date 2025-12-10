@@ -8,6 +8,7 @@ import profileAvatarWoman from '../assets/images/profile-avatar-woman.png';
 import profileAvatarMan from '../assets/images/profile-avatar-man.png';
 import diaryIcon from '../assets/icons/diary.svg';
 import questionnaireIcon from '../assets/icons/questionnaire.svg';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 const Profile: React.FC = () => {
     const navigate = useNavigate();
@@ -36,8 +37,8 @@ const Profile: React.FC = () => {
     // Loading state
     if (loading) {
         return (
-            <div className="profile-page" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-                <div>Caricamento...</div>
+            <div className="loading-screen">
+                <LoadingSpinner />
             </div>
         );
     }

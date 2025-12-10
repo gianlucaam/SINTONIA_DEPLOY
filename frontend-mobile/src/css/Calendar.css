@@ -111,8 +111,19 @@
 
 .day-item.active {
     background-color: #e0f2f1;
-    /* Sharp, dark shadow for active day */
     box-shadow: 0 8px 8px -4px rgba(0, 0, 0, 0.3);
+}
+
+.day-item.has-event:not(.active) {
+    background-color: #FAFAFA;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    transition: transform 0.1s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.day-item.has-event:active {
+    transform: scale(0.95);
+    background-color: #F0F0F0;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
 }
 
 .dot {

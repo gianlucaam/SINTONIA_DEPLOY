@@ -38,10 +38,12 @@ const CreatePost: React.FC = () => {
                 category,
             };
             await createPost(postData);
-            setShowToast(true);
-            setTimeout(() => {
-                navigate('/forum');
-            }, 2000);
+            navigate('/forum', {
+                state: {
+                    toastMessage: 'Domanda pubblicata con successo!',
+                    toastType: 'success'
+                }
+            });
         } catch (error) {
             console.error('Error creating post:', error);
             alert('Errore nella creazione del post');

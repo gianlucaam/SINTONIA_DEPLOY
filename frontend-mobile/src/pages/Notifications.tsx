@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FileText, MessageSquare, Bell, ChevronRight, ChevronLeft, Loader2, Smile, Check } from 'lucide-react';
+import { FileText, MessageSquare, Bell, ChevronRight, ChevronLeft, Smile, Check } from 'lucide-react';
 import { getNotifications, markAsRead, type NotificationDto, type PaginatedNotificationsDto } from '../services/notification.service';
+import LoadingSpinner from '../components/LoadingSpinner';
 import '../css/Notifications.css';
 
 const Notifications: React.FC = () => {
@@ -11,7 +12,7 @@ const Notifications: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
-    const [total, setTotal] = useState(0);
+    const [totalPages, setTotalPages] = useState(1);
 
     useEffect(() => {
         loadNotifications(currentPage);
@@ -24,7 +25,6 @@ const Notifications: React.FC = () => {
             const data: PaginatedNotificationsDto = await getNotifications(page);
             setNotifications(data.notifications);
             setTotalPages(data.totalPages);
-            setTotal(data.total);
         } catch (err) {
             console.error('Error loading notifications:', err);
             setError('Errore nel caricamento delle notifiche');
@@ -56,7 +56,6 @@ const Notifications: React.FC = () => {
             await markAsRead(notification.idNotifica);
             // Remove notification from local state
             setNotifications(prev => prev.filter(n => n.idNotifica !== notification.idNotifica));
-            setTotal(prev => prev - 1);
         } catch (err) {
             console.error('Error marking notification as read:', err);
         }
@@ -117,9 +116,8 @@ const Notifications: React.FC = () => {
 
             {/* Loading State */}
             {loading && (
-                <div className="notifications-loading">
-                    <Loader2 className="spinner" size={32} />
-                    <p>Caricamento...</p>
+                <div className="loading-screen">
+                    <LoadingSpinner />
                 </div>
             )}
 

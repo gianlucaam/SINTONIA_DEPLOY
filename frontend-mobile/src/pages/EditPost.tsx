@@ -7,6 +7,7 @@ import type { ForumCategory, UpdatePostDto } from '../types/forum';
 import '../css/EditPost.css';
 import LeftArrowIcon from '../assets/icons/LeftArrow.svg';
 import Toast from '../components/Toast';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 const EditPost: React.FC = () => {
     const navigate = useNavigate();
@@ -72,10 +73,12 @@ const EditPost: React.FC = () => {
                 category,
             };
             await updatePost(id, updateData);
-            setShowToast(true);
-            setTimeout(() => {
-                navigate('/forum');
-            }, 2000);
+            navigate('/forum', {
+                state: {
+                    toastMessage: 'Domanda modificata con successo!',
+                    toastType: 'success'
+                }
+            });
         } catch (error) {
             console.error('Error updating post:', error);
             alert('Errore nella modifica del post');
@@ -92,7 +95,11 @@ const EditPost: React.FC = () => {
     };
 
     if (isLoading) {
-        return <div className="loading-screen">Caricamento...</div>;
+        return (
+            <div className="loading-screen">
+                <LoadingSpinner />
+            </div>
+        );
     }
 
     return (
