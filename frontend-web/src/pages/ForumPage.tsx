@@ -3,7 +3,6 @@ import { createPortal } from 'react-dom';
 import { MessageCircle } from 'lucide-react';
 import ForumQuestionCard from '../components/ForumQuestionCard';
 import ForumCategoryFilter from '../components/ForumCategoryFilter';
-import ForumReplyModal from '../components/ForumReplyModal';
 import PageHeader from '../components/PageHeader';
 import type { ForumQuestion, LoadingState, ForumCategory } from '../types/forum';
 import { fetchForumQuestions, answerQuestion, updateAnswer, deleteAnswer } from '../services/forum.service';
@@ -26,17 +25,6 @@ const ForumPage: React.FC = () => {
     const [selectedCategory, setSelectedCategory] = useState<ForumCategory | null>(null);
     const [currentPage, setCurrentPage] = useState(1);
     const QUESTIONS_PER_PAGE = 5;
-    const [modalState, setModalState] = useState<{
-        isOpen: boolean;
-        question: ForumQuestion | null;
-        existingAnswer?: string;
-        answerId?: string;
-        isEditing: boolean;
-    }>({
-        isOpen: false,
-        question: null,
-        isEditing: false
-    });
     const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
     const [deleteModalState, setDeleteModalState] = useState<{
@@ -45,6 +33,15 @@ const ForumPage: React.FC = () => {
     }>({
         isOpen: false,
         answerId: null
+    });
+
+    // State for inline editing
+    const [editingState, setEditingState] = useState<{
+        answerId: string | null;
+        content: string;
+    }>({
+        answerId: null,
+        content: ''
     });
 
     const currentUser = getCurrentUser();
@@ -109,30 +106,44 @@ const ForumPage: React.FC = () => {
         };
     };
 
-    const handleAnswer = (questionId: string) => {
-        const question = questionsState.data?.find(q => q.idDomanda === questionId);
-        if (question) {
-            setModalState({
-                isOpen: true,
-                question,
-                isEditing: false
-            });
+    // Inline answer submission
+    const handleInlineSubmit = async (questionId: string, content: string) => {
+        try {
+            await answerQuestion(questionId, content);
+            setToast({ message: 'Risposta pubblicata con successo!', type: 'success' });
+            await loadData();
+        } catch (error) {
+            console.error('Error submitting answer:', error);
+            setToast({ message: 'Errore durante il salvataggio della risposta', type: 'error' });
+            throw error; // Re-throw to let the card handle it
         }
     };
 
     const handleEditAnswer = (answerId: string, currentText: string) => {
-        const question = questionsState.data?.find(q =>
-            q.risposte?.some(r => r.idRisposta === answerId)
-        );
-        if (question) {
-            setModalState({
-                isOpen: true,
-                question,
-                existingAnswer: currentText,
-                answerId,
-                isEditing: true
-            });
+        setEditingState({
+            answerId,
+            content: currentText
+        });
+    };
+
+    const handleEditSubmit = async (answerId: string, content: string) => {
+        try {
+            await updateAnswer(answerId, content);
+            setToast({ message: 'Risposta modificata con successo!', type: 'success' });
+            setEditingState({ answerId: null, content: '' });
+            await loadData();
+        } catch (error) {
+            console.error('Error updating answer:', error);
+            setToast({ message: 'Errore durante la modifica della risposta', type: 'error' });
         }
+    };
+
+    const handleEditCancel = () => {
+        setEditingState({ answerId: null, content: '' });
+    };
+
+    const handleEditContentChange = (content: string) => {
+        setEditingState(prev => ({ ...prev, content }));
     };
 
     const handleDeleteRequest = (answerId: string) => {
@@ -154,27 +165,6 @@ const ForumPage: React.FC = () => {
             console.error('Error deleting answer:', error);
             setToast({ message: 'Errore durante l\'eliminazione della risposta', type: 'error' });
         }
-    };
-
-    const handleModalSubmit = async (content: string) => {
-        try {
-            if (modalState.isEditing && modalState.answerId) {
-                await updateAnswer(modalState.answerId, content);
-                setToast({ message: 'Risposta modificata con successo!', type: 'success' });
-            } else if (modalState.question) {
-                await answerQuestion(modalState.question.idDomanda, content);
-                setToast({ message: 'Risposta pubblicata con successo!', type: 'success' });
-            }
-            await loadData();
-            setModalState({ isOpen: false, question: null, isEditing: false });
-        } catch (error) {
-            console.error('Error submitting answer:', error);
-            setToast({ message: 'Errore durante il salvataggio della risposta', type: 'error' });
-        }
-    };
-
-    const handleCloseModal = () => {
-        setModalState({ isOpen: false, question: null, isEditing: false });
     };
 
     const getFilteredQuestions = (): ForumQuestion[] => {
@@ -301,9 +291,14 @@ const ForumPage: React.FC = () => {
                                         <ForumQuestionCard
                                             key={question.idDomanda}
                                             question={question}
-                                            onAnswer={!isReadOnly ? handleAnswer : undefined}
+                                            onSubmitAnswer={!isReadOnly ? handleInlineSubmit : undefined}
                                             onEditAnswer={!isReadOnly ? handleEditAnswer : undefined}
                                             onDeleteAnswer={!isReadOnly ? handleDeleteRequest : undefined}
+                                            editingAnswerId={editingState.answerId}
+                                            editingContent={editingState.content}
+                                            onEditSubmit={handleEditSubmit}
+                                            onEditCancel={handleEditCancel}
+                                            onEditContentChange={handleEditContentChange}
                                         />
                                     ))}
                                 </div>
@@ -319,16 +314,6 @@ const ForumPage: React.FC = () => {
                 totalPages={getTotalPages()}
                 onPageChange={handlePageChange}
             />
-
-            {modalState.isOpen && modalState.question && (
-                <ForumReplyModal
-                    question={modalState.question}
-                    existingAnswer={modalState.existingAnswer}
-                    isEditing={modalState.isEditing}
-                    onClose={handleCloseModal}
-                    onSubmit={handleModalSubmit}
-                />
-            )}
             {toast && (
                 <Toast
                     message={toast.message}
