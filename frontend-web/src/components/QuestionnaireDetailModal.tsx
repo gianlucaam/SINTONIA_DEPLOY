@@ -274,8 +274,8 @@ const QuestionnaireDetailModal: React.FC<QuestionnaireDetailModalProps> = ({
                         </div>
                     )}
 
-                    {/* Invalidation Request Section (Psychologist only, not in readOnly mode) */}
-                    {role === 'psychologist' && !readOnly && (
+                    {/* Invalidation Request Section (Psychologist only, not in readOnly mode, and not already reviewed) */}
+                    {role === 'psychologist' && !readOnly && !questionnaire.revisionato && (
                         (() => {
                             const isInvalidationRejected = !questionnaire.invalidato &&
                                 questionnaire.dataInvalidazione &&

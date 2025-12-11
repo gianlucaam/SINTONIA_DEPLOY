@@ -133,7 +133,7 @@ const TechnicalSupportDetailModal: React.FC<TechnicalSupportDetailModalProps> = 
                     <div className="modal-header-content">
                         <div className="modal-header-text">
                             <h2 className="modal-header-title">
-                                Dettagli Ticket di Supporto
+                                Dettagli Ticket
                             </h2>
                         </div>
                         <button
@@ -457,7 +457,7 @@ const TechnicalSupportDetailModal: React.FC<TechnicalSupportDetailModalProps> = 
                                 lineHeight: '1.5',
                                 color: '#6b7280'
                             }}>
-                                Sei sicuro di voler chiudere questo ticket di supporto? L'azione non può essere annullata.
+                                Sei sicuro di voler chiudere questo ticket? L'azione non può essere annullata.
                             </p>
                             <div style={{
                                 display: 'flex',
