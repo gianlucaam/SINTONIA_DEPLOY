@@ -1,4 +1,4 @@
-Write-Host "🚀 Starting SINTONIA Setup (Windows)..." -ForegroundColor Cyan
+Write-Host "🚀 Starting SINTONIA Setup for Windows..." -ForegroundColor Cyan
 
 # Check if we are in the webapp directory
 if (-not (Test-Path "docker-compose.yml")) {
@@ -8,11 +8,11 @@ if (-not (Test-Path "docker-compose.yml")) {
 
 # 1. Setup Environment
 Write-Host "📝 Configuring environment..." -ForegroundColor Yellow
-if (-not (Test-Path "backend/.env")) {
-    Set-Content -Path "backend/.env" -Value "DATABASE_URL=postgresql://root:secret@localhost:5433/sintonia" -Encoding Ascii
-    Write-Host "✅ backend/.env created." -ForegroundColor Green
+if (-not (Test-Path "backend\.env")) {
+    Set-Content -Path "backend\.env" -Value "DATABASE_URL=postgresql://root:secret@localhost:5433/sintonia" -Encoding Ascii
+    Write-Host "✅ backend\.env created." -ForegroundColor Green
 } else {
-    Write-Host "ℹ️ backend/.env already exists." -ForegroundColor Gray
+    Write-Host "ℹ️ backend\.env already exists." -ForegroundColor Gray
 }
 
 # 2. Start Docker
@@ -38,7 +38,7 @@ while (-not $dbReady -and $retryCount -lt $maxRetries) {
     if ($LASTEXITCODE -eq 0) {
         $dbReady = $true
     } else {
-        Write-Host "   ... still waiting ($retryCount/$maxRetries)" -ForegroundColor Gray
+        Write-Host "   ... still waiting" -ForegroundColor Gray
         $retryCount++
     }
 }
@@ -51,19 +51,24 @@ Write-Host "✅ Database is ready." -ForegroundColor Green
 
 # 3. Setup Database
 Write-Host "🛠 Setting up Database..." -ForegroundColor Yellow
-Set-Location backend
+if (Test-Path "backend") {
+    Set-Location backend
+} else {
+    Write-Host "❌ Error: 'backend' directory not found." -ForegroundColor Red
+    exit 1
+}
 
 Write-Host "📦 Installing backend dependencies..." -ForegroundColor Yellow
-# Using cmd /c to ensure npm runs correctly in PowerShell on some systems
-cmd /c npm install
+# Using cmd /c with quotes to ensure npm runs correctly
+cmd /c "npm install"
 
 Write-Host "🔄 Generating and applying migrations..." -ForegroundColor Yellow
-cmd /c npx drizzle-kit generate
-cmd /c npx drizzle-kit migrate
+cmd /c "npx drizzle-kit generate"
+cmd /c "npx drizzle-kit migrate"
 
 # 4. Seed Database
 Write-Host "🌱 Seeding database..." -ForegroundColor Yellow
-cmd /c npm run db:seed
+cmd /c "npm run db:seed"
 
 Set-Location ..
 
