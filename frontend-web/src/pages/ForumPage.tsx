@@ -3,13 +3,13 @@ import { createPortal } from 'react-dom';
 import { MessageCircle } from 'lucide-react';
 import ForumQuestionCard from '../components/ForumQuestionCard';
 import ForumCategoryFilter from '../components/ForumCategoryFilter';
-import ForumReplyModal from '../components/ForumReplyModal';
 import PageHeader from '../components/PageHeader';
 import type { ForumQuestion, LoadingState, ForumCategory } from '../types/forum';
 import { fetchForumQuestions, answerQuestion, updateAnswer, deleteAnswer } from '../services/forum.service';
 import { getCurrentUser } from '../services/auth.service';
 import '../css/ForumPage.css';
 import '../css/EmptyState.css';
+import CompactPagination from '../components/CompactPagination';
 
 type FilterType = 'all' | 'unanswered' | 'answered';
 
@@ -25,17 +25,6 @@ const ForumPage: React.FC = () => {
     const [selectedCategory, setSelectedCategory] = useState<ForumCategory | null>(null);
     const [currentPage, setCurrentPage] = useState(1);
     const QUESTIONS_PER_PAGE = 5;
-    const [modalState, setModalState] = useState<{
-        isOpen: boolean;
-        question: ForumQuestion | null;
-        existingAnswer?: string;
-        answerId?: string;
-        isEditing: boolean;
-    }>({
-        isOpen: false,
-        question: null,
-        isEditing: false
-    });
     const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
     const [deleteModalState, setDeleteModalState] = useState<{
@@ -44,6 +33,15 @@ const ForumPage: React.FC = () => {
     }>({
         isOpen: false,
         answerId: null
+    });
+
+    // State for inline editing
+    const [editingState, setEditingState] = useState<{
+        answerId: string | null;
+        content: string;
+    }>({
+        answerId: null,
+        content: ''
     });
 
     const currentUser = getCurrentUser();
@@ -80,17 +78,26 @@ const ForumPage: React.FC = () => {
         const user = getCurrentUser();
         const myFiscalCode = user?.fiscalCode;
 
-        const totalQuestions = questionsState.data.length;
+        // Filter by category first if selected
+        let baseQuestions = questionsState.data;
+        if (selectedCategory) {
+            baseQuestions = baseQuestions.filter(q => q.categoria === selectedCategory);
+        }
+
+        const totalQuestions = baseQuestions.length;
 
         // Count questions with no answers
-        const unansweredQuestions = questionsState.data.filter(q =>
+        const unansweredQuestions = baseQuestions.filter(q =>
             !q.risposte || q.risposte.length === 0
         ).length;
 
-        // Count questions where *I* have answered
-        const answeredQuestions = questionsState.data.filter(q =>
-            q.risposte && q.risposte.some(r => r.idPsicologo === myFiscalCode)
-        ).length;
+        // For admin: count all questions with at least one answer
+        // For psychologist: count questions where *I* have answered
+        const answeredQuestions = isReadOnly
+            ? baseQuestions.filter(q => q.risposte && q.risposte.length > 0).length
+            : baseQuestions.filter(q =>
+                q.risposte && q.risposte.some(r => r.idPsicologo === myFiscalCode)
+            ).length;
 
         return {
             totalQuestions,
@@ -99,30 +106,44 @@ const ForumPage: React.FC = () => {
         };
     };
 
-    const handleAnswer = (questionId: string) => {
-        const question = questionsState.data?.find(q => q.idDomanda === questionId);
-        if (question) {
-            setModalState({
-                isOpen: true,
-                question,
-                isEditing: false
-            });
+    // Inline answer submission
+    const handleInlineSubmit = async (questionId: string, content: string) => {
+        try {
+            await answerQuestion(questionId, content);
+            setToast({ message: 'Risposta pubblicata con successo!', type: 'success' });
+            await loadData();
+        } catch (error) {
+            console.error('Error submitting answer:', error);
+            setToast({ message: 'Errore durante il salvataggio della risposta', type: 'error' });
+            throw error; // Re-throw to let the card handle it
         }
     };
 
     const handleEditAnswer = (answerId: string, currentText: string) => {
-        const question = questionsState.data?.find(q =>
-            q.risposte?.some(r => r.idRisposta === answerId)
-        );
-        if (question) {
-            setModalState({
-                isOpen: true,
-                question,
-                existingAnswer: currentText,
-                answerId,
-                isEditing: true
-            });
+        setEditingState({
+            answerId,
+            content: currentText
+        });
+    };
+
+    const handleEditSubmit = async (answerId: string, content: string) => {
+        try {
+            await updateAnswer(answerId, content);
+            setToast({ message: 'Risposta modificata con successo!', type: 'success' });
+            setEditingState({ answerId: null, content: '' });
+            await loadData();
+        } catch (error) {
+            console.error('Error updating answer:', error);
+            setToast({ message: 'Errore durante la modifica della risposta', type: 'error' });
         }
+    };
+
+    const handleEditCancel = () => {
+        setEditingState({ answerId: null, content: '' });
+    };
+
+    const handleEditContentChange = (content: string) => {
+        setEditingState(prev => ({ ...prev, content }));
     };
 
     const handleDeleteRequest = (answerId: string) => {
@@ -146,27 +167,6 @@ const ForumPage: React.FC = () => {
         }
     };
 
-    const handleModalSubmit = async (content: string) => {
-        try {
-            if (modalState.isEditing && modalState.answerId) {
-                await updateAnswer(modalState.answerId, content);
-                setToast({ message: 'Risposta modificata con successo!', type: 'success' });
-            } else if (modalState.question) {
-                await answerQuestion(modalState.question.idDomanda, content);
-                setToast({ message: 'Risposta pubblicata con successo!', type: 'success' });
-            }
-            await loadData();
-            setModalState({ isOpen: false, question: null, isEditing: false });
-        } catch (error) {
-            console.error('Error submitting answer:', error);
-            setToast({ message: 'Errore durante il salvataggio della risposta', type: 'error' });
-        }
-    };
-
-    const handleCloseModal = () => {
-        setModalState({ isOpen: false, question: null, isEditing: false });
-    };
-
     const getFilteredQuestions = (): ForumQuestion[] => {
         if (!questionsState.data) return [];
         const user = getCurrentUser();
@@ -184,7 +184,11 @@ const ForumPage: React.FC = () => {
             case 'unanswered':
                 return filtered.filter(q => !q.risposte || q.risposte.length === 0);
             case 'answered':
-                // Show only questions where *I* have answered
+                // Admin: show all questions with at least one answer
+                // Psychologist: show questions where *I* have answered
+                if (isReadOnly) {
+                    return filtered.filter(q => q.risposte && q.risposte.length > 0);
+                }
                 return filtered.filter(q =>
                     q.risposte && q.risposte.some(r => r.idPsicologo === myFiscalCode)
                 );
@@ -208,6 +212,11 @@ const ForumPage: React.FC = () => {
 
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
+        // Scroll to top of the questions list when changing page
+        const scrollContainer = document.querySelector('.forum-scroll-container');
+        if (scrollContainer) {
+            scrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
+        }
     };
 
     return (
@@ -238,7 +247,7 @@ const ForumPage: React.FC = () => {
                         className={`filter-pill ${filterType === 'answered' ? 'active' : ''}`}
                         onClick={() => setFilterType('answered')}
                     >
-                        Le mie risposte ({getStats()?.answeredQuestions || 0})
+                        {isReadOnly ? 'Domande risposte' : 'Le mie risposte'} ({getStats()?.answeredQuestions || 0})
                     </button>
                 </div>
 
@@ -287,9 +296,14 @@ const ForumPage: React.FC = () => {
                                         <ForumQuestionCard
                                             key={question.idDomanda}
                                             question={question}
-                                            onAnswer={!isReadOnly ? handleAnswer : undefined}
+                                            onSubmitAnswer={!isReadOnly ? handleInlineSubmit : undefined}
                                             onEditAnswer={!isReadOnly ? handleEditAnswer : undefined}
                                             onDeleteAnswer={!isReadOnly ? handleDeleteRequest : undefined}
+                                            editingAnswerId={editingState.answerId}
+                                            editingContent={editingState.content}
+                                            onEditSubmit={handleEditSubmit}
+                                            onEditCancel={handleEditCancel}
+                                            onEditContentChange={handleEditContentChange}
                                         />
                                     ))}
                                 </div>
@@ -300,35 +314,11 @@ const ForumPage: React.FC = () => {
             </div>
 
             {/* Fixed Pagination Footer */}
-            {getTotalPages() > 1 && (
-                <div className="pagination">
-                    <button
-                        className="pagination-btn"
-                        onClick={() => handlePageChange(currentPage - 1)}
-                        disabled={currentPage === 1}
-                    >
-                        ‹
-                    </button>
-                    <span className="pagination-current">{currentPage} / {getTotalPages()}</span>
-                    <button
-                        className="pagination-btn"
-                        onClick={() => handlePageChange(currentPage + 1)}
-                        disabled={currentPage === getTotalPages()}
-                    >
-                        ›
-                    </button>
-                </div>
-            )}
-
-            {modalState.isOpen && modalState.question && (
-                <ForumReplyModal
-                    question={modalState.question}
-                    existingAnswer={modalState.existingAnswer}
-                    isEditing={modalState.isEditing}
-                    onClose={handleCloseModal}
-                    onSubmit={handleModalSubmit}
-                />
-            )}
+            <CompactPagination
+                currentPage={currentPage}
+                totalPages={getTotalPages()}
+                onPageChange={handlePageChange}
+            />
             {toast && (
                 <Toast
                     message={toast.message}

@@ -1,124 +1,33 @@
 .personal-area-container {
-    background: linear-gradient(180deg, #F4FAFB 0%, #FFFFFF 100%);
+    background: #FFFFFF;
     border-radius: 16px;
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
+    height: 100%;
+    overflow: hidden;
 }
 
-/* Header Section */
-.personal-area-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 16px 24px;
-    border-bottom: 2px solid #F5F5F5;
+/* Hero Banner - fixed percentage */
+.profile-hero-banner {
+    background: linear-gradient(135deg, #0D475D 0%, #1a6b7a 50%, #2B8A8A 100%);
+    height: 15%;
+    min-height: 50px;
+    flex-shrink: 0;
 }
 
-.personal-area-title {
-    margin: 0;
-    font-size: 20px;
-    font-weight: 700;
-    color: #1A5F5F;
-}
-
-/* Action Buttons */
-.btn-edit {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: linear-gradient(135deg, #2B7A7A 0%, #1A5F5F 100%);
-    color: white;
-    border: none;
-    border-radius: 10px;
-    padding: 10px 20px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 12px rgba(26, 95, 95, 0.2);
-}
-
-.btn-edit:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(26, 95, 95, 0.3);
-}
-
-.btn-edit:active {
-    transform: translateY(0);
-}
-
-.btn-group {
-    display: flex;
-    gap: 12px;
-}
-
-.btn-cancel {
-    background-color: #f5f5f5;
-    color: #666;
-    border: 2px solid #e0e0e0;
-    border-radius: 10px;
-    padding: 10px 20px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.btn-cancel:hover {
-    background-color: #e0e0e0;
-    border-color: #ccc;
-}
-
-.btn-save {
-    background: linear-gradient(135deg, #7FB77E 0%, #6BA569 100%);
-    color: white;
-    border: none;
-    border-radius: 10px;
-    padding: 10px 20px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 12px rgba(127, 183, 126, 0.3);
-}
-
-.btn-save:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(127, 183, 126, 0.4);
-}
-
-.btn-save:active {
-    transform: translateY(0);
-}
-
-/* Content Section */
-.personal-area-content {
-    padding: 16px 24px;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-}
-
-/* Vertical Layout - Photo on top, fields below */
-.personal-area-layout-vertical {
+/* Profile Photo Container */
+.profile-photo-container {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 20px;
-    flex: 1;
-}
-
-/* Centered Profile Photo */
-.profile-photo-center {
-    display: flex;
-    justify-content: center;
+    margin-top: -25px;
+    flex-shrink: 0;
 }
 
 .profile-image-wrapper {
-    position: relative;
-    width: 100px;
-    height: 100px;
+    width: 50px;
+    height: 50px;
     flex-shrink: 0;
 }
 
@@ -127,34 +36,42 @@
     height: 100%;
     border-radius: 50%;
     object-fit: cover;
-    border: 4px solid #A5C9C9;
-    box-shadow: 0 4px 16px rgba(26, 95, 95, 0.15);
+    box-shadow: 0 4px 16px rgba(13, 71, 93, 0.25);
 }
 
-/* Fields Section */
-.profile-fields-section {
-    width: 100%;
-    max-width: 600px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+.profile-name-display {
+    margin-top: 4px;
+    text-align: center;
 }
 
+.profile-name-display h2 {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 700;
+    color: #0D475D;
+}
+
+.profile-name-display p {
+    margin: 0;
+    font-size: 11px;
+    color: #6FA8AF;
+}
+
+/* Image upload overlay */
 .image-upload-overlay {
     position: absolute;
     inset: 0;
     border-radius: 50%;
-    background: rgba(26, 95, 95, 0.85);
+    background: rgba(13, 71, 93, 0.85);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 6px;
     color: white;
-    font-size: 12px;
+    font-size: 10px;
     font-weight: 600;
     cursor: pointer;
-    opacity: 0;
+    opacity: 0.7;
     transition: opacity 0.3s ease;
 }
 
@@ -163,425 +80,269 @@
 }
 
 .image-upload-overlay svg {
-    width: 24px;
-    height: 24px;
+    width: 16px;
+    height: 16px;
 }
 
-/* Right Column: Form Fields */
-.profile-fields-column {
+/* Edit mode indicator on profile image */
+.profile-image-wrapper.editing {
+    box-shadow: 0 0 0 3px #2B8A8A, 0 0 12px rgba(43, 138, 138, 0.4);
+    border-radius: 50%;
+}
+
+/* Content Section - FILLS remaining space */
+.personal-area-content {
+    flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    padding: 8px 16px 12px;
+    min-height: 0;
+    overflow: hidden;
 }
 
-.fields-row {
+/* Info Cards Grid - FILLS available space in content */
+.info-cards-grid {
+    flex: 1;
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-}
-
-.form-actions-inline {
-    align-self: flex-end;
-    margin-bottom: 18px;
-}
-
-/* Form Section */
-.form-section {
-    max-width: 600px;
-    margin: 0 auto;
-}
-
-.form-row {
-    margin-bottom: 16px;
-}
-
-.form-row-double {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-}
-
-.form-field {
-    display: flex;
-    flex-direction: column;
+    grid-template-columns: repeat(2, 1fr);
     gap: 4px;
+    min-height: 0;
+    align-content: start;
 }
 
-.field-email-wrapper {
-    position: relative;
-    padding-bottom: 18px;
-}
-
-.email-error-message {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    color: #ef4444;
-    font-size: 12px;
-    font-weight: 500;
-}
-
-.field-label {
-    font-size: 13px;
-    font-weight: 600;
-    color: #1A5F5F;
+.info-card {
+    background: linear-gradient(135deg, #F8FCFC 0%, #F0F8F8 100%);
+    border-radius: 6px;
+    padding: 4px 8px;
+    border: 1px solid #E5F2F2;
     display: flex;
-    align-items: center;
-    gap: 8px;
+    flex-direction: column;
+    justify-content: center;
+    overflow: hidden;
 }
 
-.field-editable-badge {
-    background: linear-gradient(135deg, #FFB74D 0%, #FFA726 100%);
-    color: white;
-    font-size: 11px;
-    font-weight: 700;
-    padding: 3px 10px;
-    border-radius: 12px;
+.info-card:hover {
+    border-color: #D0E8E8;
+}
+
+.info-card-label {
+    font-size: 9px;
+    font-weight: 600;
+    color: #6FA8AF;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
-    box-shadow: 0 2px 8px rgba(255, 183, 77, 0.3);
+    letter-spacing: 0.3px;
 }
 
-.field-input {
-    padding: 8px 12px;
-    font-size: 13px;
-    font-weight: 500;
-    border: 2px solid #e0e0e0;
-    border-radius: 8px;
-    transition: all 0.3s ease;
+.info-card-value {
+    font-size: 12px;
+    font-weight: 600;
+    color: #0D475D;
+}
+
+/* Editable Card - Teal theme for consistency */
+.info-card.editable {
+    background: linear-gradient(135deg, #E0F2F2 0%, #D4ECEC 100%);
+    border: 2px solid #2B8A8A;
+    box-shadow: 0 0 0 3px rgba(43, 138, 138, 0.2), 0 4px 12px rgba(43, 138, 138, 0.15);
+}
+
+.info-card.editable .info-card-label {
+    color: #1a6b7a;
+    font-weight: 700;
+}
+
+.info-card-input {
+    width: 100%;
+    padding: 0;
+    font-size: 12px;
+    font-weight: 600;
+    color: #0D475D;
+    background: transparent;
+    border: none;
+    outline: none;
     font-family: inherit;
 }
 
-.field-input:focus {
-    outline: none;
+.info-card-input:disabled {
+    color: #0D475D;
+    cursor: default;
 }
 
-.field-disabled {
-    background-color: #f9f9f9;
-    color: #666;
-    cursor: not-allowed;
+/* Full width card */
+.info-card.full-width {
+    grid-column: span 2;
 }
 
-.field-editable {
-    background-color: #fff;
-    color: #1A5F5F;
-    border-color: #A5C9C9;
-}
-
-.field-editable:focus {
-    border-color: #2B7A7A;
-    box-shadow: 0 0 0 3px rgba(43, 122, 122, 0.1);
-}
-
-.field-editable:hover:not(:focus) {
-    border-color: #6DA5A5;
-}
-
-/* Info Banner */
-.info-banner {
-    background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%);
-    border-left: 4px solid #2196F3;
-    padding: 12px 16px;
-    border-radius: 8px;
-    margin-top: 12px;
+/* Actions Section - fixed at bottom */
+.profile-actions {
     display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.info-banner svg {
-    width: 20px;
-    height: 20px;
-    color: #2196F3;
+    justify-content: center;
+    gap: 8px;
+    padding-top: 8px;
     flex-shrink: 0;
 }
 
-.info-banner p {
-    margin: 0;
-    font-size: 13px;
-    font-weight: 500;
-    color: #1565C0;
-    line-height: 1.5;
+/* Action Buttons */
+.btn-edit {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: linear-gradient(135deg, #0D475D 0%, #1a6378 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 3px 10px rgba(13, 71, 93, 0.2);
 }
 
-/* Responsive */
+.btn-edit:hover {
+    transform: translateY(-1px);
+}
 
-/* Large Desktop - 1200px */
-@media (max-width: 1200px) {
-    .personal-area-header {
-        padding: 20px 24px;
+.btn-group {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-cancel {
+    background-color: #f5f5f5;
+    color: #666;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-save {
+    background: linear-gradient(135deg, #83B9C1 0%, #5a9aa5 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 3px 10px rgba(131, 185, 193, 0.3);
+}
+
+/* Email error */
+.email-error-message {
+    color: #ef4444;
+    font-size: 10px;
+}
+
+/* Responsive - larger screens */
+@media (min-height: 700px) {
+    .profile-hero-banner {
+        height: 18%;
     }
 
-    .personal-area-title {
-        font-size: 20px;
-    }
-
-    .personal-area-content {
-        padding: 28px 24px;
+    .profile-photo-container {
+        margin-top: -35px;
     }
 
     .profile-image-wrapper {
-        width: 140px;
-        height: 140px;
+        width: 70px;
+        height: 70px;
     }
 
-    .form-section {
-        max-width: 540px;
+    .profile-name-display h2 {
+        font-size: 18px;
+    }
+
+    .profile-name-display p {
+        font-size: 13px;
+    }
+
+    .personal-area-content {
+        padding: 12px 24px 16px;
+    }
+
+    .info-cards-grid {
+        gap: 8px;
+    }
+
+    .info-card {
+        padding: 8px 12px;
+        border-radius: 10px;
+    }
+
+    .info-card-label {
+        font-size: 11px;
+    }
+
+    .info-card-value,
+    .info-card-input {
+        font-size: 14px;
     }
 
     .btn-edit,
     .btn-cancel,
     .btn-save {
-        padding: 9px 18px;
+        padding: 10px 18px;
         font-size: 13px;
     }
 }
 
-/* Tablet - 1024px */
-@media (max-width: 1024px) {
-    .personal-area-header {
-        flex-wrap: wrap;
-        gap: 12px;
+@media (min-height: 900px) {
+    .profile-hero-banner {
+        height: 20%;
     }
 
-    .personal-area-content {
-        padding: 24px 20px;
-    }
-
-    .profile-image-wrapper {
-        width: 130px;
-        height: 130px;
-    }
-
-    .profile-image-section {
-        margin-bottom: 28px;
-    }
-
-    .form-row {
-        margin-bottom: 20px;
-    }
-
-    .field-input {
-        padding: 10px 14px;
-        font-size: 14px;
-    }
-}
-
-/* Mobile - 768px */
-@media (max-width: 768px) {
-    .personal-area-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 16px;
-        padding: 16px 18px;
-    }
-
-    .personal-area-title {
-        font-size: 18px;
-    }
-
-    .btn-group {
-        width: 100%;
-        flex-direction: column;
-    }
-
-    .btn-edit,
-    .btn-cancel,
-    .btn-save {
-        width: 100%;
-        justify-content: center;
-    }
-
-    .personal-area-content {
-        padding: 20px 16px;
+    .profile-photo-container {
+        margin-top: -50px;
     }
 
     .profile-image-wrapper {
-        width: 120px;
-        height: 120px;
+        width: 100px;
+        height: 100px;
     }
 
-    .form-row-double {
-        grid-template-columns: 1fr;
+    .profile-name-display {
+        margin-top: 8px;
     }
 
-    .form-row-centered .form-field {
-        width: 100%;
-    }
-
-    .info-banner {
-        padding: 14px 16px;
-    }
-}
-
-.form-row-centered {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 24px;
-}
-
-.form-row-centered .form-field {
-    width: calc(50% - 8px);
-}
-
-/* ==========================================================================
-   LARGE SCREEN BREAKPOINTS (min-width, ascending order)
-   ========================================================================== */
-
-/* Large Desktop - 1600px */
-@media (min-width: 1600px) {
-    .personal-area-header {
-        padding: 20px 28px;
-    }
-
-    .personal-area-title {
+    .profile-name-display h2 {
         font-size: 22px;
     }
 
     .personal-area-content {
-        padding: 20px 28px;
+        padding: 16px 32px 24px;
     }
 
-    .profile-image-wrapper {
-        width: 110px;
-        height: 110px;
+    .info-cards-grid {
+        gap: 12px;
     }
 
-    .profile-fields-section {
-        max-width: 650px;
-    }
-
-    .field-input {
-        padding: 10px 14px;
-        font-size: 14px;
-    }
-
-    .btn-edit,
-    .btn-cancel,
-    .btn-save {
-        padding: 11px 22px;
-        font-size: 15px;
-    }
-}
-
-/* Full HD+ Desktop - 1920px */
-@media (min-width: 1920px) {
-    .personal-area-header {
-        padding: 24px 32px;
-    }
-
-    .personal-area-title {
-        font-size: 24px;
-    }
-
-    .personal-area-content {
-        padding: 24px 32px;
-    }
-
-    .profile-image-wrapper {
-        width: 120px;
-        height: 120px;
-    }
-
-    .profile-fields-section {
-        max-width: 700px;
-    }
-
-    .field-label {
-        font-size: 14px;
-    }
-
-    .field-input {
+    .info-card {
         padding: 12px 16px;
-        font-size: 15px;
-        border-radius: 10px;
-    }
-
-    .form-row-double {
-        gap: 16px;
-    }
-
-    .info-banner {
-        padding: 16px 20px;
-        border-radius: 10px;
-    }
-
-    .info-banner p {
-        font-size: 14px;
-    }
-}
-
-/* 4K / Ultrawide - 2560px+ */
-@media (min-width: 2560px) {
-    .personal-area-container {
-        border-radius: 20px;
-    }
-
-    .personal-area-header {
-        padding: 28px 40px;
-        border-bottom: 3px solid #F5F5F5;
-    }
-
-    .personal-area-title {
-        font-size: 26px;
-    }
-
-    .personal-area-content {
-        padding: 32px 40px;
-    }
-
-    .personal-area-layout-vertical {
-        gap: 28px;
-    }
-
-    .profile-image-wrapper {
-        width: 140px;
-        height: 140px;
-    }
-
-    .profile-image-preview {
-        border: 5px solid #A5C9C9;
-    }
-
-    .profile-fields-section {
-        max-width: 800px;
-        gap: 16px;
-    }
-
-    .field-label {
-        font-size: 15px;
-    }
-
-    .field-input {
-        padding: 14px 18px;
-        font-size: 16px;
         border-radius: 12px;
     }
 
-    .form-row-double {
-        gap: 20px;
+    .info-card-label {
+        font-size: 12px;
+        margin-bottom: 4px;
+    }
+
+    .info-card-value,
+    .info-card-input {
+        font-size: 15px;
+    }
+
+    .profile-actions {
+        padding-top: 16px;
     }
 
     .btn-edit,
     .btn-cancel,
     .btn-save {
-        padding: 14px 28px;
-        font-size: 16px;
-        border-radius: 12px;
-    }
-
-    .info-banner {
-        padding: 18px 24px;
-        border-radius: 12px;
-        margin-top: 16px;
-    }
-
-    .info-banner svg {
-        width: 24px;
-        height: 24px;
-    }
-
-    .info-banner p {
-        font-size: 15px;
+        padding: 12px 24px;
+        font-size: 14px;
+        border-radius: 10px;
     }
 }

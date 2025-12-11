@@ -4,9 +4,10 @@ import TechnicalSupportDetailModal from '../components/TechnicalSupportDetailMod
 import PageHeader from '../components/PageHeader';
 import type { TechnicalSupportTicket } from '../types/technicalSupport';
 import '../css/AdminTechnicalSupport.css';
+import '../css/ForumPage.css'; // Reuse filter-pill styles
 import '../css/QuestionnaireTable.css'; // Reuse table styles for consistency
 import '../css/EmptyState.css';
-import '../css/ForumPage.css';
+import CompactPagination from '../components/CompactPagination';
 
 // SVG Icon Component for View Button
 const ViewIcon = () => (
@@ -15,13 +16,16 @@ const ViewIcon = () => (
     </svg>
 );
 
+type StatusFilter = 'all' | 'open' | 'closed';
+
 const AdminTechnicalSupport: React.FC = () => {
     const [tickets, setTickets] = useState<TechnicalSupportTicket[]>([]);
     const [selectedTicket, setSelectedTicket] = useState<TechnicalSupportTicket | null>(null);
     const [selectedTicketId, setSelectedTicketId] = useState<string | null>(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [isLoading, setIsLoading] = useState(true);
-    const TICKETS_PER_PAGE = 5;
+    const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
+    const TICKETS_PER_PAGE = 4;
 
     useEffect(() => {
         fetchTickets();
@@ -77,14 +81,35 @@ const AdminTechnicalSupport: React.FC = () => {
         return `ticket-status-badge ticket-status-${status}`;
     };
 
+    // Filter tickets based on status filter
+    const getFilteredTickets = (): TechnicalSupportTicket[] => {
+        switch (statusFilter) {
+            case 'open':
+                return tickets.filter(t => t.stato === 'aperto' || t.stato === 'in-lavorazione');
+            case 'closed':
+                return tickets.filter(t => t.stato === 'risolto' || t.stato === 'chiuso');
+            case 'all':
+            default:
+                return tickets;
+        }
+    };
+
+    // Get ticket counts for filter badges
+    const getStats = () => {
+        const openCount = tickets.filter(t => t.stato === 'aperto' || t.stato === 'in-lavorazione').length;
+        const closedCount = tickets.filter(t => t.stato === 'risolto' || t.stato === 'chiuso').length;
+        return { total: tickets.length, open: openCount, closed: closedCount };
+    };
+
     const getPaginatedTickets = (): TechnicalSupportTicket[] => {
+        const filtered = getFilteredTickets();
         const startIndex = (currentPage - 1) * TICKETS_PER_PAGE;
         const endIndex = startIndex + TICKETS_PER_PAGE;
-        return tickets.slice(startIndex, endIndex);
+        return filtered.slice(startIndex, endIndex);
     };
 
     const getTotalPages = (): number => {
-        return Math.ceil(tickets.length / TICKETS_PER_PAGE);
+        return Math.ceil(getFilteredTickets().length / TICKETS_PER_PAGE);
     };
 
     const handlePageChange = (page: number) => {
@@ -98,10 +123,26 @@ const AdminTechnicalSupport: React.FC = () => {
                 subtitle="Gestisci le richieste di supporto tecnico"
                 icon={<Headphones size={24} />}
             />
-            <div style={{ marginBottom: '16px' }}>
-                <p style={{ color: '#666', fontSize: '14px', margin: 0 }}>
-                    Totale ticket: <strong style={{ color: '#0D475D' }}>{tickets.length}</strong>
-                </p>
+            {/* Filter Pills */}
+            <div className="forum-filters" style={{ marginBottom: '16px' }}>
+                <button
+                    className={`filter-pill ${statusFilter === 'all' ? 'active' : ''}`}
+                    onClick={() => { setStatusFilter('all'); setCurrentPage(1); }}
+                >
+                    Tutti ({getStats().total})
+                </button>
+                <button
+                    className={`filter-pill filter-open ${statusFilter === 'open' ? 'active' : ''}`}
+                    onClick={() => { setStatusFilter('open'); setCurrentPage(1); }}
+                >
+                    Aperti ({getStats().open})
+                </button>
+                <button
+                    className={`filter-pill filter-closed ${statusFilter === 'closed' ? 'active' : ''}`}
+                    onClick={() => { setStatusFilter('closed'); setCurrentPage(1); }}
+                >
+                    Chiusi ({getStats().closed})
+                </button>
             </div>
 
             {isLoading ? (
@@ -109,8 +150,8 @@ const AdminTechnicalSupport: React.FC = () => {
                     <div className="support-loading-spinner" style={{ marginBottom: '16px', fontSize: '24px' }}>⏳</div>
                     <p>Caricamento ticket in corso...</p>
                 </div>
-            ) : tickets.length > 0 ? (
-                <>
+            ) : getFilteredTickets().length > 0 ? (
+                <div style={{ flex: 1, overflowY: 'auto', minHeight: 0 }}>
                     <div className="support-table-container">
                         <table className="support-table">
                             <thead>
@@ -158,38 +199,33 @@ const AdminTechnicalSupport: React.FC = () => {
                             </tbody>
                         </table>
                     </div>
-
-                    {getTotalPages() > 1 && (
-                        <div className="pagination">
-                            <button
-                                className="pagination-btn"
-                                onClick={() => handlePageChange(currentPage - 1)}
-                                disabled={currentPage === 1}
-                            >
-                                ‹
-                            </button>
-                            <span className="pagination-current">{currentPage} / {getTotalPages()}</span>
-                            <button
-                                className="pagination-btn"
-                                onClick={() => handlePageChange(currentPage + 1)}
-                                disabled={currentPage === getTotalPages()}
-                            >
-                                ›
-                            </button>
-                        </div>
-                    )}
-                </>
+                </div>
             ) : (
                 <div className="unified-empty-state">
                     <div className="unified-empty-icon">
                         <Mail size={48} />
                     </div>
-                    <h3 className="unified-empty-title">Nessun Ticket di Supporto</h3>
+                    <h3 className="unified-empty-title">
+                        {statusFilter === 'all' ? 'Nessun Ticket' :
+                            statusFilter === 'open' ? 'Nessun Ticket Aperto' :
+                                'Nessun Ticket Chiuso'}
+                    </h3>
                     <p className="unified-empty-message">
-                        Al momento non ci sono richieste di supporto tecnico da gestire.
+                        {statusFilter === 'all'
+                            ? 'Al momento non ci sono richieste di supporto tecnico da gestire.'
+                            : statusFilter === 'open'
+                                ? 'Non ci sono ticket aperti al momento.'
+                                : 'Non ci sono ticket chiusi al momento.'}
                     </p>
                 </div>
             )}
+
+            {/* Fixed Pagination Footer */}
+            <CompactPagination
+                currentPage={currentPage}
+                totalPages={getTotalPages()}
+                onPageChange={handlePageChange}
+            />
 
             {selectedTicket && (
                 <TechnicalSupportDetailModal
