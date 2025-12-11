@@ -17,7 +17,7 @@
 
 .questionnaire-table th {
     padding: 14px 16px;
-    text-align: left;
+    text-align: center;
     font-weight: 700;
     font-size: 13px;
     color: white;
@@ -54,6 +54,7 @@
     padding: 16px 20px;
     font-size: 14px;
     color: #333;
+    text-align: center;
 }
 
 .questionnaire-table tbody tr:last-child td {
@@ -90,6 +91,7 @@
     display: flex;
     gap: 8px;
     align-items: center;
+    justify-content: center;
 }
 
 .action-btn {
