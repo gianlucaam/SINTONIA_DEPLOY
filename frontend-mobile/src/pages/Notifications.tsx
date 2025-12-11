@@ -5,11 +5,18 @@ import { getNotifications, markAsRead, type NotificationDto, type PaginatedNotif
 import LoadingSpinner from '../components/LoadingSpinner';
 import '../css/Notifications.css';
 import { useNotification } from '../contexts/NotificationContext';
+import { useCache } from '../contexts/CacheContext';
 
 const Notifications: React.FC = () => {
     const navigate = useNavigate();
-    const [notifications, setNotifications] = useState<NotificationDto[]>([]);
-    const [loading, setLoading] = useState(true);
+
+    // Use CacheContext
+    const { notifications: cachedNotifications, setNotifications: setCachedNotifications } = useCache();
+    const notifications = cachedNotifications || [];
+
+    // Loading is true only if we don't have cached data yet
+    const [loading, setLoading] = useState(!cachedNotifications);
+
     const [error, setError] = useState<string | null>(null);
     const { decrementUnreadCount, refreshUnreadCount } = useNotification();
 
@@ -19,7 +26,7 @@ const Notifications: React.FC = () => {
 
     const loadNotifications = async () => {
         try {
-            setLoading(true);
+            if (!cachedNotifications) setLoading(true);
             setError(null);
 
             // Fetch first page to get metadata
@@ -39,7 +46,7 @@ const Notifications: React.FC = () => {
                 });
             }
 
-            setNotifications(allNotifications);
+            setCachedNotifications(allNotifications);
         } catch (err) {
             console.error('Error loading notifications:', err);
             setError('Errore nel caricamento delle notifiche');
@@ -60,7 +67,8 @@ const Notifications: React.FC = () => {
                 markAsRead(notification.idNotifica).catch(err => console.error(err));
 
                 // Also update local state to remove it or mark it read
-                setNotifications(prev => prev.filter(n => n.idNotifica !== notification.idNotifica));
+                const currentList = cachedNotifications || [];
+                setCachedNotifications(currentList.filter(n => n.idNotifica !== notification.idNotifica));
             } catch (err) {
                 console.error('Error handling notification click:', err);
             }
@@ -86,8 +94,10 @@ const Notifications: React.FC = () => {
         e.stopPropagation(); // Prevent card click
         try {
             await markAsRead(notification.idNotifica);
-            // Remove notification from local state
-            setNotifications(prev => prev.filter(n => n.idNotifica !== notification.idNotifica));
+            // Remove notification from local state (cache)
+            const currentList = cachedNotifications || [];
+            setCachedNotifications(currentList.filter(n => n.idNotifica !== notification.idNotifica));
+
             // Update global badge
             decrementUnreadCount();
         } catch (err) {

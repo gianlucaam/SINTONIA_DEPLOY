@@ -9,14 +9,20 @@ import '../css/Forum.css';
 import Toast from '../components/Toast';
 import NewDiaryPageIcon from '../assets/icons/NewDiaryPage.svg';
 import LoadingSpinner from '../components/LoadingSpinner';
+import { useCache } from '../contexts/CacheContext';
 
 const Forum: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const [searchParams, setSearchParams] = useSearchParams();
-    const [myQuestions, setMyQuestions] = useState<ForumPost[]>([]);
-    const [publicQuestions, setPublicQuestions] = useState<ForumPost[]>([]);
-    const [loading, setLoading] = useState(true);
+
+    const { forumData, setForumData } = useCache();
+    // Helper accessors
+    const myQuestions = forumData?.myQuestions || [];
+    const publicQuestions = forumData?.publicQuestions || [];
+
+    // Loading is true only if we don't have cached data yet
+    const [loading, setLoading] = useState(!forumData);
     const [selectedCategories, setSelectedCategories] = useState<ForumCategory[]>([]);
     const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
     const [filter, setFilter] = useState<'all' | 'mine'>('all'); // New filter state
@@ -58,10 +64,9 @@ const Forum: React.FC = () => {
 
     const fetchPosts = async () => {
         try {
-            setLoading(true);
+            if (!forumData) setLoading(true);
             const data = await getForumPosts();
-            setMyQuestions(data.myQuestions);
-            setPublicQuestions(data.publicQuestions);
+            setForumData(data);
         } catch (error) {
             console.error('Error fetching forum posts:', error);
         } finally {
@@ -105,7 +110,11 @@ const Forum: React.FC = () => {
     // 'mine' = only my questions
     const displayQuestions = filter === 'mine' ? filteredMyQuestions : filteredPublicQuestions;
 
-    if (loading) {
+    if (!forumData && !loading) {
+        // Show empty state or error if absolutely no data and no loading
+    }
+
+    if (loading && !forumData) {
         return (
             <div className="loading-screen">
                 <LoadingSpinner />

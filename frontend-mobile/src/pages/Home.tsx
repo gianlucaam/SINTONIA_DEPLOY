@@ -12,10 +12,12 @@ import type { HomeDashboardDto } from '../types/home';
 import '../css/Home.css';
 import LoadingSpinner from '../components/LoadingSpinner';
 import Toast from '../components/Toast';
+import { useCache } from '../contexts/CacheContext';
 
 const Home: React.FC = () => {
-    const [data, setData] = useState<HomeDashboardDto | null>(null);
-    const [loading, setLoading] = useState(true);
+    const { homeData, setHomeData } = useCache();
+    // Loading is true only if we don't have cached data yet
+    const [loading, setLoading] = useState(!homeData);
     const [showInitialModal, setShowInitialModal] = useState(false);
     const [pendingQuestionnaires, setPendingQuestionnaires] = useState<string[]>([]);
     const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
@@ -38,8 +40,11 @@ const Home: React.FC = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
+                // If we don't have data, show loading. If we do, we just refresh in background.
+                if (!homeData) setLoading(true);
+
                 const dashboardData = await getHomeDashboard();
-                setData(dashboardData);
+                setHomeData(dashboardData);
 
                 // Check if initial questionnaires are completed
                 // Only show modal once per session (after login)
@@ -72,17 +77,19 @@ const Home: React.FC = () => {
         );
     }
 
-    if (!data) {
+    if (!homeData && !loading) {
         return <div className="error-screen">Errore nel caricamento dei dati.</div>;
     }
 
+    if (!homeData) return null; // Should be covered by loading spinner, but for safety
+
     return (
         <div className="home-page">
-            <Header data={data} />
+            <Header data={homeData} />
             <QuickNote />
-            <StreakStatus data={data} />
-            <Calendar days={data.calendarDays} />
-            <SuggestedPosts posts={data.suggestedPosts} />
+            <StreakStatus data={homeData} />
+            <Calendar days={homeData.calendarDays} />
+            <SuggestedPosts posts={homeData.suggestedPosts} />
             <InitialQuestionnairesModal
                 isOpen={showInitialModal}
                 onClose={() => setShowInitialModal(false)}
