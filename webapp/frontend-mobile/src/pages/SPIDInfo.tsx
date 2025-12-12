@@ -46,7 +46,7 @@ const SPIDInfo = () => {
                     <a href="https://www.spid.gov.it/richiedi-spid" target="_blank" rel="noopener noreferrer">
                         Non hai SPID?
                     </a>
-                    <a href="#" onClick={(e) => { e.preventDefault(); alert('Servizio aiuto'); }}>
+                    <a href="https://sinfonia.regione.campania.it/assistenza" target="_blank" rel="noopener noreferrer">
                         Serve aiuto?
                     </a>
                 </div>
