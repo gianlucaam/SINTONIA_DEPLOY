@@ -15,69 +15,6 @@ interface PsychologistPatientDetailModalProps {
     onClose: () => void;
 }
 
-// Info Card Component
-const InfoCard: React.FC<{
-    icon: React.ReactNode;
-    label: string;
-    value: string;
-    iconColor: string;
-    tooltip?: string;
-}> = ({ icon, label, value, iconColor, tooltip }) => {
-    return (
-        <div
-            style={{
-                background: 'white',
-                borderRadius: '12px',
-                padding: '14px',
-                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
-                border: '1px solid #e8e8e8',
-                transition: 'all 0.3s ease'
-            }}
-            title={tooltip}
-            onMouseEnter={(e) => {
-                e.currentTarget.style.boxShadow = '0 4px 16px rgba(0, 0, 0, 0.1)';
-                e.currentTarget.style.transform = 'translateY(-2px)';
-            }}
-            onMouseLeave={(e) => {
-                e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.06)';
-                e.currentTarget.style.transform = 'translateY(0)';
-            }}
-        >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-                <div style={{
-                    width: '32px',
-                    height: '32px',
-                    borderRadius: '10px',
-                    background: `linear-gradient(135deg, ${iconColor} 0%, ${iconColor}dd 100%)`,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: 'white'
-                }}>
-                    {icon}
-                </div>
-                <span style={{
-                    fontSize: '10px',
-                    fontWeight: '600',
-                    color: '#666',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.5px'
-                }}>
-                    {label}
-                </span>
-            </div>
-            <p style={{
-                margin: 0,
-                fontSize: '14px',
-                fontWeight: '600',
-                color: '#1a1a1a'
-            }}>
-                {value}
-            </p>
-        </div>
-    );
-};
-
 const PsychologistPatientDetailModal: React.FC<PsychologistPatientDetailModalProps> = ({
     patient,
     onClose,
@@ -177,7 +114,7 @@ const PsychologistPatientDetailModal: React.FC<PsychologistPatientDetailModalPro
             loadPatientDetails(); // Reload to update hasReport status
         } catch (error) {
             console.error('Error generating report:', error);
-            setToast({ message: 'Errore durante la generazione del report', type: 'error' });
+            setToast({ message: 'Il paziente non ha dati sufficienti per generare un report clinico.', type: 'error' });
         } finally {
             setIsGeneratingReport(false);
         }
