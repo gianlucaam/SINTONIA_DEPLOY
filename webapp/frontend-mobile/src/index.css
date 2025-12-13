@@ -1,3 +1,8 @@
+html {
+  height: 100%;
+  overscroll-behavior: none;
+}
+
 :root {
   --primary-dark: #0f3e4d;
   /* Dark Teal from header */
@@ -47,9 +52,10 @@ body {
   -moz-osx-font-smoothing: grayscale;
   display: flex;
   justify-content: center;
-  min-height: 100vh;
-  overflow-x: hidden;
-  /* Prevent horizontal scroll causing layout shifts */
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  /* Prevent body scroll, let root handle it */
 }
 
 #root {
@@ -57,7 +63,10 @@ body {
   max-width: 430px;
   /* Mobile width */
   background-color: var(--secondary-bg);
-  min-height: 100vh;
+  height: 100%;
+  overflow-y: auto;
+  /* Allow scrolling within the app container */
+  -webkit-overflow-scrolling: touch;
   position: relative;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
   /* Optional shadow for depth */
