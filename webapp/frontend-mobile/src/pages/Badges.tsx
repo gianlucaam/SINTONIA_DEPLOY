@@ -63,7 +63,7 @@ const Badges: React.FC = () => {
                     return;
                 }
 
-                const response = await fetch('http://localhost:3000/paziente/badge/lista', {
+                const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/paziente/badge/lista`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },

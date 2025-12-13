@@ -13,7 +13,7 @@ const Terms = () => {
         setLoading(true);
         try {
             const token = localStorage.getItem('patient_token');
-            const response = await axios.post('http://localhost:3000/patient/terms', {}, {
+            const response = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/patient/terms`, {}, {
                 headers: { Authorization: `Bearer ${token}` }
             });
 

@@ -42,7 +42,7 @@ const AdminTechnicalSupport: React.FC = () => {
                 return;
             }
 
-            const response = await fetch('http://localhost:3000/admin/support-request', {
+            const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/admin/support-request`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }

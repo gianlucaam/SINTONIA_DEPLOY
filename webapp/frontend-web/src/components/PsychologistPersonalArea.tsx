@@ -97,7 +97,7 @@ const PsychologistPersonalArea: React.FC = () => {
                             imageUrl = data.immagineProfilo;
                         } else {
                             // Legacy: filename - serve from uploads
-                            imageUrl = `http://localhost:3000/uploads/${data.immagineProfilo}`;
+                            imageUrl = `${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/uploads/${data.immagineProfilo}`;
                         }
                     }
 

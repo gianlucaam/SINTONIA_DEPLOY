@@ -67,7 +67,7 @@ const QuestionnaireCompilation: React.FC = () => {
 
                 // Submit to backend - it will calculate score and save
                 const token = localStorage.getItem('patient_token');
-                const response = await fetch('http://localhost:3000/paziente/questionario/submit', {
+                const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/paziente/questionario/submit`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

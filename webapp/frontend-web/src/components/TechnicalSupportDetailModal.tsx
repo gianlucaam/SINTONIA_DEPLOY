@@ -28,7 +28,7 @@ const TechnicalSupportDetailModal: React.FC<TechnicalSupportDetailModalProps> = 
             const user = userStr ? JSON.parse(userStr) : null;
             const token = user?.access_token;
 
-            const response = await fetch('http://localhost:3000/admin/support-request/reply', {
+            const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/admin/support-request/reply`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -63,7 +63,7 @@ const TechnicalSupportDetailModal: React.FC<TechnicalSupportDetailModalProps> = 
             const user = userStr ? JSON.parse(userStr) : null;
             const token = user?.access_token;
 
-            const response = await fetch('http://localhost:3000/admin/support-request/close', {
+            const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/admin/support-request/close`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
