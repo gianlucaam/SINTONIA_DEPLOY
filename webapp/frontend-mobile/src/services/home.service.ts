@@ -5,8 +5,7 @@ export const getHomeDashboard = async (): Promise<HomeDashboardDto> => {
         const token = localStorage.getItem('patient_token');
         if (!token) {
             // Redirect to login if no token
-            window.location.href = '/spid-info';
-            throw new Error('Missing auth token. Redirecting to login...');
+            throw new Error('Missing auth token');
         }
 
         const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/paziente/home`, {
@@ -15,10 +14,9 @@ export const getHomeDashboard = async (): Promise<HomeDashboardDto> => {
             },
         });
         if (response.status === 401 || response.status === 403) {
-            // Token invalid/expired -> clear and redirect to login
+            // Token invalid/expired -> clear
             localStorage.removeItem('patient_token');
-            window.location.href = '/spid-info';
-            throw new Error(`Unauthorized. Redirecting to login...`);
+            throw new Error(`Unauthorized`);
         }
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
