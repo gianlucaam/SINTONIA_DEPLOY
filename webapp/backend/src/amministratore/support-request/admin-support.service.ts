@@ -63,7 +63,7 @@ export class AdminSupportService {
         }
 
         // Override email for testing
-        userEmail = 'gianlucaambrosio04@gmail.com';
+        userEmail = 'g.ambrosio39@studenti.unisa.it';
 
         if (!userEmail) {
             throw new NotFoundException('User email not found for this ticket');
