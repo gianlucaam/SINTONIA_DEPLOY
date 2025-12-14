@@ -49,7 +49,7 @@ const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
 
 function App() {
   // Check if the app is running in standalone mode (installed)
-  const [isStandalone, setIsStandalone] = React.useState(() => {
+  const [isStandalone] = React.useState(() => {
     // Basic check for standard standalone mode
     const isStandaloneMode = window.matchMedia('(display-mode: standalone)').matches;
     // Check for iOS standalone mode
