@@ -1,39 +1,34 @@
 import { Injectable } from '@nestjs/common';
-import * as nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 
 @Injectable()
 export class MailerService {
-    private transporter: nodemailer.Transporter;
+    private resend: Resend;
 
     constructor() {
-        // Initialize transporter with environment variables or default values
-        // For development, we can use a mock or a real SMTP service if credentials are provided
-        const port = parseInt(process.env.SMTP_PORT || '465');
-        this.transporter = nodemailer.createTransport({
-            host: process.env.SMTP_HOST || 'smtp.libero.it',
-            port: port,
-            secure: port === 465, // true for 465, false for other ports
-            auth: {
-                user: process.env.SMTP_USER,
-                pass: process.env.SMTP_PASS,
-            },
-        });
+        this.resend = new Resend(process.env.RESEND_API_KEY);
     }
 
     async sendMail(to: string, subject: string, text: string): Promise<void> {
-        if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
-            console.error('SMTP credentials not found in environment variables!');
-            throw new Error('SMTP credentials not configured');
+        if (!process.env.RESEND_API_KEY) {
+            console.error('RESEND_API_KEY not found in environment variables!');
+            throw new Error('Resend API key not configured');
         }
 
         try {
-            const info = await this.transporter.sendMail({
-                from: process.env.SMTP_FROM || '"Supporto SINTONIA" <noreply@sintonia.com>',
-                to,
+            const { data, error } = await this.resend.emails.send({
+                from: process.env.RESEND_FROM || 'SINTONIA <onboarding@resend.dev>',
+                to: [to],
                 subject,
                 text,
             });
-            console.log('Message sent: %s', info.messageId);
+
+            if (error) {
+                console.error('Error sending email:', error);
+                throw new Error(error.message);
+            }
+
+            console.log('Email sent successfully:', data?.id);
         } catch (error) {
             console.error('Error sending email:', error);
             throw error;

@@ -72,11 +72,10 @@ export class AdminSupportService {
         const subject = `Risposta al ticket #${ticketId}: ${ticket.oggetto}`;
         const text = `Gentile utente,\n\nIn merito alla tua richiesta di supporto (Ticket #${ticketId}), ecco la risposta del nostro team:\n\n${response}\n\nCordiali saluti,\nTeam di Supporto SINTONIA`;
 
-        try {
-            await this.mailerService.sendMail(userEmail, subject, text);
-        } catch (error) {
-            console.warn(`[DEMO MODE] Email sending failed but suppressed as requested: ${error.message}`);
-        }
+        // Fire-and-forget: don't wait for email (Demo Mode)
+        this.mailerService.sendMail(userEmail, subject, text).catch((error) => {
+            console.warn(`[DEMO MODE] Email failed in background: ${error.message}`);
+        });
 
         // Update ticket status to 'Chiuso'
         await this.db.update(schema.ticket)

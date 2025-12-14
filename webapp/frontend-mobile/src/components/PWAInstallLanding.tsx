@@ -4,12 +4,23 @@ import '../css/PWAInstallLanding.css';
 const PWAInstallLanding: React.FC = () => {
     const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
     const [isIOS, setIsIOS] = useState(false);
+    const [isSafari, setIsSafari] = useState(false);
     const [showIOSInstructions, setShowIOSInstructions] = useState(false);
 
     useEffect(() => {
         // Detect iOS
         const userAgent = window.navigator.userAgent.toLowerCase();
-        setIsIOS(/iphone|ipad|ipod/.test(userAgent));
+        const isIOSDevice = /iphone|ipad|ipod/.test(userAgent);
+        setIsIOS(isIOSDevice);
+
+        // Detect Safari (not Chrome, not Firefox, etc.)
+        // Safari has "safari" in UA but Chrome on iOS also has "safari", 
+        // so we check for absence of "crios" (Chrome) and "fxios" (Firefox)
+        const isSafariBrowser = isIOSDevice &&
+            /safari/.test(userAgent) &&
+            !/crios/.test(userAgent) &&
+            !/fxios/.test(userAgent);
+        setIsSafari(isSafariBrowser);
 
         // Capture install prompt event (Android/Desktop)
         const handleBeforeInstallPrompt = (e: any) => {
@@ -72,34 +83,57 @@ const PWAInstallLanding: React.FC = () => {
                             <h3>Installa su iPhone</h3>
                             <button className="close-btn" onClick={() => setShowIOSInstructions(false)}>✕</button>
                         </div>
-                        <div className="ios-steps">
-                            <div className="step">
-                                <div className="step">
-                                    1. Premi il tasto <strong>Menu</strong>
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="ios-icon" style={{ display: 'inline-block', verticalAlign: 'text-bottom', margin: '0 4px', color: '#007AFF' }}>
+
+                        {isSafari ? (
+                            /* Safari: Share button in bottom bar */
+                            <ol className="ios-steps">
+                                <li className="step">
+                                    Premi il tasto <strong>Condividi</strong>
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="ios-icon">
+                                        <path d="M12 15V3m0 0l-4 4m4-4l4 4M2 17l.621 2.485A2 2 0 0 0 4.561 21h14.878a2 2 0 0 0 1.94-1.515L22 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                    </svg>
+                                    nella barra in basso
+                                </li>
+                                <li className="step">
+                                    Scorri e seleziona <strong>"Aggiungi alla schermata Home"</strong>
+                                </li>
+                                <li className="step">
+                                    Premi <strong>Aggiungi</strong> in alto a destra
+                                </li>
+                            </ol>
+                        ) : (
+                            /* Chrome/Other: Menu button (3 dots) */
+                            <ol className="ios-steps">
+                                <li className="step">
+                                    Premi il tasto <strong>Menu</strong>
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="ios-icon">
                                         <circle cx="5" cy="12" r="2" fill="currentColor" />
                                         <circle cx="12" cy="12" r="2" fill="currentColor" />
                                         <circle cx="19" cy="12" r="2" fill="currentColor" />
                                     </svg>
                                     in basso a destra
-                                </div>
+                                </li>
+                                <li className="step">
+                                    Scorri e seleziona <strong>"Condividi"</strong>
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="ios-icon">
+                                        <path d="M12 15V3m0 0l-4 4m4-4l4 4M2 17l.621 2.485A2 2 0 0 0 4.561 21h14.878a2 2 0 0 0 1.94-1.515L22 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                    </svg>
+                                </li>
+                                <li className="step">
+                                    Seleziona <strong>"Aggiungi alla schermata Home"</strong>
+                                </li>
+                                <li className="step">
+                                    Premi <strong>Aggiungi</strong> in alto a destra
+                                </li>
+                            </ol>
+                        )}
+
+                        {/* Only show hint for Safari */}
+                        {isSafari && (
+                            <div className="ios-arrow-hint">
+                                Premi qui sotto 👇
                             </div>
-                            <div className="step">
-                                2. Scorri e seleziona <strong>"Condividi"</strong>
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="ios-icon" style={{ display: 'inline-block', verticalAlign: 'text-bottom', margin: '0 4px', color: '#007AFF' }}>
-                                    <path d="M12 15V3m0 0l-4 4m4-4l4 4M2 17l.621 2.485A2 2 0 0 0 4.561 21h14.878a2 2 0 0 0 1.94-1.515L22 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                </svg>
-                            </div>
-                            <div className="step">
-                                3. Seleziona <strong>"Aggiungi alla schermata Home"</strong>
-                            </div>
-                            <div className="step">
-                                4. Premi <strong>Aggiungi</strong> in alto a destra
-                            </div>
-                        </div>
-                        <div className="ios-arrow-hint">
-                             Premi qui sotto 👇
-                        </div>
+                        )}
                     </div>
                 </div>
             )}
