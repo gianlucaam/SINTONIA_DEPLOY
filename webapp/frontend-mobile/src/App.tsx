@@ -31,6 +31,8 @@ import MoodHistory from './pages/MoodHistory';
 import { NotificationProvider } from './contexts/NotificationContext';
 import { CacheProvider } from './contexts/CacheContext';
 
+import PWAInstallLanding from './components/PWAInstallLanding';
+
 // Protected Route Component
 const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
   if (!isAuthenticated()) {
@@ -46,6 +48,21 @@ const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
 };
 
 function App() {
+  // Check if the app is running in standalone mode (installed)
+  const [isStandalone, setIsStandalone] = React.useState(() => {
+    // Basic check for standard standalone mode
+    const isStandaloneMode = window.matchMedia('(display-mode: standalone)').matches;
+    // Check for iOS standalone mode
+    const isIOSStandalone = (window.navigator as any).standalone === true;
+
+    return isStandaloneMode || isIOSStandalone;
+  });
+
+  // If not standalone, show the custom Install Landing Page
+  if (!isStandalone) {
+    return <PWAInstallLanding />;
+  }
+
   return (
     <Router>
       <CacheProvider>

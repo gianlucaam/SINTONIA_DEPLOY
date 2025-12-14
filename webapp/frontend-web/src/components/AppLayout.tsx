@@ -61,7 +61,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ role }) => {
             } else {
                 try {
                     const token = user.access_token;
-                    const response = await fetch(`http://localhost:3000/admin/dashboard/me?email=${encodeURIComponent(user.email)}`, {
+                    const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/admin/dashboard/me?email=${encodeURIComponent(user.email)}`, {
                         headers: {
                             ...(token ? { Authorization: `Bearer ${token}` } : {}),
                             'Content-Type': 'application/json',

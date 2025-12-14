@@ -108,7 +108,7 @@ const MobileDrawerMenu: React.FC<MobileDrawerMenuProps> = ({
     const imgSrc = profileImageUrl
         ? profileImageUrl.startsWith('data:') || profileImageUrl.startsWith('http')
             ? profileImageUrl
-            : `http://localhost:3000/uploads/${profileImageUrl}`
+            : `${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/uploads/${profileImageUrl}`
         : profilePhoto;
 
     if (!isOpen && !showLogoutConfirm) return null;
