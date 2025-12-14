@@ -16,15 +16,16 @@
     align-items: center;
     justify-content: center;
     padding: 2rem;
-    gap: 3rem;
+    gap: 2.5rem;
 }
 
 .pwa-logo-container {
     width: 120px;
     height: 120px;
-    border-radius: 20px;
+    border-radius: 24px;
     overflow: hidden;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    background: white;
 }
 
 .pwa-logo {
@@ -34,18 +35,21 @@
 }
 
 .pwa-intro-text .quote {
-    font-size: 1.5rem;
+    font-size: 1.4rem;
     font-weight: 300;
     color: #0f3e4d;
     /* Primary dark from theme */
-    margin: 0.5rem 0;
-    line-height: 1.4;
+    margin: 0.25rem 0;
+    line-height: 1.3;
     font-style: italic;
+    font-family: serif;
+    /* Elegant styling for quote */
 }
 
 .pwa-actions {
     width: 100%;
     max-width: 320px;
+    animation: fadeInUp 0.5s ease-out 0.2s both;
 }
 
 .install-btn {
@@ -54,31 +58,39 @@
     background-color: #0D475D;
     color: #ffffff;
     border: none;
-    border-radius: 32px;
-    font-size: 18px;
+    border-radius: 16px;
+    font-size: 17px;
     font-weight: 600;
     cursor: pointer;
-    box-shadow: 0 4px 12px rgba(13, 71, 93, 0.3);
-    transition: transform 0.2s;
-    margin-bottom: 1rem;
+    box-shadow: 0 8px 16px rgba(13, 71, 93, 0.25);
+    transition: transform 0.2s, box-shadow 0.2s;
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 }
 
 .install-btn:active {
-    transform: scale(0.98);
+    transform: scale(0.96);
+    box-shadow: 0 4px 8px rgba(13, 71, 93, 0.2);
 }
 
 .pwa-note {
     font-size: 0.9rem;
-    color: #666;
+    color: #798e96;
     margin-top: 1rem;
+    line-height: 1.4;
+    padding: 0 1rem;
 }
 
 .pwa-footer {
     padding: 1.5rem;
     background-color: #0f3e4d;
-    color: rgba(255, 255, 255, 0.7);
-    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.75rem;
     text-align: center;
+    font-weight: 400;
 }
 
 /* iOS Overlay */
@@ -89,6 +101,7 @@
     right: 0;
     bottom: 0;
     background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
     display: flex;
     align-items: flex-end;
     /* Align to bottom for sheet effect */
@@ -100,61 +113,84 @@
     background: white;
     width: 100%;
     border-radius: 24px 24px 0 0;
-    padding: 2rem;
-    padding-bottom: 3rem;
+    padding: 2rem 1.5rem 3rem 1.5rem;
     /* Extra padding for bottom bar */
-    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.2);
-    animation: slideUp 0.3s ease;
+    box-shadow: 0 -4px 30px rgba(0, 0, 0, 0.15);
+    animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     position: relative;
+    max-height: 80vh;
+    overflow-y: auto;
 }
 
 .ios-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1.5rem;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid #f0f0f0;
+    padding-bottom: 1rem;
 }
 
 .ios-header h3 {
     margin: 0;
     color: #0f3e4d;
-    font-size: 1.25rem;
+    font-size: 1.2rem;
+    font-weight: 700;
 }
 
 .close-btn {
-    background: none;
+    background: #f0f2f5;
     border: none;
-    font-size: 1.5rem;
-    color: #999;
-    padding: 0.5rem;
+    font-size: 1rem;
+    color: #666;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-weight: bold;
 }
 
 .ios-steps {
     text-align: left;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 1.5rem;
 }
 
 .step {
     font-size: 1rem;
     color: #333;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+    line-height: 1.6;
+    padding-left: 0.5rem;
+}
+
+.step strong {
+    color: #0D475D;
+    font-weight: 600;
 }
 
 .ios-icon {
-    width: 20px;
-    height: 20px;
-    vertical-align: middle;
+    width: 22px;
+    height: 22px;
+    vertical-align: text-bottom;
+    margin: 0 4px;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .ios-arrow-hint {
-    margin-top: 2rem;
+    margin-top: 2.5rem;
     text-align: center;
     color: #0D475D;
     font-weight: 600;
+    font-size: 0.95rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
     animation: bounce 2s infinite;
 }
 
@@ -178,6 +214,18 @@
     }
 }
 
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 @keyframes bounce {
 
     0%,
@@ -189,10 +237,10 @@
     }
 
     40% {
-        transform: translateY(-10px);
+        transform: translateY(6px);
     }
 
     60% {
-        transform: translateY(-5px);
+        transform: translateY(3px);
     }
 }

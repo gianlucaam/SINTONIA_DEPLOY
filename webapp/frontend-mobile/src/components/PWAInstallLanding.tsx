@@ -74,7 +74,11 @@ const PWAInstallLanding: React.FC = () => {
                         </div>
                         <div className="ios-steps">
                             <div className="step">
-                                1. Premi il tasto <strong>Condividi</strong> <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Apple_Share_icon.svg/1200px-Apple_Share_icon.svg.png" alt="Share" className="ios-icon" /> nella barra in basso
+                                1. Premi il tasto <strong>Condividi</strong>
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="ios-icon" style={{ display: 'inline-block', verticalAlign: 'text-bottom', margin: '0 4px', color: '#007AFF' }}>
+                                    <path d="M12 15V3m0 0l-4 4m4-4l4 4M2 17l.621 2.485A2 2 0 0 0 4.561 21h14.878a2 2 0 0 0 1.94-1.515L22 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                </svg>
+                                nella barra in basso
                             </div>
                             <div className="step">
                                 2. Scorri e seleziona <strong>"Aggiungi alla schermata Home"</strong>
