@@ -185,11 +185,12 @@ ol.ios-steps li.step {
 }
 
 .ios-arrow-hint {
-    text-align: center;
+    text-align: right;
     color: #0D475D;
     font-weight: 700;
     font-size: 1rem;
     margin-top: 1.5rem;
+    padding-right: 0.5rem;
     animation: bounce 2s infinite;
 }
 
