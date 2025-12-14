@@ -85,10 +85,16 @@ const PWAInstallLanding: React.FC = () => {
                                 </div>
                             </div>
                             <div className="step">
-                                2. Scorri e seleziona <strong>"Aggiungi alla schermata Home"</strong>
+                                2. Scorri e seleziona <strong>"Condividi"</strong>
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="ios-icon" style={{ display: 'inline-block', verticalAlign: 'text-bottom', margin: '0 4px', color: '#007AFF' }}>
+                                    <path d="M12 15V3m0 0l-4 4m4-4l4 4M2 17l.621 2.485A2 2 0 0 0 4.561 21h14.878a2 2 0 0 0 1.94-1.515L22 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                </svg>
                             </div>
                             <div className="step">
-                                3. Premi <strong>Aggiungi</strong> in alto a destra
+                                3. Seleziona <strong>"Aggiungi alla schermata Home"</strong>
+                            </div>
+                            <div className="step">
+                                4. Premi <strong>Aggiungi</strong> in alto a destra
                             </div>
                         </div>
                         <div className="ios-arrow-hint">

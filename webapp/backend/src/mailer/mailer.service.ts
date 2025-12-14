@@ -8,9 +8,9 @@ export class MailerService {
     constructor() {
         // Initialize transporter with environment variables or default values
         // For development, we can use a mock or a real SMTP service if credentials are provided
-        const port = parseInt(process.env.SMTP_PORT || '587');
+        const port = parseInt(process.env.SMTP_PORT || '465');
         this.transporter = nodemailer.createTransport({
-            host: process.env.SMTP_HOST || 'smtp.gmail.com',
+            host: process.env.SMTP_HOST || 'smtp.libero.it',
             port: port,
             secure: port === 465, // true for 465, false for other ports
             auth: {
