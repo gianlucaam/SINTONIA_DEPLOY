@@ -67,6 +67,12 @@ const PWAInstallLanding: React.FC = () => {
                         Installa l'applicazione per un'esperienza completa e senza distrazioni.
                     </p>
                 </div>
+
+                <div className="pwa-credentials">
+                    <p className="credentials-title">Credenziali di accesso:</p>
+                    <p className="credential-item"><strong>Email:</strong> chiara.conti@gmail.com</p>
+                    <p className="credential-item"><strong>Password:</strong> password123</p>
+                </div>
             </div>
 
             <footer className="pwa-footer">

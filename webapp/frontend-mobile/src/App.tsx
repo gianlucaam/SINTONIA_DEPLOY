@@ -48,17 +48,40 @@ const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
 };
 
 function App() {
-  // Check if the app is running in standalone mode (installed)
+  // Check if the app is running in standalone mode (installed as PWA)
   const [isStandalone] = React.useState(() => {
-    // Basic check for standard standalone mode
-    const isStandaloneMode = window.matchMedia('(display-mode: standalone)').matches;
-    // Check for iOS standalone mode
+    // Check for iOS standalone mode (Safari "Add to Home Screen")
     const isIOSStandalone = (window.navigator as any).standalone === true;
 
-    return isStandaloneMode || isIOSStandalone;
+    // Check for standard standalone mode (Android/Desktop PWA)
+    const isStandaloneMode = window.matchMedia('(display-mode: standalone)').matches;
+
+    // Check for fullscreen mode (some PWAs use this)
+    const isFullscreenMode = window.matchMedia('(display-mode: fullscreen)').matches;
+
+    // Check for minimal-ui mode (another PWA display mode)
+    const isMinimalUIMode = window.matchMedia('(display-mode: minimal-ui)').matches;
+
+    // Only return true if EXPLICITLY in a PWA mode, not browser
+    const isPWA = isIOSStandalone || isStandaloneMode || isFullscreenMode || isMinimalUIMode;
+
+    // Additional check: if display-mode is 'browser', it's definitely NOT standalone
+    const isBrowserMode = window.matchMedia('(display-mode: browser)').matches;
+
+    // Debug logging (can be removed in production)
+    console.log('[PWA Detection]', {
+      isIOSStandalone,
+      isStandaloneMode,
+      isFullscreenMode,
+      isMinimalUIMode,
+      isBrowserMode,
+      isPWA: isPWA && !isBrowserMode
+    });
+
+    return isPWA && !isBrowserMode;
   });
 
-  // If not standalone, show the custom Install Landing Page
+  // If not standalone (running in browser), ALWAYS show the Install Landing Page
   if (!isStandalone) {
     return <PWAInstallLanding />;
   }
